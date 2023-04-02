@@ -33,7 +33,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v3/swagger.json", "My SuserAPI V3");
-        c.RoutePrefix = string.Empty; // Эта строка позволяет задать Swagger UI в качестве страницы по умолчанию
+        c.RoutePrefix = string.Empty;
     });
 
 }
