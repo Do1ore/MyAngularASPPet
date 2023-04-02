@@ -1,3 +1,4 @@
+[![Typing SVG](https://readme-typing-svg.herokuapp.com?color=%2336BCF7&lines=WEb+API+Angular+ASP.Net)](https://git.io/typing-svg)
 Учебный проект с Web API и Angular
 Это простой учебный проект, который демонстрирует, как использовать Web API в качестве бэкэнда и Angular в качестве фронтэнда. Этот проект позволит вам создавать, читать, обновлять и удалять элементы списка задач.
 
