@@ -1,0 +1,68 @@
+<div class="items-center mx-20 mt-20">
+
+  <div
+    class="w-100 flex flex-col items-center bg-white border border-gray-200 rounded-lg shadow md:flex-row md:max-w-100 dark:border-gray-700 dark:bg-gray-800 p-5 ">
+    <img
+      class="object-cover w-full rounded-t-lg h-auto md:h-auto md:w-80 sm:max-20 md:rounded-none md:rounded-l-lg m-5 p-10"
+      src="{{product.mainFilePath}}" alt="">
+    <div class="flex flex-col justify-between p-4 leading-normal">
+      <h5 class="mb-2 text-5xl font-bold tracking-tight text-gray-900 dark:text-white">{{product.productFullName}}</h5>
+      <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">{{product.description}}</p>
+    </div>
+  </div>
+
+
+  <div class="relative overflow-x-auto shadow-md sm:rounded-lg mt-4">
+    <table class="max-w-xl  text-sm text-left text-gray-500 dark:text-gray-400">
+      <caption class="p-5 text-lg font-semibold text-left text-gray-900 bg-white dark:text-white dark:bg-gray-800">
+        Our products
+        <p class="mt-1 text-sm font-normal text-gray-500 dark:text-gray-400">Browse a list of Flowbite products designed
+          to help you work and play, stay organized, get answers, keep in touch, grow your business, and more.</p>
+      </caption>
+      <thead class="text-xs text-gray-600 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+      <tr>
+        <th scope="col" class="px-6 py-3">
+          feature
+        </th>
+        <th scope="col" class="px-6 py-3">
+          value
+        </th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+        <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+          Product name
+        </th>
+        <td class="px-6 py-4">
+          {{product.productFullName}}
+        </td>
+      </tr>
+      <tr class="bg-gray-50 border-b dark:bg-gray-800 dark:border-gray-700">
+        <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+          Description
+        </th>
+        <td class="px-6 py-4">
+          {{product.description}}
+        </td>
+      </tr>
+      <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+        <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+          Minimal price
+        </th>
+        <td class="px-6 py-4">
+          ${{product.minPrice | currency}}
+        </td>
+      </tr>
+      <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+        <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+          Max price
+        </th>
+        <td class="px-6 py-4">
+          {{product.maxPrice | currency}}
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
