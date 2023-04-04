@@ -11,6 +11,8 @@ import { HomeComponent } from './home/home.component';
 import { ProductDetailsComponent } from './product-details/product-details.component';
 import { ProductFilterPipe } from './filter/product-filter.pipe';
 import { FooterComponent } from './footer/footer.component';
+import { LoginComponent } from './auth-components/login/login.component';
+import { RegisterComponent } from './auth-components/register-component/register.component';
 
 
 @NgModule({
@@ -21,8 +23,10 @@ import { FooterComponent } from './footer/footer.component';
       HomeComponent,
       ProductDetailsComponent,
       ProductFilterPipe,
-      FooterComponent
-   ],
+      FooterComponent,
+      LoginComponent,
+      RegisterComponent
+  ],
   imports: [
     BrowserModule,
     HttpClientModule,

@@ -1,5 +1,6 @@
 <div class="text-center mb-5 bg-black py-96 ">
-  <span class="mx-10 font-bold text-9xl my-5 bg-clip-text align-text-bottom text-left text-transparent bg-gradient-to-r from-pink-500 to-violet-500">  My super angular app</span>
+  <span
+    class="mx-10 font-bold text-9xl  my-5 bg-clip-text align-text-bottom text-left text-transparent bg-gradient-to-r from-pink-500 to-violet-500">  My super angular app</span>
 </div>
 
 <div class="pt-12 mb-20" style="padding-left: 10vw; padding-right: 10vw">
@@ -17,7 +18,9 @@
         </svg>
 
       </div>
-      <input [(ngModel)]="searchTerm" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" id="voice-search"
+      <input [(ngModel)]="searchTerm"
+             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+             id="voice-search"
              placeholder="Search Mockups, Logos, Design Templates..."
              required type="text">
       <button class="absolute inset-y-0 right-0 flex items-center pr-3" type="button">
@@ -32,19 +35,20 @@
     </div>
   </div>
 
-  <div *ngIf="products.length === 0">
+  <div *ngIf="products.length === 0" class="text-center mt-10">
     <h1
       class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white">
       There is no <span class="text-blue-600 dark:text-blue-500">products</span></h1>
     <p class="text-lg font-normal text-gray-500 lg:text-xl dark:text-gray-400">Looks like API is not works. Solving the
       problem may take some time </p>
   </div>
+
   <section class="bg-white dark:bg-gray-900">
     <div class="py-8 px-4 mx-auto max-w-screen-xl sm:py-16 lg:px-6">
-      <div class="max-w-screen-md mb-8 lg:mb-16">
-        <h2 class="mb-4 text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white">Designed for business
+      <div *ngIf="products.length != 0" class="max-w-2xl mb-8 lg:mb-16">
+        <h2 class=" text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white">Designed for business
           teams like yours</h2>
-        <p class="text-gray-500 sm:text-xl dark:text-gray-400">Here at Flowbite we focus on markets where technology,
+        <p class="text-gray-500 sm:text-xl dark:text-gray-400 mt-4">Here at Flowbite we focus on markets where technology,
           innovation, and capital can unlock long-term value and drive economic growth.</p>
       </div>
       <div class="space-y-8 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-12 md:space-y-0">
@@ -95,8 +99,9 @@
 
               <div class="flex items-center justify-between">
                 <span class="text-3xl font-bold text-gray-900 dark:text-white">${{product.minPrice}}</span>
-                <a class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                   href="#">Add
+                <a
+                  class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                  href="#">Add
                   to cart</a>
               </div>
             </div>
@@ -109,5 +114,3 @@
 </div>
 
 <router-outlet></router-outlet>
-
-
