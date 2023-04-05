@@ -11,6 +11,7 @@ import {User} from "../../models/user";
 })
 export class LoginComponent {
   user = new User();
+  errorMessage: string = '';
 
   constructor(private authService: AuthService, private router: Router) {
   }
@@ -21,10 +22,25 @@ export class LoginComponent {
     } else {
       user.username = user.email;
     }
-    this.authService.login(user).subscribe((token: string) => {
-      localStorage.setItem('authToken', token),
-      this.router.navigate(['']);
-    });
-  }
 
+    this.authService.login(user).subscribe((token: string) => {
+        this.errorMessage = '';
+        localStorage.setItem('authToken', token)
+        this.router.navigate(['']);
+      },
+      error => {
+        console.log(`error status : ${error.status} ${error.message}`);
+        switch (error.status) {
+          case 400:
+            this.errorMessage = 'Invalid input data'
+            break;
+          case 403:     //forbidden
+            this.errorMessage = 'Error 403'
+            break;
+          default:
+            this.errorMessage = "Input error"
+            break;
+        }
+      });
+  }
 }

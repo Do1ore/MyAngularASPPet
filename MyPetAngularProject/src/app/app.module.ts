@@ -1,4 +1,4 @@
-import { HttpClientModule } from '@angular/common/http';
+import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
@@ -13,6 +13,7 @@ import { ProductFilterPipe } from './filter/product-filter.pipe';
 import { FooterComponent } from './footer/footer.component';
 import { LoginComponent } from './auth-components/login/login.component';
 import { RegisterComponent } from './auth-components/register-component/register.component';
+import {AuthInterceptor} from "./services/auth.interceptor";
 
 
 @NgModule({
@@ -33,7 +34,11 @@ import { RegisterComponent } from './auth-components/register-component/register
     FormsModule,
     RoutingModule,
   ],
-  providers: [],
+  providers: [{
+    provide: HTTP_INTERCEPTORS,
+    useClass: AuthInterceptor,
+    multi: true,
+  }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
