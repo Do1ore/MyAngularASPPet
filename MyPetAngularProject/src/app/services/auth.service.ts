@@ -1,50 +1,38 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {Observable} from 'rxjs';
+import {catchError, Observable, throwError} from 'rxjs';
 import {tap} from 'rxjs/operators';
 import {environment} from "../../environments/environment";
+import {User} from "../models/user";
 
-interface LoginResponse {
-  token: string;
-}
 
 @Injectable({
   providedIn: 'root'
 })
 
 export class AuthService {
-  private readonly apiUrl = environment.baseApiUrl + 'api/' + 'Auth';
+  apiUrl: string = environment.baseApiUrl + "api/" + 'Auth';
+  token!: string;
 
   constructor(private http: HttpClient) {
   }
 
-  register(data: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/register`, data);
-  }
-
-  login(data: any): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, data).pipe(
-      tap(response => {
-        if (response && response.token) {
-          localStorage.setItem('token', response.token);
-        }
-      })
+  public register(user: User): Observable<any> {
+    return this.http.post<any>(
+      this.apiUrl + '/register',
+      user
     );
   }
 
-
-  getToken(): string | null {
-    return localStorage.getItem('token');
+  public login(user: User): Observable<string> {
+    return this.http.post(this.apiUrl + '/login', user, {
+      responseType: 'text',
+    });
   }
 
-  isLoggedIn(): boolean {
-    const token = this.getToken();
-    if (!token) {
-      return false;
-    } else return true;
-  }
-
-  logout(): void {
-    localStorage.removeItem('token');
+  public getMe(): Observable<string> {
+    return this.http.get(this.apiUrl, {
+      responseType: 'text',
+    });
   }
 }
