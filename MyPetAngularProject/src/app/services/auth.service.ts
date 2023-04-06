@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {catchError, Observable, throwError} from 'rxjs';
+import {Observable, throwError} from 'rxjs';
 import {tap} from 'rxjs/operators';
 import {environment} from "../../environments/environment";
 import {User} from "../models/user";
@@ -13,6 +13,7 @@ import {User} from "../models/user";
 export class AuthService {
   apiUrl: string = environment.baseApiUrl + "api/" + 'Auth';
   token!: string;
+
 
   constructor(private http: HttpClient) {
   }
@@ -34,5 +35,13 @@ export class AuthService {
     return this.http.get(this.apiUrl, {
       responseType: 'text',
     });
+  }
+
+  public isAuthorized(): boolean {
+    return localStorage.getItem(environment.authTokenName) == null;
+  }
+
+  public logOut(): void {
+    localStorage.removeItem(environment.authTokenName);
   }
 }

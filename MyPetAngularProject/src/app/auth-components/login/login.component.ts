@@ -2,6 +2,8 @@ import {Component} from '@angular/core';
 import {Router} from "@angular/router";
 import {AuthService} from "../../services/auth.service";
 import {User} from "../../models/user";
+import {environment} from "../../../environments/environment";
+import {NavbarComponent} from "../../navbar/navbar.component";
 
 
 @Component({
@@ -12,9 +14,9 @@ import {User} from "../../models/user";
 export class LoginComponent {
   user = new User();
   errorMessage: string = '';
+  private authToken: string = environment.authTokenName;
 
-  constructor(private authService: AuthService, private router: Router) {
-  }
+  constructor(private authService: AuthService, private router: Router, private navBar: NavbarComponent) {}
 
   onSubmit(user: User): void {
     if (user.email.length === 0) {
@@ -25,7 +27,8 @@ export class LoginComponent {
 
     this.authService.login(user).subscribe((token: string) => {
         this.errorMessage = '';
-        localStorage.setItem('authToken', token)
+        localStorage.setItem(this.authToken, token)
+        this.navBar.isAuthorized = true;
         this.router.navigate(['']);
       },
       error => {
