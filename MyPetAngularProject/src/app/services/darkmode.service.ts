@@ -5,25 +5,15 @@ import {Injectable} from "@angular/core";
 })
 export class DarkmodeService {
   setUpThemes(): void {
-    if (localStorage['theme'] === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-      document.documentElement.classList.add('dark')
+    let themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+    let themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+
+// Change the icons inside the button based on previous settings
+    if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      themeToggleLightIcon?.classList.remove('hidden');
     } else {
-      document.documentElement.classList.remove('light')
+      themeToggleDarkIcon?.classList.remove('hidden');
     }
-
-// Whenever the user explicitly chooses to respect the OS preference
-    localStorage.removeItem('theme')
   }
-
-  setUpLightMode(): void {
-    // Whenever the user explicitly chooses light mode
-    localStorage['theme'] = 'light'
-  }
-
-  setUpDarkMode(): void {
-    // Whenever the user explicitly chooses dark mode
-    localStorage['theme'] = 'dark'
-  }
-
 }
 

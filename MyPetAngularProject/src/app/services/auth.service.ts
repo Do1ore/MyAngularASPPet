@@ -38,7 +38,9 @@ export class AuthService {
   }
 
   public isAuthorized(): boolean {
-    return localStorage.getItem(environment.authTokenName) == null;
+    if (localStorage.getItem(environment.authTokenName) !== null)
+      return true;
+    return false;
   }
 
   public logOut(): void {

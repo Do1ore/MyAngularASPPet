@@ -43,23 +43,23 @@
       problem may take some time </p>
   </div>
 
-  <section class="bg-white dark:bg-gray-900">
+  <section class="bg-white dark:bg-gray-900 mt-10 rounded-lg">
     <div class="py-8 px-4 mx-auto max-w-screen-xl sm:py-16 lg:px-6">
       <div *ngIf="products.length != 0" class="max-w-2xl mb-8 lg:mb-16">
         <h2 class=" text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white">Designed for business
           teams like yours</h2>
-        <p class="text-gray-500 sm:text-xl dark:text-gray-400 mt-4">Here at Flowbite we focus on markets where technology,
+        <p class="text-gray-500 sm:text-xl dark:text-gray-400 mt-4">Here at Flowbite we focus on markets where
+          technology,
           innovation, and capital can unlock long-term value and drive economic growth.</p>
       </div>
       <div class="space-y-8 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-12 md:space-y-0">
 
-        <div *ngFor="let product of products | productFilter: searchTerm">
-
+        <div *ngFor="let product of products | productFilter: searchTerm" >
           <div
             class="w-full max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
             <a routerLink="/product/{{product.id}}">
               <div class="flex justify-center items-center ">
-                <img alt="product image" class="p-8 rounded-t-lg" src="{{product.mainFilePath}}"/>
+                <img alt="product image" class="dark:mix-blend-multiply p-8 rounded-t-lg" src="{{product.mainFilePath}}"/>
               </div>
             </a>
             <div class="px-5 pb-5">
