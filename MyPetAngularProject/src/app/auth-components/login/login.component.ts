@@ -16,7 +16,8 @@ export class LoginComponent {
   errorMessage: string = '';
   private authToken: string = environment.authTokenName;
 
-  constructor(private authService: AuthService, private router: Router, private navBar: NavbarComponent) {}
+  constructor(private authService: AuthService, private router: Router, private navBar: NavbarComponent) {
+  }
 
   onSubmit(user: User): void {
     if (user.email.length === 0) {
@@ -33,15 +34,19 @@ export class LoginComponent {
       },
       error => {
         console.log(`error status : ${error.status} ${error.message}`);
+
         switch (error.status) {
           case 400:
-            this.errorMessage = 'Invalid input data'
+            this.errorMessage = "Invalid input.";
             break;
           case 403:     //forbidden
-            this.errorMessage = 'Error 403'
+            this.errorMessage = 'Forbidden.'
+            break;
+          case 500:
+            this.errorMessage = 'Email not found.'
             break;
           default:
-            this.errorMessage = "Input error"
+            this.errorMessage = "Unknown error"
             break;
         }
       });

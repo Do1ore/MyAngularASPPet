@@ -5,14 +5,18 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using MySuperApi.Services.UserService;
+using MySuperApi.JWTModule.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("MySuperConnection") ?? throw new InvalidOperationException("Connection string 'MySuperConnection' not found.");
+var userconnetionString = builder.Configuration.GetConnectionString("MySuperApiContextConnection") ?? throw new InvalidOperationException("Conntextion string 'UserConnection' not found.");
 builder.Services.AddDbContext<MyPetContext>(options =>
     options.UseSqlServer(connectionString));
 
+builder.Services.AddDbContext<MyUserDbContext>(options =>
+    options.UseSqlServer(userconnetionString));
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

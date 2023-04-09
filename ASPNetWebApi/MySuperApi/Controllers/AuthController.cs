@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using MySuperApi.JWTModule.Models;
 using MySuperApi.Services.UserService;
 using System.IdentityModel.Tokens.Jwt;
+using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Security.Cryptography;
 
@@ -12,14 +15,15 @@ namespace JWTModule.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        public static User user = new User();
+        private readonly MyUserDbContext _db;
         private readonly IConfiguration _configuration;
         private readonly IUserService _userService;
 
-        public AuthController(IConfiguration configuration, IUserService userService)
+        public AuthController(IConfiguration configuration, IUserService userService, MyUserDbContext db)
         {
             _configuration = configuration;
             _userService = userService;
+            _db = db;
         }
 
         [HttpGet, Authorize]
@@ -30,24 +34,29 @@ namespace JWTModule.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult<User>> Register(UserDto request)
+        public async Task<ActionResult<MyUser>> Register(UserDto request)
         {
             CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
-
+            MyUser user = new();
             user.Username = request.Username;
+            user.Email = request.Email;
             user.PasswordHash = passwordHash;
             user.PasswordSalt = passwordSalt;
-
+            if (await _db.Users.AnyAsync(u => u.Email == request.Email))
+            {
+                return BadRequest("Email exists");
+            }
+            await _db.Users.AddAsync(user);
+            await _db.SaveChangesAsync();
             return Ok(user);
         }
 
         [HttpPost("login")]
         public async Task<ActionResult<string>> Login(UserDto request)
         {
-            if (user.Username != request.Username)
-            {
-                return BadRequest("User not found.");
-            }
+            MyUser? user = await _db.Users.Where(u => u.Email == request.Email).Select(u => u).FirstAsync();
+
+            if (user is null) return NotFound("Email not found.");
 
             if (!VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt))
             {
@@ -57,13 +66,13 @@ namespace JWTModule.Controllers
             string token = CreateToken(user);
 
             var refreshToken = GenerateRefreshToken();
-            SetRefreshToken(refreshToken);
+            SetRefreshToken(refreshToken, user);
 
             return Ok(token);
         }
 
         [HttpPost("refresh-token")]
-        public async Task<ActionResult<string>> RefreshToken()
+        public async Task<ActionResult<string>> RefreshToken(MyUser user)
         {
             var refreshToken = Request.Cookies["refreshToken"];
 
@@ -78,7 +87,7 @@ namespace JWTModule.Controllers
 
             string token = CreateToken(user);
             var newRefreshToken = GenerateRefreshToken();
-            SetRefreshToken(newRefreshToken);
+            SetRefreshToken(newRefreshToken, user);
 
             return Ok(token);
         }
@@ -95,7 +104,7 @@ namespace JWTModule.Controllers
             return refreshToken;
         }
 
-        private void SetRefreshToken(RefreshToken newRefreshToken)
+        private void SetRefreshToken(RefreshToken newRefreshToken, MyUser user)
         {
             var cookieOptions = new CookieOptions
             {
@@ -109,7 +118,7 @@ namespace JWTModule.Controllers
             user.TokenExpires = newRefreshToken.Expires;
         }
 
-        private string CreateToken(User user)
+        private string CreateToken(MyUser user)
         {
             List<Claim> claims = new List<Claim>
             {

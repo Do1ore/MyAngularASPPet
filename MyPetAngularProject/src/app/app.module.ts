@@ -15,6 +15,8 @@ import { LoginComponent } from './auth-components/login/login.component';
 import { RegisterComponent } from './auth-components/register-component/register.component';
 import {AuthInterceptor} from "./services/auth.interceptor";
 
+import {ToastrModule} from "ngx-toastr";
+
 
 @NgModule({
   declarations: [
@@ -26,7 +28,8 @@ import {AuthInterceptor} from "./services/auth.interceptor";
       ProductFilterPipe,
       FooterComponent,
       LoginComponent,
-      RegisterComponent
+      RegisterComponent,
+
   ],
   imports: [
     BrowserModule,
