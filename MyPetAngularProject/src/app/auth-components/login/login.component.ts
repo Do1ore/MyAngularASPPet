@@ -4,6 +4,7 @@ import {AuthService} from "../../services/auth.service";
 import {User} from "../../models/user";
 import {environment} from "../../../environments/environment";
 import {NavbarComponent} from "../../navbar/navbar.component";
+import {ToastrService} from "ngx-toastr";
 
 
 @Component({
@@ -16,7 +17,8 @@ export class LoginComponent {
   errorMessage: string = '';
   private authToken: string = environment.authTokenName;
 
-  constructor(private authService: AuthService, private router: Router, private navBar: NavbarComponent) {
+  constructor(private authService: AuthService, private router: Router, private navBar: NavbarComponent,
+              private toasterService: ToastrService) {
   }
 
   onSubmit(user: User): void {
@@ -31,6 +33,7 @@ export class LoginComponent {
         localStorage.setItem(this.authToken, token)
         this.navBar.isAuthorized = true;
         this.router.navigate(['']);
+        this.toasterService.success('Success login', 'Success');
       },
       error => {
         console.log(`error status : ${error.status} ${error.message}`);
@@ -49,6 +52,7 @@ export class LoginComponent {
             this.errorMessage = "Unknown error"
             break;
         }
+        this.toasterService.error(this.errorMessage + '😒', 'Error');
       });
   }
 }

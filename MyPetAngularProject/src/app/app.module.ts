@@ -1,7 +1,6 @@
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
 import  {RoutingModule} from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ProductComponent } from './product/product.component';
@@ -15,7 +14,8 @@ import { LoginComponent } from './auth-components/login/login.component';
 import { RegisterComponent } from './auth-components/register-component/register.component';
 import {AuthInterceptor} from "./services/auth.interceptor";
 
-import {ToastrModule} from "ngx-toastr";
+import {ToastrModule, GlobalConfig} from "ngx-toastr";
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 
 
 @NgModule({
@@ -36,6 +36,12 @@ import {ToastrModule} from "ngx-toastr";
     HttpClientModule,
     FormsModule,
     RoutingModule,
+    ToastrModule.forRoot({
+      timeOut: 4000,
+      progressBar: true,
+      positionClass: 'toast-bottom-right',
+    } as GlobalConfig),
+    BrowserAnimationsModule
   ],
   providers: [{
     provide: HTTP_INTERCEPTORS,

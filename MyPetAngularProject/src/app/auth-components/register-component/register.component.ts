@@ -2,6 +2,7 @@ import {Component} from '@angular/core';
 import {AuthService} from "../../services/auth.service";
 import {Router} from "@angular/router";
 import {User} from "../../models/user";
+import {ToastrService} from "ngx-toastr";
 
 @Component({
   selector: 'app-register',
@@ -13,21 +14,23 @@ export class RegisterComponent {
   repeatedPassword!: string;
   errorMessage: string = '';
 
-  constructor(private authService: AuthService, private router: Router) {
+  constructor(private authService: AuthService, private router: Router, private toastService: ToastrService) {
   }
 
   onSubmit(user: User, repeatedPassword: string): void {
     if (repeatedPassword != user.password) {
       this.errorMessage = "Incorrect repeated password"
+      this.toastService.error(this.errorMessage + '😒', 'Error');
       return;
-    }
-    else if(user.email.length === 0 || user.username.length === 0 || user.password.length === 0)
-    {
+    } else if (user.email.length === 0 || user.username.length === 0 || user.password.length === 0) {
       this.errorMessage = "Some inputs are empty"
+      this.toastService.error(this.errorMessage + '😒', 'Error');
+
       return;
     }
     this.authService.register(user).subscribe(() => {
         this.router.navigate(['/login']);
+        this.toastService.success('Account registered👍', 'Success');
       },
       error => {
         console.log(`error status : ${error.status} ${error.message}`);
@@ -39,9 +42,10 @@ export class RegisterComponent {
             this.errorMessage = 'Error 403'
             break;
           default:
-            this.errorMessage = "Input error"
+            this.errorMessage = 'Unknown error'
             break;
         }
+        this.toastService.error(this.errorMessage + '😒', 'Error');
       });
   }
 
