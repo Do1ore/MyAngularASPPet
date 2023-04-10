@@ -1,4 +1,6 @@
+ <head>
  <script src="https://cdn.tailwindcss.com"></script>
+ </head>
 [![Typing SVG](https://readme-typing-svg.herokuapp.com?color=%2336BCF7&lines=WEb+API+Angular+ASP.Net)](https://git.io/typing-svg)
 <br>
 
