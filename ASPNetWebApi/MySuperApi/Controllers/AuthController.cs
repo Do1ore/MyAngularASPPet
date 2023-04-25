@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using MySuperApi.JWTModule.Models;
+using MySuperApi.Models.APIModels;
 using MySuperApi.Services.UserService;
 using System.IdentityModel.Tokens.Jwt;
 using System.Runtime.CompilerServices;
@@ -15,11 +15,11 @@ namespace JWTModule.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly MyUserDbContext _db;
+        private readonly AppDbContext _db;
         private readonly IConfiguration _configuration;
         private readonly IUserService _userService;
 
-        public AuthController(IConfiguration configuration, IUserService userService, MyUserDbContext db)
+        public AuthController(IConfiguration configuration, IUserService userService, AppDbContext db)
         {
             _configuration = configuration;
             _userService = userService;

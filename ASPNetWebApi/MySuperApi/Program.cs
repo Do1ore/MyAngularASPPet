@@ -5,7 +5,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using MySuperApi.Services.UserService;
-using MySuperApi.JWTModule.Models;
+using MySuperApi.Models.APIModels;
+using MySuperApi.Services.PathLogic;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,12 +16,13 @@ var userconnetionString = builder.Configuration.GetConnectionString("MySuperApiC
 builder.Services.AddDbContext<MyPetContext>(options =>
     options.UseSqlServer(connectionString));
 
-builder.Services.AddDbContext<MyUserDbContext>(options =>
+builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(userconnetionString));
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IPathMaster, PathMaster>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddCors(setupAction =>
 {

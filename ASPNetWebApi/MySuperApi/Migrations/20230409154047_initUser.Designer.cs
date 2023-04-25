@@ -5,13 +5,13 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using MySuperApi.JWTModule.Models;
+using MySuperApi.Models.APIModels;
 
 #nullable disable
 
 namespace MySuperApi.Migrations
 {
-    [DbContext(typeof(MyUserDbContext))]
+    [DbContext(typeof(AppDbContext))]
     [Migration("20230409154047_initUser")]
     partial class initUser
     {

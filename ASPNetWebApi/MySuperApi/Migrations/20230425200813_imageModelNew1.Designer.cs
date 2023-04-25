@@ -12,20 +12,37 @@ using MySuperApi.Models.APIModels;
 namespace MySuperApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230409171549_initUser12")]
-    partial class initUser12
+    [Migration("20230425200813_imageModelNew1")]
+    partial class imageModelNew1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.4")
+                .HasAnnotation("ProductVersion", "7.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("JWTModule.MyUser", b =>
+            modelBuilder.Entity("MySuperApi.Models.APIModels.ApiImageModel", b =>
+                {
+                    b.Property<Guid>("ImageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("FileName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImagePath")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ImageId");
+
+                    b.ToTable("ApiImages");
+                });
+
+            modelBuilder.Entity("MySuperApi.Models.APIModels.MyUser", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
