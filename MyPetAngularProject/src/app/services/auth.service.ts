@@ -32,7 +32,7 @@ export class AuthService {
   }
 
   public getMe(): Observable<string> {
-    return this.http.get(this.apiUrl, {
+    return this.http.get(this.apiUrl + '/getme', {
       responseType: 'text',
     });
   }

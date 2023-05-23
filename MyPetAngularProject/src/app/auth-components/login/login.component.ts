@@ -22,12 +22,6 @@ export class LoginComponent {
   }
 
   onSubmit(user: User): void {
-    if (user.email.length === 0) {
-      user.email = user.username;
-    } else {
-      user.username = user.email;
-    }
-
     this.authService.login(user).subscribe((token: string) => {
         this.errorMessage = '';
         localStorage.setItem(this.authToken, token)

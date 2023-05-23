@@ -5,19 +5,15 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using MySuperApi.Services.UserService;
-using MySuperApi.Models.APIModels;
 using MySuperApi.Services.PathLogic;
+using MySuperApi.Areas;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("MySuperConnection") ?? throw new InvalidOperationException("Connection string 'MySuperConnection' not found.");
-var userconnetionString = builder.Configuration.GetConnectionString("MySuperApiContextConnection") ?? throw new InvalidOperationException("Conntextion string 'UserConnection' not found.");
-builder.Services.AddDbContext<MyPetContext>(options =>
-    options.UseSqlServer(connectionString));
+var connectionString = builder.Configuration.GetConnectionString("PostgreSQLConnectionString") ?? throw new InvalidOperationException("Connection string 'MySuperConnection' not found.");
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(userconnetionString));
+    options.UseNpgsql(connectionString));
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -37,6 +33,7 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v3", new OpenApiInfo { Title = "My API", Version = "v3" });
 });
 
+builder.Services.AddAutoMapper(typeof(AppMappingProfile));
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -59,7 +56,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v3/swagger.json", "My SuserAPI V3");
-        c.RoutePrefix = string.Empty; // ��� ������ ��������� ������ Swagger UI � �������� �������� �� ���������
+        c.RoutePrefix = string.Empty;
     });
 
 }

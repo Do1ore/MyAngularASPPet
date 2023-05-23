@@ -2,10 +2,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using MySuperApi.Models.APIModels;
+using MySuperApi.DTOs;
+using MySuperApi.JWTModule;
+using MySuperApi.Models;
 using MySuperApi.Services.UserService;
 using System.IdentityModel.Tokens.Jwt;
-using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Security.Cryptography;
 
@@ -26,7 +27,7 @@ namespace JWTModule.Controllers
             _db = db;
         }
 
-        [HttpGet, Authorize]
+        [HttpGet("getme"), Authorize]
         public ActionResult<string> GetMe()
         {
             var userName = _userService.GetMyName();
@@ -34,14 +35,22 @@ namespace JWTModule.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult<MyUser>> Register(UserDto request)
+        public async Task<ActionResult<AppUser>> Register(RegisterUserDto request)
         {
             CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
-            MyUser user = new();
-            user.Username = request.Username;
-            user.Email = request.Email;
-            user.PasswordHash = passwordHash;
-            user.PasswordSalt = passwordSalt;
+            AppUser user = new()
+            {
+                Username = request.Username,
+                Surname = request.Surname,
+                Email = request.Email,
+                PasswordHash = passwordHash,
+                PasswordSalt = passwordSalt,
+                AccountCreated = DateTime.UtcNow,
+                AccountLastTimeEdited = DateTime.UtcNow,
+                LastTimeOnline = DateTime.UtcNow,
+
+            };
+
             if (await _db.Users.AnyAsync(u => u.Email == request.Email))
             {
                 return BadRequest("Email exists");
@@ -52,13 +61,17 @@ namespace JWTModule.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult<string>> Login(UserDto request)
+        public async Task<ActionResult<string>> Login(UserDto dto)
         {
-            MyUser? user = await _db.Users.Where(u => u.Email == request.Email).Select(u => u).FirstAsync();
+            if(dto is null)
+            {
+                return BadRequest("User data is null.");
+            }
+            AppUser? user = await _db.Users.Where(u => u.Email == dto.email).Select(u => u).FirstAsync();
 
             if (user is null) return NotFound("Email not found.");
 
-            if (!VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt))
+            if (!VerifyPasswordHash(dto.password, user.PasswordHash, user.PasswordSalt))
             {
                 return BadRequest("Wrong password.");
             }
@@ -72,7 +85,7 @@ namespace JWTModule.Controllers
         }
 
         [HttpPost("refresh-token")]
-        public async Task<ActionResult<string>> RefreshToken(MyUser user)
+        public async Task<ActionResult<string>> RefreshToken(AppUser user)
         {
             var refreshToken = Request.Cookies["refreshToken"];
 
@@ -104,7 +117,7 @@ namespace JWTModule.Controllers
             return refreshToken;
         }
 
-        private void SetRefreshToken(RefreshToken newRefreshToken, MyUser user)
+        private void SetRefreshToken(RefreshToken newRefreshToken, AppUser user)
         {
             var cookieOptions = new CookieOptions
             {
@@ -118,12 +131,13 @@ namespace JWTModule.Controllers
             user.TokenExpires = newRefreshToken.Expires;
         }
 
-        private string CreateToken(MyUser user)
+        private string CreateToken(AppUser user)
         {
             List<Claim> claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.Role, "Admin")
+                new Claim(ClaimTypes.Role, "Admin"),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
             };
 
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(

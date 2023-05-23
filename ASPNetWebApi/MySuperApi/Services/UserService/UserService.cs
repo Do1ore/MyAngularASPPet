@@ -11,6 +11,16 @@ namespace MySuperApi.Services.UserService
             _httpContextAccessor = httpContextAccessor;
         }
 
+        public string GetMyId()
+        {
+            var result = string.Empty;
+            if (_httpContextAccessor.HttpContext != null)
+            {
+                result = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            }
+            return result;
+        }
+
         public string GetMyName()
         {
             var result = string.Empty;
@@ -20,6 +30,5 @@ namespace MySuperApi.Services.UserService
             }
             return result;
         }
-        
     }
 }
