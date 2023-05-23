@@ -39,7 +39,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\images\uploaded\" />
+    <Folder Include="Resourses\Uploaded\" />
   </ItemGroup>
 
 </Project>

@@ -7,6 +7,8 @@ using System.Text;
 using MySuperApi.Services.UserService;
 using MySuperApi.Services.PathLogic;
 using MySuperApi.Areas;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +30,13 @@ builder.Services.AddCors(setupAction =>
             builder.WithOrigins("*").AllowAnyHeader().AllowAnyMethod();
         });
 });
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MemoryBufferThreshold = int.MaxValue;
+    options.ValueLengthLimit = int.MaxValue;
+    options.MultipartBodyLengthLimit = int.MaxValue;
+});
+
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v3", new OpenApiInfo { Title = "My API", Version = "v3" });
@@ -61,8 +70,14 @@ if (app.Environment.IsDevelopment())
 
 }
 app.UseCors("default");
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"Resourses")),
+    RequestPath = new PathString("/Resourses")
+});
+app.UseStaticFiles();
 app.UseHttpsRedirection();
-
 app.MapControllers();
 app.MapSwagger();
+
 app.Run();

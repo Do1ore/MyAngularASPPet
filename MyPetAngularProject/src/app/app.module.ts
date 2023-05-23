@@ -2,7 +2,7 @@ import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import  {RoutingModule} from './app-routing.module';
-import { AppComponent } from './app.component';import { FormsModule } from "@angular/forms";
+import { AppComponent } from './app.component';import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import { NavbarComponent } from './navbar/navbar.component';
 import { HomeComponent } from './home/home.component';
 import { FooterComponent } from './footer/footer.component';
@@ -36,7 +36,8 @@ import { UserProfileComponent } from './profile-components/user-profile/user-pro
       progressBar: true,
       positionClass: 'toast-bottom-right',
     } as GlobalConfig),
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    ReactiveFormsModule
   ],
   providers: [{
     provide: HTTP_INTERCEPTORS,
