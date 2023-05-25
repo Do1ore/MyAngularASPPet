@@ -9,6 +9,8 @@ using MySuperApi.Services.PathLogic;
 using MySuperApi.Areas;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.FileProviders;
+using MySuperApi.Services.ProfileImageService;
+using MySuperApi.HubConfig;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,13 +23,18 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPathMaster, PathMaster>();
+builder.Services.AddTransient<IProfileImageService, ProfileImageService>();
+builder.Services.AddSignalR();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddCors(setupAction =>
 {
     setupAction.AddPolicy("default",
         builder =>
         {
-            builder.WithOrigins("*").AllowAnyHeader().AllowAnyMethod();
+            builder.WithOrigins("http://localhost:4200")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
         });
 });
 builder.Services.Configure<FormOptions>(options =>
@@ -75,6 +82,10 @@ app.UseStaticFiles(new StaticFileOptions
     FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"Resourses")),
     RequestPath = new PathString("/Resourses")
 });
+
+//SignalR route
+app.MapHub<UserHub>("hub/user");
+
 app.UseStaticFiles();
 app.UseHttpsRedirection();
 app.MapControllers();

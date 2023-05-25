@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using MySuperApi.Models.MessageModels;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MySuperApi.Models
 {
@@ -16,10 +18,13 @@ namespace MySuperApi.Models
         public DateTime TokenCreated { get; set; }
         public DateTime TokenExpires { get; set; }
         public DateTime AccountCreated { get; set; }
-        public DateTime AccountLastTimeEdited { get; set; }    
+        public DateTime AccountLastTimeEdited { get; set; }
         public DateTime LastTimeOnline { get; set; }
-        public Guid CurrentImage { get; set; }
         public ICollection<UserProfileImage> UserProfileImages { get; set; } = new List<UserProfileImage>();
+        [NotMapped]
+        public ICollection<ChatMessage> SentMessages { get; set; } = new List<ChatMessage>();
+        [NotMapped]
+        public ICollection<ChatMessage> ReceivedMessages { get; set; } = new List<ChatMessage>();
 
     }
 }
