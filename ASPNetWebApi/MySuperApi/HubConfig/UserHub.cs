@@ -19,6 +19,7 @@ namespace MySuperApi.HubConfig
 
         public override Task OnDisconnectedAsync(Exception? exception)
         {
+            _logger.LogInformation("Connection " + Context.ConnectionId + " terminated");
             return base.OnDisconnectedAsync(exception);
         }
     }

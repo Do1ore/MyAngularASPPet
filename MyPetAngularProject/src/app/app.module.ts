@@ -46,9 +46,7 @@ import {SignalRMessageService} from "./services/signal-r-message.service";
     provide: HTTP_INTERCEPTORS,
     useClass: AuthInterceptor,
     multi: true,
-  },
-    SignalRMessageService
-  ],
+  }],
   bootstrap: [AppComponent]
 })
 export class AppModule {
