@@ -15,8 +15,16 @@ import {ToastrModule, GlobalConfig} from "ngx-toastr";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {UserProfileComponent} from './profile-components/user-profile/user-profile.component';
 import {ChatComponent} from './messanger-components/chat/chat.component';
+import {JWT_OPTIONS, JwtHelperService, JwtModule, JwtModuleOptions} from "@auth0/angular-jwt";
 import {SignalRMessageService} from "./services/signal-r-message.service";
 
+export function jwtOptionsFactory(): JwtModuleOptions {
+  return {
+    // @ts-ignore
+    allowedDomains: ['example.com'], // Разрешенные домены для отправки токена
+    disallowedRoutes: ['example.com/api/auth'], // Маршруты, которым запрещено отправлять токен
+  };
+}
 
 @NgModule({
   declarations: [
@@ -40,13 +48,19 @@ import {SignalRMessageService} from "./services/signal-r-message.service";
       positionClass: 'toast-bottom-right',
     } as GlobalConfig),
     BrowserAnimationsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    JwtModule.forRoot({
+      jwtOptionsProvider: {
+        provide: JWT_OPTIONS,
+        useFactory: jwtOptionsFactory
+      }
+    })
   ],
   providers: [{
     provide: HTTP_INTERCEPTORS,
     useClass: AuthInterceptor,
     multi: true,
-  }],
+  }, SignalRMessageService, JwtHelperService],
   bootstrap: [AppComponent]
 })
 export class AppModule {

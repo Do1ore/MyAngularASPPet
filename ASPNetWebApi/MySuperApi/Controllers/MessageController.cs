@@ -1,6 +1,9 @@
 ﻿using Azure.Messaging;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using MySuperApi.HubConfig;
 using MySuperApi.Models;
+using MySuperApi.Models.MessageModels;
 using MySuperApi.Repositories.Implementation;
 using MySuperApi.Repositories.Interfaces;
 using NuGet.Protocol.Plugins;
@@ -13,10 +16,20 @@ namespace MySuperApi.Controllers
     {
         private readonly AppDbContext _db;
         private readonly IChatRepository _chatRepository;
-        public MessageController(AppDbContext db, IChatRepository chatRepository)
+        private readonly IHubContext<UserHub> _hubContext;
+
+        [HttpPost("sendmodel")]
+        public async Task<IActionResult> SendModelToClient(string connectionId, Chat model)
+        {
+            await _hubContext.Clients.Client(connectionId).SendAsync("ReceiveModel", model);
+            return Ok();
+        }
+
+        public MessageController(AppDbContext db, IChatRepository chatRepository, IHubContext<UserHub> hubContext)
         {
             _db = db;
-            this._chatRepository = chatRepository;
+            _chatRepository = chatRepository;
+            _hubContext = hubContext;
         }
 
         [HttpPost("test")]
