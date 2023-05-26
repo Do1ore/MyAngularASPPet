@@ -42,6 +42,7 @@ export class SignalRMessageService {
   public getAllChatsForUser(userId: string) {
     if (this.hubConnection === undefined)
       return;
+
     return this.hubConnection.invoke('GetAllChatsForUser', userId);
   }
 }

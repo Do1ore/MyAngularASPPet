@@ -9,7 +9,6 @@ namespace MySuperApi.Models
         public DbSet<ProfileImageClaims> ProfileImageClaims { get; set; }
         public DbSet<UserProfileImage> ProfileImages { get; set; }
         public DbSet<UserProfileImageStorage> ProfileImageStorages { get; set; }
-
         public DbSet<ChatMessage> Messages { get; set; }
         public DbSet<Chat> Chats { get; set; }
         public DbSet<ChatUser> ChatUsers { get; set; }

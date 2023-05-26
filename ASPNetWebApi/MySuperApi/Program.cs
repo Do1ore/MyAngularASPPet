@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.FileProviders;
 using MySuperApi.Services.ProfileImageService;
 using MySuperApi.HubConfig;
+using MySuperApi.Repositories.Interfaces;
+using MySuperApi.Repositories.Implementation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +26,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPathMaster, PathMaster>();
 builder.Services.AddTransient<IProfileImageService, ProfileImageService>();
+builder.Services.AddScoped<IChatRepository, ChatResository>();
 builder.Services.AddSignalR();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddCors(setupAction =>
