@@ -11,18 +11,18 @@ export class ChatComponent implements OnInit {
   constructor(
     private signalRMessageService: SignalRMessageService) {
   }
-  public chat: Chat | null = null;
+  // @ts-ignore
+  public chat: Chat;
 
   ngOnInit(): void {
     this.signalRMessageService.getHubConnection();
-
-
   }
 
   getChatInfo() : void{
     this.signalRMessageService.getAllChatsForUserCaller();
     this.signalRMessageService.getAllChatsForUserListener();
-    this.signalRMessageService.model$.subscribe((model) => this.chat = model);
+    this.chat = this.signalRMessageService.chatModel;
+
   }
 
 

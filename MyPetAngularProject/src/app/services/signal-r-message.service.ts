@@ -13,7 +13,11 @@ export class SignalRMessageService {
   private hubConnection: HubConnection | undefined;
   private baseApiUrl = environment.baseApiUrl;
   private authTokenName = environment.authTokenName;
+  private modelSubject: Subject<Chat> = new Subject<Chat>();
+  public model$ = this.modelSubject.asObservable();
 
+  // @ts-ignore
+  public chatModel : Chat;
   private readonly userId: string = '';
 
   constructor(private jwtHelper: JwtHelperService, private toaster: ToastrService) {
@@ -53,8 +57,9 @@ export class SignalRMessageService {
       return;
     }
     this.hubConnection.on('GetAllChatsForUserResponse', (model: Chat) => {
-      console.info(model);
-    });
+        console.info(model);
+        this.chatModel = model;
+      });
   }
 
   public getAllMessagesForUser() {

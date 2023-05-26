@@ -1,10 +1,10 @@
-import { ChatMessage } from "./chatMessage";
-import { ChatUser } from "./chatUser";
+import {ChatMessage} from "./chatMessage";
+import {ChatUser} from "./chatUser";
 
-export interface Chat {
-  id: string;
-  name: string | null;
-  lastmessage: string | null;
-  messages: ChatMessage[];
-  chatUsers: ChatUser[];
+export class Chat {
+  public id: string = "";
+  public name: string | null = "";
+  public lastmessage: string | null = "";
+  public messages: ChatMessage[] = [];
+  public chatUsers: ChatUser[] = [];
 }

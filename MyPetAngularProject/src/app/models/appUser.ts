@@ -1,22 +1,22 @@
-import { ChatMessage } from "./chatMessage";
+import {ChatMessage} from "./chatMessage";
 
 
-import { UserProfileImage } from "./userProfileImage";
+import {UserProfileImage} from "./userProfileImage";
 
-export interface AppUser {
-  id: string;
-  username: string;
-  surname: string;
-  email: string;
-  passwordHash: string;
-  passwordSalt: string;
-  refreshToken: string;
-  tokenCreated: string;
-  tokenExpires: string;
-  accountCreated: string;
-  accountLastTimeEdited: string;
-  lastTimeOnline: string;
-  userProfileImages: UserProfileImage[];
-  sentMessages: ChatMessage[];
-  receivedMessages: ChatMessage[];
+export class AppUser {
+  public id: string = "";
+  public username: string = "";
+  public surname: string = "";
+  public email: string = "";
+  public passwordHash: string = "";
+  public passwordSalt: string = "";
+  public refreshToken: string = "";
+  public tokenCreated: string = "";
+  public tokenExpires: string = "";
+  public accountCreated: string = "";
+  public accountLastTimeEdited: string = "";
+  public lastTimeOnline: string = "";
+  public userProfileImages: UserProfileImage[] = [];
+  public sentMessages: ChatMessage[] = [];
+  public receivedMessages: ChatMessage[] = [];
 }

@@ -1,6 +1,6 @@
 export class UserFull {
-  username = '';
-  surname = '';
-  email = '';
-  password = '';
+  public username = '';
+  public surname = '';
+  public email = '';
+  public password = '';
 }
