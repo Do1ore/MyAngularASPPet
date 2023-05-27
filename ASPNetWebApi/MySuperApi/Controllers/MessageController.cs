@@ -18,13 +18,6 @@ namespace MySuperApi.Controllers
         private readonly IChatRepository _chatRepository;
         private readonly IHubContext<UserHub> _hubContext;
 
-        [HttpPost("sendmodel")]
-        public async Task<IActionResult> SendModelToClient(string connectionId, Chat model)
-        {
-            await _hubContext.Clients.Client(connectionId).SendAsync("ReceiveModel", model);
-            return Ok();
-        }
-
         public MessageController(AppDbContext db, IChatRepository chatRepository, IHubContext<UserHub> hubContext)
         {
             _db = db;
@@ -32,6 +25,14 @@ namespace MySuperApi.Controllers
             _hubContext = hubContext;
         }
 
+        [HttpPost("sendmodel")]
+        public async Task<IActionResult> SendModelToClient(string connectionId, Chat model)
+        {
+            await _hubContext.Clients.Client(connectionId).SendAsync("ReceiveModel", model);
+            return Ok();
+        }
+
+       
         [HttpPost("test")]
 
         public async Task<IActionResult> TestAsync(string userId)

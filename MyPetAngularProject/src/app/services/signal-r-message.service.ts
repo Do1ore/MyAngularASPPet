@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {HubConnection, HubConnectionBuilder} from '@microsoft/signalr';
 import {environment} from "../../environments/environment";
 import {Subject} from "rxjs";
-import {Chat} from '../models/chat';
+import {ChatMainModel} from '../models/chatMainModel';
 import {JwtHelperService} from "@auth0/angular-jwt";
 import {ToastrService} from "ngx-toastr";
 
@@ -10,14 +10,15 @@ import {ToastrService} from "ngx-toastr";
   providedIn: 'root'
 })
 export class SignalRMessageService {
-  private hubConnection: HubConnection | undefined;
+
+  private hubConnection: HubConnection | null = null;
   private baseApiUrl = environment.baseApiUrl;
   private authTokenName = environment.authTokenName;
-  private modelSubject: Subject<Chat> = new Subject<Chat>();
+  public modelSubject: Subject<ChatMainModel[]> = new Subject<ChatMainModel[]>();
   public model$ = this.modelSubject.asObservable();
 
-  // @ts-ignore
-  public chatModel : Chat;
+
+  public chatModel: ChatMainModel = new ChatMainModel();
   private readonly userId: string = '';
 
   constructor(private jwtHelper: JwtHelperService, private toaster: ToastrService) {
@@ -37,33 +38,44 @@ export class SignalRMessageService {
         .build();
 
       this.hubConnection.start()
-        .then(() => console.log('SignalR connection started'))
+        .then(() => {
+          console.log('SignalR connection started')
+          this.getAllChatsForUserListener();
+        })
         .catch(err => console.error('Error while starting SignalR connection:', err));
     }
     return this.hubConnection;
   }
 
   public getAllChatsForUserCaller() {
-    if (this.hubConnection === undefined)
+    if (this.hubConnection === null || this.hubConnection.state != 'Connected') {
+      console.log("not yet1")
       return;
+    }
 
-    this.hubConnection.invoke('GetAllChatsForUser', this.userId)
+    console.log("yes1");
+    this.hubConnection!.invoke('GetAllChatsForUser', this.userId)
       .catch(err => console.error(err));
   }
 
   public getAllChatsForUserListener() {
-    if (this.hubConnection === undefined) {
-      console.error('hub connection undefined');
+    if (this.hubConnection === null || this.hubConnection.state != 'Connected') {
+      console.log("not yet1")
       return;
     }
-    this.hubConnection.on('GetAllChatsForUserResponse', (model: Chat) => {
-        console.info(model);
-        this.chatModel = model;
+    console.log("yes2")
+
+    this.hubConnection.on('GetAllChatsForUserResponse', (model: ChatMainModel[]) => {
+      console.info(model);
+      model.forEach((model) => {
+        console.log(model.id);
       });
+      this.modelSubject.next(model);
+    });
   }
 
   public getAllMessagesForUser() {
-    if (this.hubConnection === undefined)
+    if (this.hubConnection === null)
       return;
 
     return this.hubConnection.invoke('GetAllMessagesForUser', this.userId);

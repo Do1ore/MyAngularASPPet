@@ -1,12 +1,12 @@
 import { AppUser } from "./appUser";
-import { Chat } from "./chat";
+import { ChatMainModel } from "./chatMainModel";
 
 export class ChatMessage {
   public id: string = '';
-  public content: string | null = null;
+  public content: string = '';
   public sentAt: string = '';
   public senderId: string = '';
   public sender: AppUser | null = null;
   public chatId: string = '';
-  public chat: Chat | null = null;
+  public chat: ChatMainModel | null = null;
 }

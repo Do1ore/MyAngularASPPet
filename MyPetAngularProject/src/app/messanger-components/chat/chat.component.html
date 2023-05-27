@@ -2,5 +2,12 @@
   <h1>Info</h1>
 
   <button (click)="getChatInfo()" class="p-1.5 bg-white text-gray-800 rounded-xl">Get</button>
-  <span>{{signalRMessageService.chatModel)}}</span>
-</div>
+  <div id="span1" *ngIf="chatMainModel">
+    <div *ngFor="let chat of chatMainModel">
+      <h1>Users in chat: {{chat.chatUsers.length}}</h1>
+      <h1>Messages {{chat.messages.length}}</h1>
+      <span class="text-gray-800 border-2 p-2">{{chat.id}}</span>
+      <div>
+      </div>
+    </div>
+  </div>
