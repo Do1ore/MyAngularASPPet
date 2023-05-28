@@ -2,8 +2,8 @@ import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {ToastrService} from "ngx-toastr";
 import {HttpClient, HttpEventType} from "@angular/common/http";
 import {environment} from "../../../environments/environment";
-
-
+import {UserProfileService} from "../../services/user-profile.service";
+import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
 
 
 @Component({
@@ -17,12 +17,28 @@ export class UserProfileComponent implements OnInit {
   public progress: number = 0;
   @Output() public onUploadFinished = new EventEmitter();
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, public userProfile: UserProfileService, private sanitizer: DomSanitizer) {
   }
+
+  public imageUrl!: SafeUrl;
 
   ngOnInit(): void {
-
+    this.getProfileImage();
   }
+
+  public getProfileImage() {
+    this.userProfile.getImage().subscribe(
+      (imageBlob: Blob) => {
+        // Создаем безопасный URL для изображения
+        const objectUrl: string = URL.createObjectURL(imageBlob);
+        this.imageUrl = this.sanitizer.bypassSecurityTrustUrl(objectUrl);
+      },
+      (error: any) => {
+        console.error('Ошибка при загрузке изображения:', error);
+      }
+    );
+  }
+
   // @ts-ignore
   public uploadFile = (files) => {
     if (files.length === 0) {
@@ -36,10 +52,9 @@ export class UserProfileComponent implements OnInit {
       reportProgress: true,
       observe: "events",
     }).subscribe(event => {
-      if(event.type === HttpEventType.UploadProgress){
+      if (event.type === HttpEventType.UploadProgress) {
         this.progress = Math.round(100 * event.loaded / event.total!);
-      }
-      else if(event.type === HttpEventType.Response){
+      } else if (event.type === HttpEventType.Response) {
         this.message = 'Upload success';
         this.onUploadFinished.emit(event.body);
       }

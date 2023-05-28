@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, EventEmitter, OnDestroy, OnInit, Output} from '@angular/core';
 import {ChatMainModel} from 'src/app/models/chatMainModel';
 import {SignalRMessageService} from "../../services/signal-r-message.service";
 import {Subscription} from "rxjs";
@@ -9,6 +9,8 @@ import {Subscription} from "rxjs";
   styleUrls: ['./chat.component.scss']
 })
 export class ChatComponent implements OnInit, OnDestroy {
+  @Output() chatSelected: EventEmitter<string> = new EventEmitter<string>();
+
   constructor(
     public signalRMessageService: SignalRMessageService) {
   }
@@ -16,6 +18,11 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   private subscription: Subscription | undefined;
   public chatMainModel: ChatMainModel[] = [];
+
+  selectChat(chatId: string) {
+    this.chatSelected.emit(chatId);
+    console.log('emited' + chatId);
+  }
 
   async waitForHubConnection(): Promise<void> {
     while (this.signalRMessageService.getHubConnection().state != 'Connected') {

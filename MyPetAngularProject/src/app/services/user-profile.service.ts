@@ -1,7 +1,8 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {environment} from "../../environments/environment";
 import {Observable} from "rxjs";
+import {JwtHelperService} from "@auth0/angular-jwt";
 
 @Injectable({
   providedIn: 'root'
@@ -21,8 +22,13 @@ export class UserProfileService {
     });
   }
 
-  public getProfileImage() : Observable<any>{
-    return this.http.get(this.baseApiUrl + 'get-image');
+  public getImage(): Observable<Blob> {
+    const headers = new HttpHeaders().set('Accept', 'image/png');
+
+    const url = this.baseApiUrl + "/profile-image";
+    return this.http.get(url, {
+      headers: headers,
+      responseType: 'blob'});
   }
 }
 
