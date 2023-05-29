@@ -33,13 +33,8 @@ namespace MySuperApi.Controllers
         }
 
        
-        [HttpPost("test")]
 
-        public async Task<IActionResult> TestAsync(string userId)
-        {
-            var chats = await _chatRepository.GetAllChatsForUser(userId.ToString());
-            return Ok(chats);
-        }
+   
 
         [HttpPost("test-message")]
 

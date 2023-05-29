@@ -26,7 +26,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPathMaster, PathMaster>();
 builder.Services.AddTransient<IProfileImageService, ProfileImageService>();
-builder.Services.AddScoped<IChatRepository, ChatResository>();
+builder.Services.AddScoped<IChatRepository, ChatRepository>();
 builder.Services.AddSignalR();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddCors(setupAction =>

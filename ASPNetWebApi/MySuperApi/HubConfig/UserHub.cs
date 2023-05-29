@@ -44,14 +44,25 @@ namespace MySuperApi.HubConfig
 
         public async Task GetAllChatsForUser(string userId)
         {
-           
-            if(userId == null)
+
+            if (userId == null)
             {
                 return;
             }
-            var chats = await _chatRepository.GetAllChatsForUser(userId);
+            var chats = await _chatRepository.GetChatsForUser(userId);
 
             await Clients.Caller.SendAsync("GetAllChatsForUserResponse", chats);
+        }
+
+        public async Task GetChatsDetails(string userId, string chatId)
+        {
+            if (chatId == null)
+            {
+                return;
+            }
+            var chat = await _chatRepository.GetChatDetails(userId, chatId);
+
+            await Clients.Caller.SendAsync("GetChatsDetailsResponse", chat);
         }
 
         public async Task SendMessage(string chatId, string senderId, string messageContent)
