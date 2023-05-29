@@ -13,6 +13,7 @@ export class ChatDetailsComponent implements OnInit {
 
   @Input() chatModel: ChatMainModel = new ChatMainModel();
   @Input() chatId: string = '';
+  public userId = '';
   message: string = '';
 
   constructor(public signalRMessageService: SignalRMessageService) {
@@ -27,6 +28,7 @@ export class ChatDetailsComponent implements OnInit {
 
 
   async ngOnInit() {
+    this.userId = this.signalRMessageService.getUserIdFromToken();
     console.log("from this: " + this.chatId);
     await this.waitForHubConnection()
     this.signalRMessageService.onReceiveMessage((message: ChatMessage) => {

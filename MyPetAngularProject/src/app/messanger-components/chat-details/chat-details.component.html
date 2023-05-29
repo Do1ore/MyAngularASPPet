@@ -10,9 +10,15 @@
     </div>
     <div *ngIf="chatModel.messages.length > 0" class="pt-10 pb-20">
       <div *ngFor="let message of chatModel.messages" class="">
-        <div class="bg-gray-200 rounded-md mt-2 p-2 flex-row justify-center">
-          <span class="me-4 ">{{message.sender!.username!}}</span>
-          <span class="">{{message.content}}</span>
+        <div *ngIf="message.senderId === userId"
+             class="bg-gray-100 dark:bg-cyan-950  rounded-md mt-2 p-2 flex-row justify-center">
+          <span class="me-4 text-black dark:text-fuchsia-100">{{message.sender!.username!}}</span>
+          <span class="text-black dark:text-fuchsia-100">{{message.content}}</span>
+        </div>
+        <div *ngIf="message.senderId !== userId"
+             class="bg-gray-50 dark:bg-gray-800 rounded-md mt-2 p-2 flex-row justify-center">
+          <span class="me-4 text-black dark:text-fuchsia-100">{{message.sender!.username!}}</span>
+          <span class="text-black dark:text-lime-100">{{message.content}}</span>
         </div>
       </div>
     </div>

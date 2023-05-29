@@ -11,14 +11,14 @@ import {ChatMessage} from "../../models/chatMessage";
 })
 export class ChatComponent implements OnInit, OnDestroy {
   @Output() chatSelected: EventEmitter<string> = new EventEmitter<string>();
+  private subscription: Subscription | undefined;
+  public chatMainModel: ChatMainModel[] = [];
 
   constructor(
     public signalRMessageService: SignalRMessageService) {
   }
 
 
-  private subscription: Subscription | undefined;
-  public chatMainModel: ChatMainModel[] = [];
 
   selectChat(chatId: string) {
     this.chatSelected.emit(chatId);
