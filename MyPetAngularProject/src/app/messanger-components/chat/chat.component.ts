@@ -49,10 +49,9 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.signalRMessageService.getAllChatsForUserListener();
     this.subscription = this.signalRMessageService.modelSubject.asObservable().subscribe((model: ChatMainModel[]) => {
       this.chatMainModel = model;
-
-
     })
     await this.waitForMessages();
+    console.log(this.chatMainModel)
   }
 
   ngOnDestroy(): void {

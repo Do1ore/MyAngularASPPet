@@ -17,19 +17,24 @@ export class SignalRMessageService {
   public modelSubject: Subject<ChatMainModel[]> = new Subject<ChatMainModel[]>();
   public model$ = this.modelSubject.asObservable();
 
-
   public chatModel: ChatMainModel = new ChatMainModel();
-  private readonly userId: string = '';
+  public chatDetailsSubject: Subject<ChatMainModel> = new Subject<ChatMainModel>();
+  public chatDetails$ = this.modelSubject.asObservable();
+
+  private userId: string = '';
 
   constructor(private jwtHelper: JwtHelperService, private toaster: ToastrService) {
-    const token = localStorage.getItem(this.authTokenName);
-    if (token === null) {
-      return;
-    }
-    const decodedToken = this.jwtHelper.decodeToken(token);
-    this.userId = decodedToken['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
+    this.userId = this.getUserIdFromToken();
   }
 
+  public getUserIdFromToken(): string {
+    const token = localStorage.getItem(this.authTokenName);
+    if (token === null) {
+      return '';
+    }
+    const decodedToken = this.jwtHelper.decodeToken(token);
+    return decodedToken['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
+  }
 
   public getHubConnection(): HubConnection {
     if (!this.hubConnection) {
@@ -74,10 +79,33 @@ export class SignalRMessageService {
     });
   }
 
-  public getAllMessagesForUser() {
-    if (this.hubConnection === null)
+  //CHAT DETAILS//
+  public getChatDetailsCaller(chatId: string) {
+    if (this.hubConnection === null || this.hubConnection.state != 'Connected') {
       return;
+    }
+    this.hubConnection!.invoke('GetChatsDetails', this.userId, chatId)
+      .catch(err => console.error(err));
+  }
 
-    return this.hubConnection.invoke('GetAllMessagesForUser', this.userId);
+  public getChatDetailsListener() {
+    if (this.hubConnection === null || this.hubConnection.state != 'Connected') {
+      return;
+    }
+
+    this.hubConnection.on('GetChatsDetailsResponse', (model: ChatMainModel) => {
+      console.info(model);
+      this.chatDetailsSubject.next(model);
+    });
+  }
+
+  public sendMessageCaller(message: string, chatId: string) {
+    if (this.hubConnection === null || this.hubConnection.state != 'Connected') {
+      return;
+    }
+    this.hubConnection.on('GetChatsDetailsResponse', (model: ChatMainModel) => {
+      console.info(model);
+      this.chatDetailsSubject.next(model);
+    });
   }
 }

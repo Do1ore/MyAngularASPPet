@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+﻿using Azure.Messaging;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.SignalR;
 using MySuperApi.Models.MessageModels;
 using MySuperApi.Repositories.Interfaces;
 using MySuperApi.Services.UserService;
+using NuGet.Protocol.Plugins;
 
 namespace MySuperApi.HubConfig
 {
@@ -65,10 +67,25 @@ namespace MySuperApi.HubConfig
             await Clients.Caller.SendAsync("GetChatsDetailsResponse", chat);
         }
 
-        public async Task SendMessage(string chatId, string senderId, string messageContent)
+
+
+        public async Task SendMessage(string chatId, string senderId, string message)
         {
-            await _chatRepository.SendMessage(chatId, senderId, messageContent);
+            var chatMessage = await _chatRepository.SendMessage(chatId, senderId, message);
+
+            // Обработка полученного сообщения и отправка его обратно клиентам
+            await Clients.Group(chatId).SendAsync("ReceiveMessage", chatMessage);
         }
+        public async Task JoinChat(string chatId)
+        {
+            await Groups.AddToGroupAsync(Context.ConnectionId, chatId);
+        }
+        public async Task LeaveChat(string chatId)
+        {
+            // Отсоединение клиента от группы чата
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, chatId);
+        }
+
 
         public override Task OnConnectedAsync()
         {
