@@ -32,7 +32,7 @@ export class ChatDetailsComponent implements OnInit {
     this.signalRMessageService.onReceiveMessage((message: ChatMessage) => {
       this.chatModel.messages.push(message);
       console.log('Received new message:', message);
-    })
+    });
   }
 
   async sendMessage() {

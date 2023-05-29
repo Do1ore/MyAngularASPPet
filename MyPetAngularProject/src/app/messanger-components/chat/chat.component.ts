@@ -2,6 +2,7 @@ import {Component, EventEmitter, OnDestroy, OnInit, Output} from '@angular/core'
 import {ChatMainModel} from 'src/app/models/chatMainModel';
 import {SignalRMessageService} from "../../services/signal-r-message.service";
 import {Subscription} from "rxjs";
+import {ChatMessage} from "../../models/chatMessage";
 
 @Component({
   selector: 'app-chat',
@@ -21,7 +22,6 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   selectChat(chatId: string) {
     this.chatSelected.emit(chatId);
-    console.log('emited' + chatId);
   }
 
   async waitForHubConnection(): Promise<void> {
@@ -57,6 +57,11 @@ export class ChatComponent implements OnInit, OnDestroy {
         resolve();
       }, 0);
     });
+    this.signalRMessageService.onReceiveLastMessage((chatId, message) => {
+      this.chatMainModel.forEach(a => {
+        if (a.id === chatId) a.lastmessage = message;
+      })
+    })
     console.log('Connected to chat/s')
 
   }

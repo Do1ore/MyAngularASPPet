@@ -144,4 +144,15 @@ export class SignalRMessageService {
       callback(message);
     });
   }
+
+  public onReceiveLastMessage(callback: (chatId: string, message: string) => void): void {
+    if (this.hubConnection === null || this.hubConnection.state != 'Connected') {
+      return;
+    }
+    this.hubConnection.on('ReceiveLastMessage', (chatId: string, message: string) => {
+      callback(chatId, message);
+    });
+  }
+
+
 }

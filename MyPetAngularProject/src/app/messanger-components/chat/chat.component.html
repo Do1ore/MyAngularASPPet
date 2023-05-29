@@ -20,7 +20,7 @@
                         clip-rule="evenodd"></path>
                 </svg>
                 <span class="flex-1 ml-3 text-2xl font-bold whitespace-nowrap">{{chat.name}}</span>
-                <span class="flex-1 ml-3 whitespace-nowrap">{{chat.lastmessage}}</span>
+                <span class="flex-1 ml-3 whitespace-nowrap">{{chat.lastmessage | truncateText:5}}</span>
 
               </button>
             </li>

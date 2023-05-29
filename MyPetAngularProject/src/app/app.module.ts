@@ -19,6 +19,7 @@ import {JWT_OPTIONS, JwtHelperService, JwtModule, JwtModuleOptions} from "@auth0
 import {SignalRMessageService} from "./services/signal-r-message.service";
 import { ChatDetailsComponent } from './messanger-components/chat-details/chat-details.component';
 import { ChatDomainComponent } from './messanger-components/chat-domain/chat-domain.component';
+import { TruncateTextPipe } from './services/pipes/truncate-text.pipe';
 
 export function jwtOptionsFactory(): JwtModuleOptions {
   return {
@@ -40,6 +41,7 @@ export function jwtOptionsFactory(): JwtModuleOptions {
     ChatComponent,
     ChatDetailsComponent,
     ChatDomainComponent,
+    TruncateTextPipe,
   ],
   imports: [
     BrowserModule,

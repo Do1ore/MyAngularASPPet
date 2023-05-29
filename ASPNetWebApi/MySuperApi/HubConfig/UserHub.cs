@@ -76,6 +76,7 @@ namespace MySuperApi.HubConfig
 
             // Обработка полученного сообщения и отправка его обратно клиентам
             await Clients.Group(chatId).SendAsync("ReceiveMessage", detailedChatMessage);
+            await Clients.Group(chatId).SendAsync("ReceiveLastMessage", chatId, message);
         }
         public async Task JoinChat(string chatId)
         {
