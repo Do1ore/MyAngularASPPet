@@ -5,6 +5,8 @@ import {Subject} from "rxjs";
 import {ChatMainModel} from '../models/chatMainModel';
 import {JwtHelperService} from "@auth0/angular-jwt";
 import {ToastrService} from "ngx-toastr";
+import {ChatMessage} from "../models/chatMessage";
+import {Message} from "postcss";
 
 @Injectable({
   providedIn: 'root'
@@ -44,7 +46,6 @@ export class SignalRMessageService {
 
       this.hubConnection.start()
         .then(() => {
-          console.log('SignalR connection started')
           this.getAllChatsForUserListener();
         })
         .catch(err => console.error('Error while starting SignalR connection:', err));
@@ -104,8 +105,43 @@ export class SignalRMessageService {
       return;
     }
     this.hubConnection.on('GetChatsDetailsResponse', (model: ChatMainModel) => {
-      console.info(model);
       this.chatDetailsSubject.next(model);
+    });
+  }
+
+  //MESSAGES//
+  joinChat(chatId: string) {
+    if (this.hubConnection === null || this.hubConnection.state != 'Connected') {
+      return;
+    }
+    return this.hubConnection.invoke('JoinChat', chatId);
+  }
+
+  leaveChat(chatId: string) {
+    if (this.hubConnection === null || this.hubConnection.state != 'Connected') {
+      return;
+    }
+
+    return this.hubConnection.invoke('LeaveChat', chatId);
+  }
+
+
+  public sendMessage(chatId: string, message: string) {
+    if (this.hubConnection === null || this.hubConnection.state != 'Connected') {
+      return;
+    }
+    if (this.userId.length === 0) {
+      return;
+    }
+    return this.hubConnection.invoke('SendMessage', chatId, this.userId, message);
+  }
+
+  public onReceiveMessage(callback: (message: ChatMessage) => void): void {
+    if (this.hubConnection === null || this.hubConnection.state != 'Connected') {
+      return;
+    }
+    this.hubConnection.on('ReceiveMessage', (message: ChatMessage) => {
+      callback(message);
     });
   }
 }

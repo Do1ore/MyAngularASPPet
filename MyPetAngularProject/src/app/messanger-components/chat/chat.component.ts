@@ -31,32 +31,69 @@ export class ChatComponent implements OnInit, OnDestroy {
     }
   }
 
-  async waitForMessages(): Promise<void> {
-    while (this.signalRMessageService.chatModel == null) {
+  async waitForChats(): Promise<void> {
+    let model1: ChatMainModel[] = [];
+    this.signalRMessageService.chatDetails$.subscribe((model) => model1 = model)
+
+    while (model1.length == 0) {
+      console.log(model1.length);
+
       //wait 100 milliseconds and check state again and again
       await new Promise(resolve => setTimeout(resolve, 100));
     }
   }
 
+
   async ngOnInit(): Promise<void> {
+    this.signalRMessageService.getHubConnection();
+
+    await this.waitForHubConnection();
     await this.getChatInfo();
+    await this.waitForChats();
+    // Подождите, пока выполнится предыдущая асинхронная операция
+    await new Promise<void>((resolve) => {
+      setTimeout(() => {
+        this.joinGroups();
+        resolve();
+      }, 0);
+    });
+    console.log('Connected to chat/s')
+
   }
 
   async getChatInfo(): Promise<void> {
-    await this.waitForHubConnection();
-    this.signalRMessageService.getHubConnection();
     this.signalRMessageService.getAllChatsForUserCaller();
     this.signalRMessageService.getAllChatsForUserListener();
     this.subscription = this.signalRMessageService.modelSubject.asObservable().subscribe((model: ChatMainModel[]) => {
       this.chatMainModel = model;
     })
-    await this.waitForMessages();
-    console.log(this.chatMainModel)
+
+    console.log('zxczxczxcxz' + this.chatMainModel)
+  }
+
+
+  joinGroups() {
+    if (this.chatMainModel.length > 0) {
+
+      this.chatMainModel.forEach((a) => {
+        this.signalRMessageService.joinChat(a.id);
+      })
+    }
+  }
+
+  leftGroups() {
+    if (this.chatMainModel.length > 0) {
+      this.chatMainModel.forEach((a) => {
+        this.signalRMessageService.leaveChat(a.id);
+      })
+    }
   }
 
   ngOnDestroy(): void {
     if (this.subscription) {
       this.subscription.unsubscribe();
     }
+    this.leftGroups();
+    console.log('Disconnected from chat/s')
   }
 }

@@ -34,22 +34,27 @@ namespace MySuperApi.Repositories.Implementation
             var chat = await _db.Chats.AsNoTracking().SingleOrDefaultAsync(a => a.Id == Guid.Parse(chatId));
             if (chat == null) { return new Chat(); }
 
-            //.AsNoTracking().Where(a => a.ChatId == chat.Id).ToListAsync();
-            var messagesWithSender = from message in _db.Messages
-                                     join sender in _db.Users on message.SenderId equals sender.Id
-                                     select new ChatMessage
-                                     {
-                                         Id = message.Id,
-                                         Content = message.Content,
-                                         SentAt = message.SentAt,
-                                         SenderId = message.SenderId,
-                                         Sender = sender,
-                                         ChatId = message.ChatId
-                                     };
-            var chatUsers = await _db.ChatUsers.Where(a=>a.ChatId == chat.Id).ToListAsync();
-            chat.Messages= await messagesWithSender.ToListAsync();
+            List<ChatMessage> messagesWithSender = await GetMessageWithSenderAsync();
+            var chatUsers = await _db.ChatUsers.Where(a => a.ChatId == chat.Id).ToListAsync();
+            chat.Messages = messagesWithSender;
             chat.ChatUsers = chatUsers;
             return chat;
+        }
+
+        private async Task<List<ChatMessage>> GetMessageWithSenderAsync()
+        {
+            var messages = from message in _db.Messages
+                           join sender in _db.Users on message.SenderId equals sender.Id
+                           select new ChatMessage
+                           {
+                               Id = message.Id,
+                               Content = message.Content,
+                               SentAt = message.SentAt,
+                               SenderId = message.SenderId,
+                               Sender = sender,
+                               ChatId = message.ChatId
+                           };
+            return await messages.ToListAsync();
         }
 
         public async Task<string> GetProfileImage(string userId)
@@ -107,6 +112,25 @@ namespace MySuperApi.Repositories.Implementation
             }
 
             await _db.ProfileImageClaims.ExecuteUpdateAsync(p => p.SetProperty(a => a.ProfileImageId, Guid.Parse(imageId)));
+        }
+
+        public async Task<ChatMessage> GetMessageDetails(ChatMessage chatMessage)
+        {
+            var result = await _db.Users.Select(a => new AppUser()
+            {
+                Email = a.Email,
+                Id = a.Id,
+                Surname = a.Surname,
+                Username = a.Username,
+            }).SingleOrDefaultAsync(a => a.Id == chatMessage.SenderId);
+
+            if(result == null)
+            {
+                return chatMessage;
+            }
+            chatMessage.Sender = result;
+            return chatMessage;               
+                
         }
     }
 }

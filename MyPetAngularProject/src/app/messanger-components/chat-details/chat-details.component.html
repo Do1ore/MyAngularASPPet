@@ -1,14 +1,14 @@
 <div *ngIf="chatId" class="p-4 sm:ml-64">
   <div class="p-4 rounded-lg dark:border-gray-700">
-    <div class="grid grid-cols-3 gap-4 mb-4">
-      <div class="flex items-center justify-center h-24 rounded bg-gray-50 dark:bg-gray-800">
-        <div class="flex flex-row justify-center items-center">
+    <div class="grid mb-4">
+      <div class="flex h-24 pl-5 items-center rounded bg-gray-50 dark:bg-gray-800">
+        <div class="flex flex-row justify-start items-start">
           <h1 class="text-2xl font-bold me-4">{{chatModel.name}}</h1>
           <span class="text-2xl">Users: {{chatModel.chatUsers.length}}</span>
         </div>
       </div>
     </div>
-    <div *ngIf="chatModel.messages.length > 0" class="pt-10">
+    <div *ngIf="chatModel.messages.length > 0" class="pt-10 pb-20">
       <div *ngFor="let message of chatModel.messages" class="">
         <div class="bg-gray-200 rounded-md mt-2 p-2 flex-row justify-center">
           <span class="me-4 ">{{message.sender!.username!}}</span>

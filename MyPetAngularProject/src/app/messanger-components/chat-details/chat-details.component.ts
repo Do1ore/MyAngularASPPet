@@ -1,6 +1,8 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {SignalRMessageService} from "../../services/signal-r-message.service";
 import {ChatMainModel} from "../../models/chatMainModel";
+import {Message} from "postcss";
+import {ChatMessage} from "../../models/chatMessage";
 
 @Component({
   selector: 'app-chat-details',
@@ -12,8 +14,10 @@ export class ChatDetailsComponent implements OnInit {
   @Input() chatModel: ChatMainModel = new ChatMainModel();
   @Input() chatId: string = '';
   message: string = '';
+
   constructor(public signalRMessageService: SignalRMessageService) {
   }
+
   async waitForHubConnection(): Promise<void> {
     while (this.signalRMessageService.getHubConnection().state != 'Connected') {
       //wait 100 milliseconds and check state again and again
@@ -22,14 +26,27 @@ export class ChatDetailsComponent implements OnInit {
   }
 
 
-  ngOnInit() : void {
+  async ngOnInit() {
     console.log("from this: " + this.chatId);
+    await this.waitForHubConnection()
+    this.signalRMessageService.onReceiveMessage((message: ChatMessage) => {
+      this.chatModel.messages.push(message);
+      console.log('Received new message:', message);
+    })
   }
 
-  sendMessage(){
+  async sendMessage() {
+    if (this.message === '') {
+      console.log('message null')
+      return;
+    }
+    await this.waitForHubConnection();
+    this.signalRMessageService.sendMessage(this.chatId, this.message);
     console.log(this.message);
     this.message = '';
   }
+
+
   async getChatModel() {
     await this.waitForHubConnection();
     this.signalRMessageService.getChatDetailsCaller(this.chatId);

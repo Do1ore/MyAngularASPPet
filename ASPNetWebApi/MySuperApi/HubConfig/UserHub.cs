@@ -72,18 +72,22 @@ namespace MySuperApi.HubConfig
         public async Task SendMessage(string chatId, string senderId, string message)
         {
             var chatMessage = await _chatRepository.SendMessage(chatId, senderId, message);
+            var detailedChatMessage = await _chatRepository.GetMessageDetails(chatMessage);
 
             // Обработка полученного сообщения и отправка его обратно клиентам
-            await Clients.Group(chatId).SendAsync("ReceiveMessage", chatMessage);
+            await Clients.Group(chatId).SendAsync("ReceiveMessage", detailedChatMessage);
         }
         public async Task JoinChat(string chatId)
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, chatId);
+            _logger.LogInformation($"Connected to chat {chatId}  and connection {Context.ConnectionId}");
         }
         public async Task LeaveChat(string chatId)
         {
             // Отсоединение клиента от группы чата
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, chatId);
+            _logger.LogInformation($"Disconnected from chat {chatId}  and connection {Context.ConnectionId}");
+
         }
 
 

@@ -1,4 +1,5 @@
-﻿using MySuperApi.Models.MessageModels;
+﻿using Microsoft.DotNet.Scaffolding.Shared.Messaging;
+using MySuperApi.Models.MessageModels;
 
 namespace MySuperApi.Repositories.Interfaces
 {
@@ -9,8 +10,7 @@ namespace MySuperApi.Repositories.Interfaces
         public Task<ChatMessage> SendMessage(string chatId, string senderId, string messageContent);
         public Task<List<Chat>> GetChatsForUser(string userId);
         public Task<Chat> GetChatDetails(string userId, string chatId);
-
-
+        public Task<ChatMessage> GetMessageDetails(ChatMessage message);
         Task UpdateCurrentProfileImage(string imageId, string userId);
 
 
