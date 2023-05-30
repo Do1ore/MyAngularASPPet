@@ -2,7 +2,7 @@ import {Component, EventEmitter, OnDestroy, OnInit, Output} from '@angular/core'
 import {ChatMainModel} from 'src/app/models/chatMainModel';
 import {SignalRMessageService} from "../../services/signal-r-message.service";
 import {Subscription} from "rxjs";
-import {ChatMessage} from "../../models/chatMessage";
+import {Modal, ModalInterface, ModalOptions} from "flowbite";
 
 @Component({
   selector: 'app-chat',
@@ -13,15 +13,46 @@ export class ChatComponent implements OnInit, OnDestroy {
   @Output() chatSelected: EventEmitter<string> = new EventEmitter<string>();
   private subscription: Subscription | undefined;
   public chatMainModel: ChatMainModel[] = [];
-
+  public isPageIsLoaded : boolean = false;
   constructor(
     public signalRMessageService: SignalRMessageService) {
   }
 
-
-
   selectChat(chatId: string) {
     this.chatSelected.emit(chatId);
+  }
+
+  getNewChatModal() : ModalInterface {
+    const $modalElement: HTMLElement | null = document.querySelector('#add-chat-modal');
+
+    const modalOptions: ModalOptions = {
+      placement: 'top-center',
+      backdrop: 'dynamic',
+      backdropClasses: 'bg-gray-900 bg-opacity-50 dark:bg-opacity-80 fixed inset-0 z-40',
+      closable: true,
+      onHide: () => {
+        console.log('modal is hidden');
+      },
+      onShow: () => {
+        console.log('modal is shown');
+      },
+      onToggle: () => {
+        console.log('modal has been toggled');
+      }
+    }
+    return new Modal($modalElement, modalOptions);
+  }
+  showCreateChatModal(){
+    if(this.getNewChatModal()){
+      let modal = this.getNewChatModal();
+      modal.show();
+    }
+  }
+  hideCreateChatModal(){
+    if(this.getNewChatModal()){
+      let modal = this.getNewChatModal();
+      modal.hide();
+    }
   }
 
   async waitForHubConnection(): Promise<void> {
@@ -45,6 +76,9 @@ export class ChatComponent implements OnInit, OnDestroy {
 
 
   async ngOnInit(): Promise<void> {
+    setTimeout(() => {
+      this.isPageIsLoaded = true;
+    }, 1000); // Задержка в 1 секунду, вы можете настроить значение в соответствии с вашими потребностями
     this.signalRMessageService.getHubConnection();
 
     await this.waitForHubConnection();

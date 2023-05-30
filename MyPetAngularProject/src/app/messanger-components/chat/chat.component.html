@@ -1,35 +1,89 @@
-<div class="pt-36">
+<div *ngIf="chatMainModel" id="span1">
+  <aside aria-label="Sidebar"
+         class="fixed left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0"
+         id="default-sidebar"
+         style="top:100px !important;">
+    <div class="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800 rounded-xl">
+      <ul class="space-y-2 font-medium">
+        <li>
+          <button
+            (click)="showCreateChatModal()"
+            class="w-full flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
+            <svg
+              aria-hidden="true"
+              class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+              fill="none" stroke="currentColor" stroke-width="1.5"
+              viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round"
+                    stroke-linejoin="round"></path>
+            </svg>
+            <span class="ml-3">New chat</span>
+          </button>
+        </li>
+        <li *ngFor="let chat of chatMainModel">
+          <button (click)="selectChat(chat.id)"
+                  class="w-full flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
+            <svg aria-hidden="true"
+                 class="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                 fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+              <path clip-rule="evenodd"
+                    d="M5 4a3 3 0 00-3 3v6a3 3 0 003 3h10a3 3 0 003-3V7a3 3 0 00-3-3H5zm-1 9v-1h5v2H5a1 1 0 01-1-1zm7 1h4a1 1 0 001-1v-1h-5v2zm0-4h5V8h-5v2zM9 8H4v2h5V8z"
+                    fill-rule="evenodd"></path>
+            </svg>
+            <span class="flex-1 ml-3 whitespace-nowrap">{{chat.name}}</span>
+            <span class="flex-1 ml-3 whitespace-nowrap">{{chat.lastmessage | truncateText:12}}</span>
+
+          </button>
+        </li>
+      </ul>
+    </div>
+  </aside>
+</div>
 
 
-  <div id="span1" *ngIf="chatMainModel">
-
-    <aside id="default-sidebar"
-           class="fixed top-20 left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0"
-           aria-label="Sidebar">
-      <div class="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800 rounded-xl">
-        <ul class="space-y-2 font-medium">
-          <div *ngFor="let chat of chatMainModel">
-            <li>
-              <button (click)="selectChat(chat.id)"
-                 class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
-                <svg aria-hidden="true"
-                     class="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-                     fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                  <path fill-rule="evenodd"
-                        d="M5 4a3 3 0 00-3 3v6a3 3 0 003 3h10a3 3 0 003-3V7a3 3 0 00-3-3H5zm-1 9v-1h5v2H5a1 1 0 01-1-1zm7 1h4a1 1 0 001-1v-1h-5v2zm0-4h5V8h-5v2zM9 8H4v2h5V8z"
-                        clip-rule="evenodd"></path>
-                </svg>
-                <span class="flex-1 ml-3 text-2xl font-bold whitespace-nowrap">{{chat.name}}</span>
-                <span class="flex-1 ml-3 whitespace-nowrap">{{chat.lastmessage | truncateText:5}}</span>
-
-              </button>
-            </li>
-
+<!-- Main modal -->
+<div aria-hidden="true"
+     class="fixed left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full"
+     id="add-chat-modal"
+     style="top:100px !important;"
+     tabindex="-1">
+  <div class="relative w-full max-w-md max-h-full">
+    <!-- Modal content -->
+    <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+      <button
+        (click)="hideCreateChatModal()"
+        class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white"
+        data-modal-hide="add-chat-modal"
+        type="button">
+        <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
+             xmlns="http://www.w3.org/2000/svg">
+          <path clip-rule="evenodd"
+                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                fill-rule="evenodd"></path>
+        </svg>
+        <span class="sr-only">Close modal</span>
+      </button>
+      <div class="px-6 py-6 lg:px-8">
+        <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">Create new chat</h3>
+        <form class="space-y-6">
+          <div>
+            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Chat name</label>
+            <input
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+              placeholder="Chat name..."
+              required type="text"
+              autocomplete="off">
           </div>
-
-        </ul>
+          <button
+            class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            type="submit">
+            Login to your account
+          </button>
+          <div class="text-sm font-medium text-gray-500 dark:text-gray-300">
+            Not registered? <a class="text-blue-700 hover:underline dark:text-blue-500" href="#">Create chat</a>
+          </div>
+        </form>
       </div>
-    </aside>
-
+    </div>
   </div>
 </div>
