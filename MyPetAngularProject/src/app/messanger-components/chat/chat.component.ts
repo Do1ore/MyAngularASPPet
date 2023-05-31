@@ -116,8 +116,6 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.signalRMessageService.createChatListener((chat) => {
         this.chatMainModel.push(chat)
         this.signalRMessageService.joinChat(chat.id);
-
-
       }
     );
   }
