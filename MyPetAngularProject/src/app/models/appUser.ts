@@ -16,6 +16,7 @@ export class AppUser {
   public accountCreated: string = "";
   public accountLastTimeEdited: string = "";
   public lastTimeOnline: string = "";
+  public imageURL: string = '';
   public userProfileImages: UserProfileImage[] = [];
   public sentMessages: ChatMessage[] = [];
   public receivedMessages: ChatMessage[] = [];

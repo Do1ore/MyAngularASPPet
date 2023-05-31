@@ -3,6 +3,7 @@ import {SignalRMessageService} from "../../services/signal-r-message.service";
 import {ChatMainModel} from "../../models/chatMainModel";
 import {Message} from "postcss";
 import {ChatMessage} from "../../models/chatMessage";
+import {UserProfileService} from "../../services/user-profile.service";
 
 @Component({
   selector: 'app-chat-details',
@@ -16,7 +17,7 @@ export class ChatDetailsComponent implements OnInit {
   public userId = '';
   message: string = '';
 
-  constructor(public signalRMessageService: SignalRMessageService) {
+  constructor(public signalRMessageService: SignalRMessageService, public userProfileService: UserProfileService) {
   }
 
   async waitForHubConnection(): Promise<void> {
@@ -65,5 +66,7 @@ export class ChatDetailsComponent implements OnInit {
       });
     }
   }
+
+
 
 }

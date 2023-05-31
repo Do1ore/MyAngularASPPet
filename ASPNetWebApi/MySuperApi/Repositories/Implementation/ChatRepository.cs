@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MySuperApi.DTOs;
 using MySuperApi.Models;
 using MySuperApi.Models.MessageModels;
 using MySuperApi.Repositories.Interfaces;
@@ -34,17 +35,18 @@ namespace MySuperApi.Repositories.Implementation
             var chat = await _db.Chats.AsNoTracking().SingleOrDefaultAsync(a => a.Id == Guid.Parse(chatId));
             if (chat == null) { return new Chat(); }
 
-            List<ChatMessage> messagesWithSender = await GetMessageWithSenderAsync();
+            List<ChatMessage> messagesWithSender = await GetMessageWithSenderAsync(chatId);
             var chatUsers = await _db.ChatUsers.Where(a => a.ChatId == chat.Id).ToListAsync();
             chat.Messages = messagesWithSender;
             chat.ChatUsers = chatUsers;
             return chat;
         }
 
-        private async Task<List<ChatMessage>> GetMessageWithSenderAsync()
+        private async Task<List<ChatMessage>> GetMessageWithSenderAsync(string chatId)
         {
             var messages = from message in _db.Messages
                            join sender in _db.Users on message.SenderId equals sender.Id
+                           where message.ChatId == Guid.Parse(chatId)
                            select new ChatMessage
                            {
                                Id = message.Id,
@@ -124,13 +126,66 @@ namespace MySuperApi.Repositories.Implementation
                 Username = a.Username,
             }).SingleOrDefaultAsync(a => a.Id == chatMessage.SenderId);
 
-            if(result == null)
+            if (result == null)
             {
                 return chatMessage;
             }
             chatMessage.Sender = result;
-            return chatMessage;               
-                
+            return chatMessage;
+
+        }
+
+        public async Task<List<AppUser>> SearchUsers(string searchTerm)
+        {
+            if (string.IsNullOrEmpty(searchTerm))
+            {
+                return new List<AppUser>();
+            }
+
+            var users = await _db.Users
+                .Where(a => a.Username
+                .Contains(searchTerm)
+                || a.Surname.Contains(searchTerm)
+                || a.Email.Contains(searchTerm))
+                 .AsNoTracking()
+                 .ToListAsync();
+            var userId = users.Select(i => i.Id).ToList();
+
+
+
+            if (users.Count < 0)
+            {
+                return new List<AppUser>();
+            }
+            return users;
+        }
+
+        public async Task<Chat> CreateChat(CreateChatDto chatDto)
+        {
+            var appUser = await _db.Users.Where(a => chatDto.UserId.Contains(a.Id.ToString())).ToListAsync();
+            List<ChatUser> chatUsers = new();
+            var chatId = Guid.NewGuid();
+
+            Chat chat = new Chat()
+            {
+                Id = chatId,
+                Name = chatDto.ChatName,
+            };
+            foreach (var user in appUser)
+            {
+                chatUsers.Add(new ChatUser()
+                {
+                    ChatId = chatId,
+                    User = user,
+                });
+            }
+
+          
+            await _db.Chats.AddAsync(chat);
+            await _db.ChatUsers.AddRangeAsync(chatUsers);
+            await _db.SaveChangesAsync();
+            return chat;
+
         }
     }
 }

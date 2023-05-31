@@ -12,14 +12,15 @@ namespace MySuperApi.Models
         public string Surname { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
 
-        public byte[] PasswordHash { get; set; }
-        public byte[] PasswordSalt { get; set; }
+        public byte[]? PasswordHash { get; set; }
+        public byte[]? PasswordSalt { get; set; }
         public string RefreshToken { get; set; } = string.Empty;
         public DateTime TokenCreated { get; set; }
         public DateTime TokenExpires { get; set; }
         public DateTime AccountCreated { get; set; }
         public DateTime AccountLastTimeEdited { get; set; }
         public DateTime LastTimeOnline { get; set; }
+        public byte[]? CurrentImageBytes { get; set; }
         public ICollection<UserProfileImage> UserProfileImages { get; set; } = new List<UserProfileImage>();
         [NotMapped]
         public ICollection<ChatMessage> SentMessages { get; set; } = new List<ChatMessage>();

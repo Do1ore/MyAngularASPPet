@@ -7,6 +7,7 @@ import {JwtHelperService} from "@auth0/angular-jwt";
 import {ToastrService} from "ngx-toastr";
 import {ChatMessage} from "../models/chatMessage";
 import {Message} from "postcss";
+import {CreateChatDto} from "../models/createChatDto";
 
 @Injectable({
   providedIn: 'root'
@@ -152,7 +153,23 @@ export class SignalRMessageService {
     this.hubConnection.on('ReceiveLastMessage', (chatId: string, message: string) => {
       callback(chatId, message);
     });
+
   }
 
+  //CHATS//
+  public createChatCaller(chatDto: CreateChatDto) {
+    if (this.hubConnection === null || this.hubConnection.state != 'Connected') {
+      return;
+    }
+    return this.hubConnection.invoke('CreateChat', chatDto);
+  }
 
+  public createChatListener(callback: (chat: ChatMainModel) => void): void {
+    if (this.hubConnection === null || this.hubConnection.state != 'Connected') {
+      return;
+    }
+    this.hubConnection.on('CreateChatResponse', (chat: ChatMainModel) => {
+      callback(chat);
+    });
+  }
 }

@@ -89,7 +89,6 @@ namespace MySuperApi.Controllers
             var userId = _userService.GetMyId();
             var a = _userService.GetMyName();
             var user = await _db.Users
-                .Include(a => a.UserProfileImages)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(i => i.Id.ToString() == userId);
             if (user == null)
@@ -111,6 +110,67 @@ namespace MySuperApi.Controllers
             Response.Headers.Add("Content-Type", "image/png");
 
             return File(file, "image/png");
+        }
+
+        [HttpPost("profile-image-by-id")]
+        public async Task<FileContentResult> GetProfileImageById([FromBody] UserIdModel userIdModel)
+        {
+            var user = await _db.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(i => i.Id.ToString() == userIdModel.userId);
+            if (user == null)
+            {
+            }
+
+            var imagePath = await _chatResository.GetProfileImage(userIdModel.userId);
+            if (string.IsNullOrEmpty(imagePath))
+            {
+            }
+            string pathToImage = Path.Combine(Directory.GetCurrentDirectory(), imagePath);
+            if (!System.IO.File.Exists(pathToImage))
+            {
+            }
+            var file = await System.IO.File.ReadAllBytesAsync(pathToImage);
+            var extension = Path.GetExtension(pathToImage);
+
+            Response.Headers.Add("Content-Type", GetMimeType(extension));
+            Response.StatusCode = 200;
+            return File(file, GetMimeType(extension));
+        }
+
+        public class UserIdModel
+        {
+            public string userId { get; set; }
+        }
+
+        [HttpPost("search-user")]
+        public async Task<IActionResult> SearchUser([FromBody] SearchUserModel searchUserModel)
+        {
+            var users = await _chatResository.SearchUsers(searchUserModel.SearchTerm);
+            if (users == null || users.Count < 0)
+            {
+                return BadRequest("No users found");
+            }
+            return Ok(users);
+        }
+        public class SearchUserModel
+        {
+            public string SearchTerm { get; set; }
+        }
+
+        private string GetMimeType(string fileExtension)
+        {
+            switch (fileExtension.ToLower())
+            {
+                case ".jpg":
+                case ".jpeg":
+                    return "image/jpeg";
+                case ".png":
+                    return "image/png";
+                // Добавьте другие расширения и соответствующие MIME-типы по необходимости
+                default:
+                    return "application/octet-stream"; // MIME-тип по умолчанию для неизвестных расширений
+            }
         }
     }
 }

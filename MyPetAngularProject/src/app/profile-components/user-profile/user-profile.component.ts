@@ -4,6 +4,7 @@ import {HttpClient, HttpEventType} from "@angular/common/http";
 import {environment} from "../../../environments/environment";
 import {UserProfileService} from "../../services/user-profile.service";
 import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
+import {SignalRMessageService} from "../../services/signal-r-message.service";
 
 
 @Component({
@@ -17,9 +18,8 @@ export class UserProfileComponent implements OnInit {
   public progress: number = 0;
   @Output() public onUploadFinished = new EventEmitter();
 
-  constructor(private http: HttpClient, public userProfile: UserProfileService, private sanitizer: DomSanitizer) {
+  constructor(private http: HttpClient, public userProfile: UserProfileService, private sanitizer: DomSanitizer, public signalRService: SignalRMessageService) {
   }
-
   public imageUrl!: SafeUrl;
 
   ngOnInit(): void {
@@ -28,6 +28,20 @@ export class UserProfileComponent implements OnInit {
 
   public getProfileImage() {
     this.userProfile.getImage().subscribe(
+      (imageBlob: Blob) => {
+        // Создаем безопасный URL для изображения
+        const objectUrl: string = URL.createObjectURL(imageBlob);
+        this.imageUrl = this.sanitizer.bypassSecurityTrustUrl(objectUrl);
+      },
+      (error: any) => {
+        console.error('Ошибка при загрузке изображения:', error);
+      }
+    );
+  }
+
+  public getProfileImageById() {
+    let userId = this.signalRService.getUserIdFromToken();
+    this.userProfile.getImageById(userId).subscribe(
       (imageBlob: Blob) => {
         // Создаем безопасный URL для изображения
         const objectUrl: string = URL.createObjectURL(imageBlob);
