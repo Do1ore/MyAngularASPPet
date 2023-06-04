@@ -8,6 +8,8 @@ import {AppUser} from "../../models/appUser";
 import {DomSanitizer} from "@angular/platform-browser";
 import {ToastrService} from "ngx-toastr";
 import {CreateChatDto} from "../../models/createChatDto";
+import {AuthService} from "../../services/auth.service";
+import {Route, Router} from "@angular/router";
 
 @Component({
   selector: 'app-chat',
@@ -15,6 +17,16 @@ import {CreateChatDto} from "../../models/createChatDto";
   styleUrls: ['./chat.component.scss']
 })
 export class ChatComponent implements OnInit, OnDestroy {
+  get isAuthorized(): boolean {
+    return this._isAuthorized;
+  }
+
+  set isAuthorized(value: boolean) {
+    this._isAuthorized = value;
+  }
+
+  private _isAuthorized: boolean = false;
+
   @Output() chatSelected: EventEmitter<string> = new EventEmitter<string>();
   public chatMainModel: ChatMainModel[] = [];
   public appUsers: AppUser[] = [];
@@ -32,19 +44,26 @@ export class ChatComponent implements OnInit, OnDestroy {
     public signalRMessageService: SignalRMessageService,
     public userService: UserProfileService,
     private sanitizer: DomSanitizer,
-    public toaster: ToastrService) {
+    public toaster: ToastrService,
+    public authService: AuthService,
+    private router: Router
+  ) {
   }
 
   async ngOnInit(): Promise<void> {
+    if (!this.authService.isAuthorized()) {
+      this.router.navigate(['/login']).then();
+      this.toaster.warning('To use chat you need to be authorized', 'Account required');
+
+      return;
+    }
     this.initDropdownMenu();
-    setTimeout(() => {
-      this.isPageIsLoaded = true;
-    }, 1000); // Задержка в 1 секунду, вы можете настроить значение в соответствии с вашими потребностями
     this.signalRMessageService.getHubConnection();
 
     await this.waitForHubConnection();
     await this.getChatInfo();
     await this.waitForChats();
+
     // Подождите, пока выполнится предыдущая асинхронная операция
     await new Promise<void>((resolve) => {
       setTimeout(() => {
@@ -59,6 +78,15 @@ export class ChatComponent implements OnInit, OnDestroy {
     })
     console.log('Connected to chat/s')
 
+  }
+
+  ngOnDestroy(): void {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
+    this.leftGroups();
+    console.log('Component destroyed');
+    this.signalRMessageService.disconnectFromHub();
   }
 
   selectChat(chatId: string) {
@@ -178,6 +206,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   async waitForHubConnection(): Promise<void> {
     while (this.signalRMessageService.getHubConnection().state != 'Connected') {
       //wait 100 milliseconds and check state again and again
+      console.log('waiting');
       await new Promise(resolve => setTimeout(resolve, 100));
     }
   }
@@ -239,11 +268,5 @@ export class ChatComponent implements OnInit, OnDestroy {
     }
   }
 
-  ngOnDestroy(): void {
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-    }
-    this.leftGroups();
-    console.log('Disconnected from chat/s')
-  }
+
 }

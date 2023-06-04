@@ -121,11 +121,13 @@ namespace JWTModule.Controllers
         {
             var cookieOptions = new CookieOptions
             {
+                Secure = true,
                 HttpOnly = true,
-                Expires = newRefreshToken.Expires
+                Expires = newRefreshToken.Expires,
+                SameSite = SameSiteMode.None,
             };
             Response.Cookies.Append("refreshToken", newRefreshToken.Token, cookieOptions);
-
+            Response.ContentType = "application/json";
             user.RefreshToken = newRefreshToken.Token;
             user.TokenCreated = newRefreshToken.Created;
             user.TokenExpires = newRefreshToken.Expires;

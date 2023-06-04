@@ -68,7 +68,6 @@ namespace MySuperApi.HubConfig
 
             await Clients.Caller.SendAsync("GetChatsDetailsResponse", chat);
         }
-
         public async Task SendMessage(string chatId, string senderId, string message)
         {
             var chatMessage = await _chatRepository.SendMessage(chatId, senderId, message);

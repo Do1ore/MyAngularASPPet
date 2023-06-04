@@ -40,9 +40,10 @@ export class SignalRMessageService {
   }
 
   public getHubConnection(): HubConnection {
-    if (!this.hubConnection) {
+    if (!this.hubConnection || this.hubConnection?.state !== 'Connected') {
       this.hubConnection = new HubConnectionBuilder()
         .withUrl(this.baseApiUrl + 'hub/user')
+        .withAutomaticReconnect()
         .build();
 
       this.hubConnection.start()
@@ -52,6 +53,13 @@ export class SignalRMessageService {
         .catch(err => console.error('Error while starting SignalR connection:', err));
     }
     return this.hubConnection;
+  }
+
+  public disconnectFromHub() {
+    if (this.hubConnection) {
+      this.hubConnection.stop().then();
+      console.log('Connection with hub closed');
+    }
   }
 
   public getAllChatsForUserCaller() {
