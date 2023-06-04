@@ -1,5 +1,6 @@
 
 [![Typing SVG](https://readme-typing-svg.herokuapp.com?color=%2336BCF7&lines=WEb+API+Angular+ASP.Net)](https://git.io/typing-svg)
+[![Typing SVG](https://readme-typing-svg.herokuapp.com?color=%23111CF7&lines=В+разработке)](https://git.io/typing-svg)
 <br>
 
 <h1>Учебный проект с Web API и Angular</h1>
