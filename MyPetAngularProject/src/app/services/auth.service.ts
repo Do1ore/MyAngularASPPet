@@ -1,9 +1,9 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {Observable, throwError} from 'rxjs';
+import {Observable} from 'rxjs';
 import {environment} from "../../environments/environment";
 import {User} from "../models/user";
-import {error} from "@angular/compiler-cli/src/transformers/util";
+import {Subject} from "rxjs";
 
 
 @Injectable({
@@ -14,6 +14,10 @@ export class AuthService {
   apiUrl: string = environment.baseApiUrl + "api/" + 'Auth';
   token!: string;
 
+  private logoutSubject = new Subject<void>();
+  public logout$ = this.logoutSubject.asObservable();
+  private currentUserEmailSubject = new Subject<string>();
+  public userEmail$ = this.currentUserEmailSubject.asObservable();
 
   constructor(private http: HttpClient) {
   }
@@ -36,9 +40,10 @@ export class AuthService {
   }
 
   public getMe(): Observable<string> {
-    return this.http.get(this.apiUrl + '/getme', {
+    this.userEmail$ = this.http.get(this.apiUrl + '/getme', {
       responseType: 'text',
     });
+    return this.userEmail$;
   }
 
   public isAuthorized(): boolean {
@@ -72,5 +77,6 @@ export class AuthService {
 
   public logOut(): void {
     localStorage.removeItem(environment.authTokenName);
+    this.logoutSubject.next();
   }
 }

@@ -1,7 +1,7 @@
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {AuthService} from "../services/auth.service";
-import {Observable} from "rxjs";
 import {DarkmodeService} from "../services/darkmode.service";
+import {Subject} from "rxjs";
 
 @Component({
   selector: 'app-navbar',
@@ -9,6 +9,9 @@ import {DarkmodeService} from "../services/darkmode.service";
   styleUrls: ['./navbar.component.scss']
 })
 export class NavbarComponent implements OnInit {
+
+  private logoutSubject = new Subject<void>();
+  public logout$ = this.logoutSubject.asObservable();
 
   set isAuthorized(value: boolean) {
     this._isAuthorized = value;
@@ -22,6 +25,9 @@ export class NavbarComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.authService.userEmail$.subscribe((email: string) => {
+      this.userName = email;
+    });
     this.authService.getMe().subscribe((name: string) => {
         this.userName = name;
       },
@@ -35,7 +41,7 @@ export class NavbarComponent implements OnInit {
 
   logout(): void {
     this.authService.logOut();
-    this._isAuthorized = false;
+    this.isAuthorized = false;
   }
 
   onClick(): void {

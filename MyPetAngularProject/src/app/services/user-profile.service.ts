@@ -32,10 +32,11 @@ export class UserProfileService {
       responseType: 'blob'
     });
   }
+
   public getImageById(userId: string): Observable<Blob> {
     const headers = new HttpHeaders().set('Accept', 'image/png');
     const url = this.baseApiUrl + "/profile-image-by-id";
-    return this.http.post<Blob>(url,{
+    return this.http.post<Blob>(url, {
       userId: userId,
       headers: headers,
       responseType: 'blob'

@@ -28,6 +28,7 @@ export class LoginComponent {
         this.navBar.isAuthorized = true;
         this.router.navigate(['']);
         this.toasterService.success('Success login', 'Success');
+
       },
       error => {
         console.log(`error status : ${error.status} ${error.message}`);

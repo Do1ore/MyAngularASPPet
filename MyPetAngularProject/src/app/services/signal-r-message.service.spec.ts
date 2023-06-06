@@ -1,6 +1,6 @@
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { SignalRMessageService } from './signal-r-message.service';
+import {SignalRMessageService} from './signal-r-message.service';
 
 describe('SignalRMessageService', () => {
   let service: SignalRMessageService;

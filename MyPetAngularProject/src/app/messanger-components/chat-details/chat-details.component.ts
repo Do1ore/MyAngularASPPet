@@ -1,9 +1,9 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {SignalRMessageService} from "../../services/signal-r-message.service";
 import {ChatMainModel} from "../../models/chatMainModel";
-import {Message} from "postcss";
 import {ChatMessage} from "../../models/chatMessage";
 import {UserProfileService} from "../../services/user-profile.service";
+import {Modal, ModalOptions} from "flowbite";
 
 @Component({
   selector: 'app-chat-details',
@@ -16,6 +16,7 @@ export class ChatDetailsComponent implements OnInit {
   @Input() chatId: string = '';
   public userId = '';
   message: string = '';
+  private modalInterface: Modal | null = null;
 
   constructor(public signalRMessageService: SignalRMessageService, public userProfileService: UserProfileService) {
   }
@@ -67,6 +68,42 @@ export class ChatDetailsComponent implements OnInit {
     }
   }
 
+  initModal(): Modal {
+    const $modalElement: HTMLElement = document.querySelector('#popup-modal')!;
 
+    const modalOptions: ModalOptions = {
+      placement: 'top-center',
+      backdrop: 'dynamic',
+      backdropClasses: 'bg-gray-900 bg-opacity-50 dark:bg-opacity-80 fixed inset-0 z-40',
+      closable: true,
+      onHide: () => {
+        console.log('modal is hidden');
+      },
+      onShow: () => {
+        console.log('modal is shown');
+      },
+      onToggle: () => {
+        console.log('modal has been toggled');
+      }
+    }
+    return new Modal($modalElement, modalOptions);
+  }
 
+  toggleDeleteModal() {
+    let modal = new Modal();
+    if (!this.modalInterface) {
+      modal = this.initModal();
+
+    }
+    modal.toggle();
+  }
+
+  closeModal() {
+    let modal = new Modal();
+
+    if (!this.modalInterface) {
+      modal = this.initModal();
+    }
+    modal.hide()
+  }
 }

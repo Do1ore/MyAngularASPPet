@@ -19,7 +19,16 @@ export class ChatDomainComponent implements OnInit {
     this.selectedChatId = chatId;
   }
 
-  ngOnInit(): void {
-
+  ngOnInit() {
+    this.authService.logout$.subscribe(() => {
+      this.router.navigate(['/login']).then();
+      this.toaster.warning('To use chat you need to be authorized', 'Account required👁️');
+      return;
+    });
+    if (!this.authService.isAuthorized()) {
+      this.router.navigate(['/login']).then();
+      this.toaster.warning('To use chat you need to be authorized', 'Account required💀');
+      return;
+    }
   }
 }

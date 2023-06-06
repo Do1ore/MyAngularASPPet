@@ -14,16 +14,14 @@ import {CreateChatDto} from "../models/createChatDto";
 })
 export class SignalRMessageService {
 
-  private hubConnection: HubConnection | null = null;
-  private baseApiUrl = environment.baseApiUrl;
-  private authTokenName = environment.authTokenName;
   public modelSubject: Subject<ChatMainModel[]> = new Subject<ChatMainModel[]>();
   public model$ = this.modelSubject.asObservable();
-
   public chatModel: ChatMainModel = new ChatMainModel();
   public chatDetailsSubject: Subject<ChatMainModel> = new Subject<ChatMainModel>();
   public chatDetails$ = this.modelSubject.asObservable();
-
+  private hubConnection: HubConnection | null = null;
+  private baseApiUrl = environment.baseApiUrl;
+  private authTokenName = environment.authTokenName;
   private userId: string = '';
 
   constructor(private jwtHelper: JwtHelperService, private toaster: ToastrService) {

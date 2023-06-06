@@ -5,11 +5,9 @@ import {Subscription} from "rxjs";
 import {Dropdown, DropdownInterface, DropdownOptions, Modal, ModalInterface, ModalOptions} from "flowbite";
 import {UserProfileService} from "../../services/user-profile.service";
 import {AppUser} from "../../models/appUser";
-import {DomSanitizer} from "@angular/platform-browser";
 import {ToastrService} from "ngx-toastr";
 import {CreateChatDto} from "../../models/createChatDto";
 import {AuthService} from "../../services/auth.service";
-import {Route, Router} from "@angular/router";
 
 @Component({
   selector: 'app-chat',
@@ -43,23 +41,22 @@ export class ChatComponent implements OnInit, OnDestroy {
   constructor(
     public signalRMessageService: SignalRMessageService,
     public userService: UserProfileService,
-    private sanitizer: DomSanitizer,
     public toaster: ToastrService,
     public authService: AuthService,
-    private router: Router
   ) {
   }
 
   async ngOnInit(): Promise<void> {
-    if (!this.authService.isAuthorized()) {
-      this.router.navigate(['/login']).then();
-      this.toaster.warning('To use chat you need to be authorized', 'Account required');
-
+    this.authService.logout$.subscribe(() => {
+      this.chatMainModel = [];
+      this.appUsers = [];
+      this.appUsersSearch = [];
+      this.signalRMessageService.disconnectFromHub();
+      console.log('Logging out');
       return;
-    }
+    });
     this.initDropdownMenu();
     this.signalRMessageService.getHubConnection();
-
     await this.waitForHubConnection();
     await this.getChatInfo();
     await this.waitForChats();
