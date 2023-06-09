@@ -21,14 +21,14 @@ export class LoginComponent {
               private toasterService: ToastrService) {
   }
 
-  onSubmit(user: User): void {
-    this.authService.login(user).subscribe((token: string) => {
+  onSubmit(user: User) {
+    this.authService.login(user).subscribe(async (token: string) => {
         this.errorMessage = '';
         localStorage.setItem(this.authToken, token)
         this.navBar.isAuthorized = true;
-        this.router.navigate(['']);
+        await this.router.navigate(['']);
         this.toasterService.success('Success login', 'Success');
-
+        this.authService.loginSubject.next();
       },
       error => {
         console.log(`error status : ${error.status} ${error.message}`);

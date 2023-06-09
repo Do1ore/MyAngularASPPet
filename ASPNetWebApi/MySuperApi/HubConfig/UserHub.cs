@@ -1,12 +1,7 @@
-﻿using Azure.Messaging;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.SignalR;
 using MySuperApi.DTOs;
-using MySuperApi.Migrations;
-using MySuperApi.Models.MessageModels;
 using MySuperApi.Repositories.Interfaces;
 using MySuperApi.Services.UserService;
-using NuGet.Protocol.Plugins;
 
 namespace MySuperApi.HubConfig
 {

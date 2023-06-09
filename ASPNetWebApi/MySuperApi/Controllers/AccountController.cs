@@ -34,9 +34,9 @@ namespace MySuperApi.Controllers
         [HttpPost("upload"), DisableRequestSizeLimit]
         public async Task<IActionResult> UploadAsync()
         {
-            var userId = _userService.GetMyId();
-            var a = _userService.GetMyName();
-            var user = await _db.Users
+            string userId = _userService.GetMyId();
+            string a = _userService.GetMyName();
+            AppUser? user = await _db.Users
                 .Include(a => a.UserProfileImages)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(i => i.Id.ToString() == userId);
@@ -46,32 +46,32 @@ namespace MySuperApi.Controllers
             }
 
 
-            var file = Request.Form.Files[0];
+            IFormFile file = Request.Form.Files[0];
             string folderName = Path.Combine("Resourses", "Uploaded");
             string pathToSave = Path.Combine(Directory.GetCurrentDirectory());
 
             if (file.Length > 0)
             {
-                var filename = Guid.NewGuid().ToString()
+                string filename = Guid.NewGuid().ToString()
                     + DateTime.Now.ToShortDateString()
                     + ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName!.Trim('"');
 
-                var fullPath = Path.Combine(pathToSave, folderName, filename);
-                var relativePath = Path.Combine(folderName, filename);
+                string fullPath = Path.Combine(pathToSave, folderName, filename);
+                string relativePath = Path.Combine(folderName, filename);
 
-                using (var stream = new FileStream(fullPath, FileMode.Create))
+                using (FileStream stream = new(fullPath, FileMode.Create))
                 {
                     file.CopyTo(stream);
                 }
-                var profileImage = _userProfileImage.CreateProfileImageModel(filename, relativePath, userId);
+                UserProfileImage profileImage = _userProfileImage.CreateProfileImageModel(filename, relativePath, userId);
 
-                await _db.ProfileImages.AddAsync(profileImage);
-                await _db.ProfileImageStorages.AddAsync(new UserProfileImageStorage()
+                _ = await _db.ProfileImages.AddAsync(profileImage);
+                _ = await _db.ProfileImageStorages.AddAsync(new UserProfileImageStorage()
                 {
                     UserId = Guid.Parse(userId),
                     ProfileImage = profileImage
                 });
-                await _db.SaveChangesAsync();
+                _ = await _db.SaveChangesAsync();
                 await _chatResository.UpdateCurrentProfileImage(profileImage.ImageId.ToString(), userId);
 
                 return Ok(new JsonResult("Uploaded"));
@@ -86,9 +86,9 @@ namespace MySuperApi.Controllers
         [HttpGet("profile-image")]
         public async Task<IActionResult> GetProfileImage()
         {
-            var userId = _userService.GetMyId();
-            var a = _userService.GetMyName();
-            var user = await _db.Users
+            string userId = _userService.GetMyId();
+            string a = _userService.GetMyName();
+            AppUser? user = await _db.Users
                 .AsNoTracking()
                 .FirstOrDefaultAsync(i => i.Id.ToString() == userId);
             if (user == null)
@@ -96,7 +96,7 @@ namespace MySuperApi.Controllers
                 return Unauthorized("User not found");
             }
 
-            var imagePath = await _chatResository.GetProfileImage(userId);
+            string imagePath = await _chatResository.GetProfileImage(userId);
             if (string.IsNullOrEmpty(imagePath))
             {
                 return BadRequest("No image found.");
@@ -106,7 +106,7 @@ namespace MySuperApi.Controllers
             {
                 return BadRequest("No image file found.");
             }
-            var file = System.IO.File.ReadAllBytes(pathToImage);
+            byte[] file = System.IO.File.ReadAllBytes(pathToImage);
             Response.Headers.Add("Content-Type", "image/png");
 
             return File(file, "image/png");
@@ -115,14 +115,14 @@ namespace MySuperApi.Controllers
         [HttpPost("profile-image-by-id")]
         public async Task<FileContentResult> GetProfileImageById([FromBody] UserIdModel userIdModel)
         {
-            var user = await _db.Users
+            AppUser? user = await _db.Users
                 .AsNoTracking()
                 .FirstOrDefaultAsync(i => i.Id.ToString() == userIdModel.userId);
             if (user == null)
             {
             }
 
-            var imagePath = await _chatResository.GetProfileImage(userIdModel.userId);
+            string imagePath = await _chatResository.GetProfileImage(userIdModel.userId);
             if (string.IsNullOrEmpty(imagePath))
             {
             }
@@ -130,8 +130,8 @@ namespace MySuperApi.Controllers
             if (!System.IO.File.Exists(pathToImage))
             {
             }
-            var file = await System.IO.File.ReadAllBytesAsync(pathToImage);
-            var extension = Path.GetExtension(pathToImage);
+            byte[] file = await System.IO.File.ReadAllBytesAsync(pathToImage);
+            string extension = Path.GetExtension(pathToImage);
 
             Response.Headers.Add("Content-Type", GetMimeType(extension));
             Response.StatusCode = 200;
@@ -140,37 +140,28 @@ namespace MySuperApi.Controllers
 
         public class UserIdModel
         {
-            public string userId { get; set; }
+            public required string userId { get; set; }
         }
 
         [HttpPost("search-user")]
         public async Task<IActionResult> SearchUser([FromBody] SearchUserModel searchUserModel)
         {
-            var users = await _chatResository.SearchUsers(searchUserModel.SearchTerm);
-            if (users == null || users.Count < 0)
-            {
-                return BadRequest("No users found");
-            }
-            return Ok(users);
+            List<AppUser> users = await _chatResository.SearchUsers(searchUserModel.SearchTerm);
+            return users == null || users.Count < 0 ? BadRequest("No users found") : Ok(users);
         }
         public class SearchUserModel
         {
-            public string SearchTerm { get; set; }
+            public required string SearchTerm { get; set; }
         }
 
         private string GetMimeType(string fileExtension)
         {
-            switch (fileExtension.ToLower())
+            return fileExtension.ToLower() switch
             {
-                case ".jpg":
-                case ".jpeg":
-                    return "image/jpeg";
-                case ".png":
-                    return "image/png";
-                // Добавьте другие расширения и соответствующие MIME-типы по необходимости
-                default:
-                    return "application/octet-stream"; // MIME-тип по умолчанию для неизвестных расширений
-            }
+                ".jpg" or ".jpeg" => "image/jpeg",
+                ".png" => "image/png",
+                _ => "application/octet-stream",
+            };
         }
     }
 }

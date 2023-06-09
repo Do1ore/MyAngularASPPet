@@ -22,10 +22,14 @@ export class SignalRMessageService {
   private hubConnection: HubConnection | null = null;
   private baseApiUrl = environment.baseApiUrl;
   private authTokenName = environment.authTokenName;
-  private userId: string = '';
+
+
+
+  private signalRConnectedSubject: Subject<void> = new Subject<void>();
+  public signalRConnect$ = this.signalRConnectedSubject.asObservable();
+
 
   constructor(private jwtHelper: JwtHelperService, private toaster: ToastrService) {
-    this.userId = this.getUserIdFromToken();
   }
 
   public getUserIdFromToken(): string {
@@ -38,6 +42,7 @@ export class SignalRMessageService {
   }
 
   public getHubConnection(): HubConnection {
+    console.log('method started!')
     if (!this.hubConnection || this.hubConnection?.state !== 'Connected') {
       this.hubConnection = new HubConnectionBuilder()
         .withUrl(this.baseApiUrl + 'hub/user')
@@ -46,6 +51,7 @@ export class SignalRMessageService {
 
       this.hubConnection.start()
         .then(() => {
+          this.signalRConnectedSubject.next();
           this.getAllChatsForUserListener();
         })
         .catch(err => console.error('Error while starting SignalR connection:', err));
@@ -65,9 +71,10 @@ export class SignalRMessageService {
       console.log("not yet1")
       return;
     }
+    let userId = this.getUserIdFromToken();
 
     console.log("yes1");
-    this.hubConnection!.invoke('GetAllChatsForUser', this.userId)
+    this.hubConnection!.invoke('GetAllChatsForUser', userId)
       .catch(err => console.error(err));
   }
 
@@ -92,7 +99,9 @@ export class SignalRMessageService {
     if (this.hubConnection === null || this.hubConnection.state != 'Connected') {
       return;
     }
-    this.hubConnection!.invoke('GetChatsDetails', this.userId, chatId)
+    let userId = this.getUserIdFromToken();
+
+    this.hubConnection!.invoke('GetChatsDetails', userId, chatId)
       .catch(err => console.error(err));
   }
 
@@ -137,10 +146,12 @@ export class SignalRMessageService {
     if (this.hubConnection === null || this.hubConnection.state != 'Connected') {
       return;
     }
-    if (this.userId.length === 0) {
+    let userId = this.getUserIdFromToken();
+
+    if (userId.length === 0) {
       return;
     }
-    return this.hubConnection.invoke('SendMessage', chatId, this.userId, message);
+    return this.hubConnection.invoke('SendMessage', chatId, userId, message);
   }
 
   public onReceiveMessage(callback: (message: ChatMessage) => void): void {

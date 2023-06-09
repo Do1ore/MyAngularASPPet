@@ -1,10 +1,15 @@
 <div *ngIf="chatId" class="p-4 sm:ml-64 pt-36">
   <div class="p-4 rounded-lg dark:border-gray-700">
     <div class="grid mb-4">
-      <div class="flex h-24 pl-5 items-center rounded bg-gray-50 dark:bg-gray-800">
-        <div class="flex flex-row justify-start items-start">
-          <h1 class="text-2xl font-bold me-4 dark:text-white">{{chatModel.name}}</h1>
-          <span class="text-2xl dark:text-gray-50 me-3">Users: {{chatModel.chatUsers.length}}</span>
+      <div class="flex h-fit p-3 pl-5 items-center rounded bg-gray-50 dark:bg-gray-800">
+        <div class="flex-row justify-start items-start">
+          <h1
+            class="justify-center items-center mb-4 text-3xl font-extrabold text-gray-900 dark:text-white md:text-5xl lg:text-6xl me-2">
+            <span
+              class="text-transparent bg-clip-text bg-gradient-to-r to-emerald-600 from-sky-400">{{chatModel.name}}</span>
+          </h1>
+          <span
+            class="justify-center items-center float-none text-2xl dark:text-gray-50 me-3">Users: {{chatModel.chatUsers.length}}</span>
           <button
             (click)="toggleDeleteModal()"
             type="button"
@@ -19,16 +24,18 @@
         </div>
       </div>
     </div>
-    <div *ngIf="chatModel.messages.length > 0" class="pt-10 pb-20">
-      <div *ngFor="let message of chatModel.messages" class="">
+    <div *ngIf="chatModel.messages.length > 0" class="pt-10 pb-20 px-0 sm:px-0 md:px-6 lg:px-8 xl:px-10">
+      <div *ngFor="let message of chatModel.messages" class="flex-row">
         <div *ngIf="message.senderId === userId"
-             class="bg-gray-100 dark:bg-cyan-950  rounded-md mt-2 p-3 flex-row w-fit justify-center justify-start">
-          <span class="me-4 text-black dark:text-fuchsia-100">{{message.sender!.username!}}</span>
+             class="bg-gray-100 dark:bg-cyan-950  rounded-md mt-2 p-3 self-end w-fit content-start ml-auto max-w-xl">
+          <mark
+            class="me-4 p-1 text-white bg-blue-600 rounded dark:bg-blue-500 font-bold">{{message.sender!.username!}}</mark>
           <span class="text-black dark:text-fuchsia-100">{{message.content}}</span>
         </div>
         <div *ngIf="message.senderId !== userId"
-             class="bg-gray-50 dark:bg-gray-800 rounded-md mt-2 p-3 flex-row justify-center justify-end w-fit">
-          <span class="me-4 text-black dark:text-fuchsia-100">{{message.sender!.username!}}</span>
+             class="bg-gray-50 dark:bg-gray-800 rounded-md mt-2 p-3 content-start w-fit">
+          <mark
+            class="me-4 p-1 text-white bg-gray-600 rounded dark:bg-gray-600 font-bold">{{message.sender!.username!}}</mark>
           <span class="text-black dark:text-lime-100">{{message.content}}</span>
         </div>
       </div>
@@ -112,8 +119,11 @@
 
 <!-- Delete chat modal -->
 <div id="popup-modal" tabindex="-1"
-     class="fixed top-0 left-0 right-0 z-50 hidden p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
-  <div class="relative w-full max-w-md max-h-full">
+     class="
+     fixed top-0 left-0 right-0 z-50 hidden p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full"
+     style="backdrop-filter: blur(15px)!important;">
+  <div class="relative w-full max-w-md max-h-full"
+       style="top: 300px !important;">
     <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
       <button
         (click)="closeModal()"

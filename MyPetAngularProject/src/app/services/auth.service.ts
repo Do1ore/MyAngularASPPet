@@ -1,9 +1,11 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {Observable} from 'rxjs';
+import {catchError, map, Observable, of} from 'rxjs';
 import {environment} from "../../environments/environment";
 import {User} from "../models/user";
 import {Subject} from "rxjs";
+import {SignalRMessageService} from "./signal-r-message.service";
+import {waitForAsync} from "@angular/core/testing";
 
 
 @Injectable({
@@ -14,12 +16,15 @@ export class AuthService {
   apiUrl: string = environment.baseApiUrl + "api/" + 'Auth';
   token!: string;
 
-  private logoutSubject = new Subject<void>();
+  public logoutSubject = new Subject<void>();
   public logout$ = this.logoutSubject.asObservable();
+
+  public loginSubject = new Subject<void>();
+  public login$ = this.loginSubject.asObservable();
   private currentUserEmailSubject = new Subject<string>();
   public userEmail$ = this.currentUserEmailSubject.asObservable();
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, public signalService: SignalRMessageService) {
   }
 
   public register(user: User): Observable<any> {
@@ -29,54 +34,60 @@ export class AuthService {
     );
   }
 
-  public login(user: User): Observable<any> {
+  public login(user: User) : Observable<string> {
     const headers = new HttpHeaders()
       .set('Content-Type', 'application/json');
 
-    return this.http.post(this.apiUrl + '/login', user, {
+    return this.http.post<string>(this.apiUrl + '/login', user, {
       headers: headers,
       withCredentials: true,
     });
   }
 
-  public getMe(): Observable<string> {
-    this.userEmail$ = this.http.get(this.apiUrl + '/getme', {
+  public getMe(): Observable<any> {
+    this.http.get(this.apiUrl + '/getme', {
       responseType: 'text',
+    }).subscribe((response) => {
+      this.currentUserEmailSubject.next(response);
     });
     return this.userEmail$;
   }
 
-  public isAuthorized(): boolean {
-    this.http.get(this.apiUrl + '/refresh-token', {
-      responseType: 'text',
-    }).subscribe((response) => {
+
+  public isAuthorized(): Observable<boolean> {
+
+    return this.http.get(this.apiUrl + '/refresh-token', {
+      responseType: 'json',
+      withCredentials: true,
+    }).pipe(
+      map((response) => {
         console.log(response);
         return true;
-      },
-      error => {
+      }),
+      catchError((error) => {
         console.log(`error status : ${error.status} ${error.message}`);
 
         switch (error.status) {
           case 401: {
-            console.log('Unauthorized')
-            return false;
+            console.log('Unauthorized');
+            return of(false);
           }
           case 403: {
-            console.log('Forbidden')
-            return false;
+            console.log('Forbidden');
+            return of(false);
           }
           default: {
-            return false;
+            return of(false);
           }
         }
-      });
-    if (localStorage.getItem(environment.authTokenName) !== null)
-      return true;
-    return false;
+      })
+    );
   }
+
 
   public logOut(): void {
     localStorage.removeItem(environment.authTokenName);
     this.logoutSubject.next();
+    this.signalService.disconnectFromHub();
   }
 }

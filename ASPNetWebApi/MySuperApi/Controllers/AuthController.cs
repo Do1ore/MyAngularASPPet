@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using JWTModule;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -10,7 +11,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 
-namespace JWTModule.Controllers
+namespace MySuperApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -30,7 +31,8 @@ namespace JWTModule.Controllers
         [HttpGet("getme"), Authorize]
         public ActionResult<string> GetMe()
         {
-            var userName = _userService.GetMyName();
+            string userName = _userService.GetMyName();
+            Response.ContentType = "text";
             return Ok(userName);
         }
 
@@ -51,25 +53,29 @@ namespace JWTModule.Controllers
 
             };
 
+
             if (await _db.Users.AnyAsync(u => u.Email == request.Email))
             {
                 return BadRequest("Email exists");
             }
-            await _db.Users.AddAsync(user);
-            await _db.SaveChangesAsync();
+            _ = await _db.Users.AddAsync(user);
+            _ = await _db.SaveChangesAsync();
             return Ok(user);
         }
 
         [HttpPost("login")]
         public async Task<ActionResult<string>> Login(UserDto dto)
         {
-            if(dto is null)
+            if (dto is null)
             {
                 return BadRequest("User data is null.");
             }
-            AppUser? user = await _db.Users.Where(u => u.Email == dto.email).Select(u => u).FirstAsync();
+            AppUser? user = await _db.Users.SingleOrDefaultAsync(a => a.Email == dto.email);
 
-            if (user is null) return NotFound("Email not found.");
+            if (user is null)
+            {
+                return NotFound("Email not found.");
+            }
 
             if (!VerifyPasswordHash(dto.password, user.PasswordHash, user.PasswordSalt))
             {
@@ -78,16 +84,23 @@ namespace JWTModule.Controllers
 
             string token = CreateToken(user);
 
-            var refreshToken = GenerateRefreshToken();
+            RefreshToken refreshToken = GenerateRefreshToken();
             SetRefreshToken(refreshToken, user);
 
             return Ok(token);
         }
 
-        [HttpPost("refresh-token")]
-        public async Task<ActionResult<string>> RefreshToken(AppUser user)
+        [HttpGet("refresh-token")]
+        public async Task<ActionResult<string>> RefreshToken()
         {
-            var refreshToken = Request.Cookies["refreshToken"];
+            string userId = _userService.GetMyId();
+            AppUser? user = await _db.Users.SingleOrDefaultAsync(a => a.Id == Guid.Parse(userId));
+            if (user is null)
+            {
+                return NotFound("Email not found");
+            }
+
+            string? refreshToken = Request.Cookies["refreshToken"];
 
             if (!user.RefreshToken.Equals(refreshToken))
             {
@@ -99,27 +112,27 @@ namespace JWTModule.Controllers
             }
 
             string token = CreateToken(user);
-            var newRefreshToken = GenerateRefreshToken();
+            RefreshToken newRefreshToken = GenerateRefreshToken();
             SetRefreshToken(newRefreshToken, user);
-
+            Response.ContentType = "application/json";
             return Ok(token);
         }
 
         private RefreshToken GenerateRefreshToken()
         {
-            var refreshToken = new RefreshToken
+            RefreshToken refreshToken = new()
             {
                 Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
-                Expires = DateTime.Now.AddDays(7),
-                Created = DateTime.Now
+                Expires = DateTime.UtcNow.AddDays(7),
+                Created = DateTime.UtcNow
             };
 
             return refreshToken;
         }
 
-        private void SetRefreshToken(RefreshToken newRefreshToken, AppUser user)
+        private async void SetRefreshToken(RefreshToken newRefreshToken, AppUser user)
         {
-            var cookieOptions = new CookieOptions
+            CookieOptions cookieOptions = new()
             {
                 Secure = true,
                 HttpOnly = true,
@@ -131,48 +144,51 @@ namespace JWTModule.Controllers
             user.RefreshToken = newRefreshToken.Token;
             user.TokenCreated = newRefreshToken.Created;
             user.TokenExpires = newRefreshToken.Expires;
+            _ = await _db.Users
+                .Where(a => a.Id == user.Id)
+                .ExecuteUpdateAsync(s => s
+                .SetProperty(a => a.RefreshToken, newRefreshToken.Token)
+                .SetProperty(a => a.TokenCreated, newRefreshToken.Created)
+                .SetProperty(a => a.TokenExpires, newRefreshToken.Expires));
         }
 
         private string CreateToken(AppUser user)
         {
-            List<Claim> claims = new List<Claim>
+
+            List<Claim> claims = new()
             {
                 new Claim(ClaimTypes.Name, user.Username),
                 new Claim(ClaimTypes.Role, "Admin"),
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
             };
 
-            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
+            SymmetricSecurityKey key = new(System.Text.Encoding.UTF8.GetBytes(
                 _configuration.GetSection("AppSettings:Token").Value));
 
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+            SigningCredentials creds = new(key, SecurityAlgorithms.HmacSha512Signature);
 
-            var token = new JwtSecurityToken(
+            JwtSecurityToken token = new(
                 claims: claims,
                 expires: DateTime.Now.AddDays(1),
                 signingCredentials: creds);
 
-            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+            string jwt = new JwtSecurityTokenHandler().WriteToken(token);
 
             return jwt;
         }
 
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
-            using (var hmac = new HMACSHA512())
-            {
-                passwordSalt = hmac.Key;
-                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-            }
+            using HMACSHA512 hmac = new();
+            passwordSalt = hmac.Key;
+            passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
         }
 
         private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
         {
-            using (var hmac = new HMACSHA512(passwordSalt))
-            {
-                var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-                return computedHash.SequenceEqual(passwordHash);
-            }
+            using HMACSHA512 hmac = new(passwordSalt);
+            byte[] computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+            return computedHash.SequenceEqual(passwordHash);
         }
     }
 }

@@ -30,7 +30,6 @@ export class ChatComponent implements OnInit, OnDestroy {
   public appUsers: AppUser[] = [];
   public appUsersSearch: AppUser[] = [];
   public addUsersArray: AppUser[] = [];
-  public isPageIsLoaded: boolean = false;
   public searchTerm: string = '';
   private subscription: Subscription | undefined;
   private dropdown: DropdownInterface = new Dropdown();
@@ -55,26 +54,21 @@ export class ChatComponent implements OnInit, OnDestroy {
       console.log('Logging out');
       return;
     });
+
     this.initDropdownMenu();
     this.signalRMessageService.getHubConnection();
-    await this.waitForHubConnection();
-    await this.getChatInfo();
-    await this.waitForChats();
+    this.signalRMessageService.signalRConnect$.subscribe(async () => {
+      await this.getChatInfo();
+      await this.waitForChats();
+      this.joinGroups();
+    })
 
-    // Подождите, пока выполнится предыдущая асинхронная операция
-    await new Promise<void>((resolve) => {
-      setTimeout(() => {
-        this.joinGroups();
-        resolve();
-      }, 0);
-    });
     this.signalRMessageService.onReceiveLastMessage((chatId, message) => {
       this.chatMainModel.forEach(a => {
         if (a.id === chatId) a.lastmessage = message;
       })
     })
     console.log('Connected to chat/s')
-
   }
 
   ngOnDestroy(): void {
@@ -110,7 +104,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     const modalOptions: ModalOptions = {
       placement: 'top-center',
       backdrop: 'dynamic',
-      backdropClasses: 'bg-gray-900 bg-opacity-50 dark:bg-opacity-80 fixed inset-0 z-40',
+      backdropClasses: '',
       closable: true,
       onHide: () => {
         console.log('modal is hidden');
@@ -134,8 +128,8 @@ export class ChatComponent implements OnInit, OnDestroy {
       return;
     }
     this.addUsersArray.forEach(u => chatDto.userId.push(u.id));
-    //current userid
-    chatDto.userId.push(this.signalRMessageService.getUserIdFromToken());
+    //current userId
+    chatDto.creatorId = this.signalRMessageService.getUserIdFromToken();
 
     this.signalRMessageService.createChatCaller(chatDto);
     this.signalRMessageService.createChatListener((chat) => {
@@ -198,14 +192,6 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   hideDropdown() {
     this.dropdown.hide();
-  }
-
-  async waitForHubConnection(): Promise<void> {
-    while (this.signalRMessageService.getHubConnection().state != 'Connected') {
-      //wait 100 milliseconds and check state again and again
-      console.log('waiting');
-      await new Promise(resolve => setTimeout(resolve, 100));
-    }
   }
 
   async waitForChats(): Promise<void> {

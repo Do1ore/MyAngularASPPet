@@ -1,12 +1,9 @@
-﻿using Azure.Messaging;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using MySuperApi.HubConfig;
 using MySuperApi.Models;
 using MySuperApi.Models.MessageModels;
-using MySuperApi.Repositories.Implementation;
 using MySuperApi.Repositories.Interfaces;
-using NuGet.Protocol.Plugins;
 
 namespace MySuperApi.Controllers
 {
@@ -32,15 +29,15 @@ namespace MySuperApi.Controllers
             return Ok();
         }
 
-       
 
-   
+
+
 
         [HttpPost("test-message")]
 
         public async Task<IActionResult> TestMessageAsync(string chatId, string senderId, string messageContent)
         {
-            await _chatRepository.SendMessage(chatId, senderId, messageContent);
+            _ = await _chatRepository.SendMessage(chatId, senderId, messageContent);
             return Ok();
         }
 

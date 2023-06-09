@@ -10,9 +10,6 @@ import {Subject} from "rxjs";
 })
 export class NavbarComponent implements OnInit {
 
-  private logoutSubject = new Subject<void>();
-  public logout$ = this.logoutSubject.asObservable();
-
   set isAuthorized(value: boolean) {
     this._isAuthorized = value;
   }
@@ -24,7 +21,7 @@ export class NavbarComponent implements OnInit {
   constructor(private authService: AuthService, private themeService: DarkmodeService) {
   }
 
-  ngOnInit(): void {
+  async ngOnInit() {
     this.authService.userEmail$.subscribe((email: string) => {
       this.userName = email;
     });
@@ -36,15 +33,29 @@ export class NavbarComponent implements OnInit {
       });
     this.setUpExpandNavbar();
     this.themeService.setUpThemes();
-    this._isAuthorized = this.authService.isAuthorized();
+    await this.authService.isAuthorized().subscribe((response) => {
+      this._isAuthorized = response;
+    });
+
+    //if user logins update current nav username
+    this.authService.login$.subscribe(() => {
+      this.authService.getMe().subscribe((name: string) => {
+          this.userName = name;
+          console.log(name)
+        },
+        error => {
+          this._isAuthorized = false;
+        });
+    })
   }
 
   logout(): void {
     this.authService.logOut();
+
     this.isAuthorized = false;
   }
 
-  onClick(): void {
+  onThemeButtonClick(): void {
     let themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
     let themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
 // Change the icons inside the button based on previous settings

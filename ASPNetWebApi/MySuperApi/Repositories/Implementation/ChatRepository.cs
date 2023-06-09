@@ -170,6 +170,7 @@ namespace MySuperApi.Repositories.Implementation
             {
                 Id = chatId,
                 Name = chatDto.ChatName,
+                ChatAdministrator = Guid.Parse(chatDto.CreatorId),
             };
             foreach (var user in appUser)
             {
@@ -180,7 +181,13 @@ namespace MySuperApi.Repositories.Implementation
                 });
             }
 
-          
+            //Adding admin to chat
+            chatUsers.Add(new ChatUser()
+            {
+                ChatId = chatId,
+                UserId = Guid.Parse(chatDto.CreatorId),
+            });
+
             await _db.Chats.AddAsync(chat);
             await _db.ChatUsers.AddRangeAsync(chatUsers);
             await _db.SaveChangesAsync();

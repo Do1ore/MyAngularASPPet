@@ -8,5 +8,7 @@ namespace MySuperApi.DTOs
         public string? ChatName { get; set; }
         [Required]
         public List<string>? UserId { get; set; }
+        [Required]
+        public string? CreatorId { get; set; }
     }
 }
