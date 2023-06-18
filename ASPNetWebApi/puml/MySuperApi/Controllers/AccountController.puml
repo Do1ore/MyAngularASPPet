@@ -1,0 +1,18 @@
+@startuml
+class AccountController {
+    + AccountController(pathMaster:IPathMaster, userService:IUserService, db:AppDbContext, userProfileImage:IProfileImageService, chatResository:IChatRepository)
+    + <<async>> UploadAsync() : Task<IActionResult>
+    + <<async>> GetProfileImage() : Task<IActionResult>
+    + <<async>> GetProfileImageById(userIdModel:UserIdModel) : Task<FileContentResult>
+    + <<async>> SearchUser(searchUserModel:SearchUserModel) : Task<IActionResult>
+}
+class UserIdModel {
+    userId : string <<get>> <<set>>
+}
+class SearchUserModel {
+    SearchTerm : string <<get>> <<set>>
+}
+ControllerBase <|-- AccountController
+AccountController +-- UserIdModel
+AccountController +-- SearchUserModel
+@enduml

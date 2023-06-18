@@ -1,0 +1,5 @@
+@startuml
+interface IProfileImageService {
+    CreateProfileImageModel(filename:string, webpath:string, userId:string) : UserProfileImage
+}
+@enduml

@@ -1,0 +1,12 @@
+@startuml
+interface IChatRepository {
+    + CreateChat(chatDto:CreateChatDto) : Task<Chat>
+    + GetProfileImage(userId:string) : Task<string>
+    + SendMessage(chatId:string, senderId:string, messageContent:string) : Task<ChatMessage>
+    + GetChatsForUser(userId:string) : Task<List<Chat>>
+    + GetChatDetails(userId:string, chatId:string) : Task<Chat>
+    + GetMessageDetails(message:ChatMessage) : Task<ChatMessage>
+    UpdateCurrentProfileImage(imageId:string, userId:string) : Task
+    + SearchUsers(searchTerm:string) : Task<List<AppUser>>
+}
+@enduml

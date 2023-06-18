@@ -1,0 +1,5 @@
+@startuml
+class profileImage3 <<partial>> {
+}
+Migration <|-- profileImage3
+@enduml

@@ -1,0 +1,14 @@
+@startuml
+class UserHub {
+    + UserHub(logger:ILogger<UserHub>, chatRepository:IChatRepository, userService:IUserService, hubContext:IHubContext<UserHub>)
+    + <<async>> GetAllChatsForUser(userId:string) : Task
+    + <<async>> GetChatsDetails(userId:string, chatId:string) : Task
+    + <<async>> SendMessage(chatId:string, senderId:string, message:string) : Task
+    + <<async>> JoinChat(chatId:string) : Task
+    + <<async>> LeaveChat(chatId:string) : Task
+    + <<async>> CreateChat(chatDto:CreateChatDto) : Task
+    + <<override>> OnConnectedAsync() : Task
+    + <<override>> OnDisconnectedAsync(exception:Exception?) : Task
+}
+Hub <|-- UserHub
+@enduml

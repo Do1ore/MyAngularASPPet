@@ -1,0 +1,5 @@
+@startuml
+class imageBytes <<partial>> {
+}
+Migration <|-- imageBytes
+@enduml

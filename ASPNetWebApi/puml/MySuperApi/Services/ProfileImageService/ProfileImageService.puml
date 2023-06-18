@@ -1,0 +1,6 @@
+@startuml
+class ProfileImageService {
+    + CreateProfileImageModel(filename:string, webpath:string, userId:string) : UserProfileImage
+}
+IProfileImageService <|-- ProfileImageService
+@enduml

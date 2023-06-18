@@ -1,0 +1,8 @@
+@startuml
+class UserService {
+    + UserService(httpContextAccessor:IHttpContextAccessor)
+    + GetMyId() : string
+    + GetMyName() : string
+}
+IUserService <|-- UserService
+@enduml

@@ -1,4 +1,4 @@
-import {Component, Input, OnChanges, OnInit} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, Input, OnChanges, OnInit, ViewChild} from '@angular/core';
 import {SignalRMessageService} from "../../services/signal-r-message.service";
 import {ChatMainModel} from "../../models/chatMainModel";
 import {ChatMessage} from "../../models/chatMessage";
@@ -14,7 +14,7 @@ import {Subscription} from "rxjs";
   templateUrl: './chat-details.component.html',
   styleUrls: ['./chat-details.component.scss']
 })
-export class ChatDetailsComponent implements OnInit, OnChanges {
+export class ChatDetailsComponent implements OnInit, OnChanges, AfterViewInit {
 
   @Input() chatModel: ChatMainModel = new ChatMainModel();
   @Input() chatId: string = '';
@@ -31,6 +31,19 @@ export class ChatDetailsComponent implements OnInit, OnChanges {
     public toaster: ToastrService) {
   }
 
+  @ViewChild('bottom') scrollTarget!: ElementRef;
+
+  ngAfterViewInit() {
+    setTimeout(() => {
+      this.scrollToBottom();
+    }, 200);
+  }
+
+  scrollToBottom() {
+    if (this.scrollTarget && this.scrollTarget.nativeElement) {
+      this.scrollTarget.nativeElement.scrollIntoView({behavior: 'smooth'});
+    }
+  }
 
   async ngOnInit() {
     this.authService.logout$.subscribe(() => {
@@ -67,7 +80,7 @@ export class ChatDetailsComponent implements OnInit, OnChanges {
     this.signalRMessageService.sendMessage(this.chatId, this.message);
     console.log(this.message);
     this.message = '';
-
+    this.scrollToBottom();
   }
 
 

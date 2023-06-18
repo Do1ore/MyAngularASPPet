@@ -1,0 +1,5 @@
+@startuml
+class chatOwner <<partial>> {
+}
+Migration <|-- chatOwner
+@enduml

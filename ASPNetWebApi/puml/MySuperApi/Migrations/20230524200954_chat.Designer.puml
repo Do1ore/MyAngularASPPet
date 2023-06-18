@@ -1,0 +1,4 @@
+@startuml
+class chat <<partial>> {
+}
+@enduml
