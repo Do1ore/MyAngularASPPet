@@ -1,0 +1,8 @@
+@startuml
+class MessageController {
+    + MessageController(db:AppDbContext, chatRepository:IChatRepository, hubContext:IHubContext<UserHub>)
+    + <<async>> SendModelToClient(connectionId:string, model:Chat) : Task<IActionResult>
+    + <<async>> TestMessageAsync(chatId:string, senderId:string, messageContent:string) : Task<IActionResult>
+}
+ControllerBase <|-- MessageController
+@enduml

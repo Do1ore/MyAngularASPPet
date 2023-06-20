@@ -20,6 +20,7 @@ import {SignalRMessageService} from "./services/signal-r-message.service";
 import { ChatDetailsComponent } from './messanger-components/chat-details/chat-details.component';
 import { ChatDomainComponent } from './messanger-components/chat-domain/chat-domain.component';
 import { TruncateTextPipe } from './services/pipes/truncate-text.pipe';
+import { AncientPageComponent } from './ancientpage/ancient-page.component';
 
 export function jwtOptionsFactory(): JwtModuleOptions {
   return {
@@ -42,6 +43,7 @@ export function jwtOptionsFactory(): JwtModuleOptions {
     ChatDetailsComponent,
     ChatDomainComponent,
     TruncateTextPipe,
+    AncientPageComponent,
   ],
   imports: [
     BrowserModule,

@@ -1,0 +1,4 @@
+@startuml
+class profileImage3 <<partial>> {
+}
+@enduml

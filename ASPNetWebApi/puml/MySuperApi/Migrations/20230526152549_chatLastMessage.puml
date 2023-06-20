@@ -1,0 +1,5 @@
+@startuml
+class chatLastMessage <<partial>> {
+}
+Migration <|-- chatLastMessage
+@enduml

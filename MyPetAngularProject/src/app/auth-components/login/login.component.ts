@@ -1,10 +1,10 @@
-import {Component} from '@angular/core';
-import {Router} from "@angular/router";
-import {AuthService} from "../../services/auth.service";
-import {User} from "../../models/user";
-import {environment} from "../../../environments/environment";
-import {NavbarComponent} from "../../navbar/navbar.component";
-import {ToastrService} from "ngx-toastr";
+import { Component } from '@angular/core';
+import { Router } from "@angular/router";
+import { AuthService } from "../../services/auth.service";
+import { User } from "../../models/user";
+import { environment } from "../../../environments/environment";
+import { NavbarComponent } from "../../navbar/navbar.component";
+import { ToastrService } from "ngx-toastr";
 
 
 @Component({
@@ -18,18 +18,18 @@ export class LoginComponent {
   private authToken: string = environment.authTokenName;
 
   constructor(private authService: AuthService, private router: Router, private navBar: NavbarComponent,
-              private toasterService: ToastrService) {
+    private toasterService: ToastrService) {
   }
 
   onSubmit(user: User) {
     this.authService.login(user).subscribe(async (token: string) => {
-        this.errorMessage = '';
-        localStorage.setItem(this.authToken, token)
-        this.navBar.isAuthorized = true;
-        await this.router.navigate(['']);
-        this.toasterService.success('Success login', 'Success');
-        this.authService.loginSubject.next();
-      },
+      this.errorMessage = '';
+      localStorage.setItem(this.authToken, token)
+      this.navBar.isAuthorized = true;
+      await this.router.navigate(['']);
+      this.toasterService.success('Success login', 'Success');
+      this.authService.loginSubject.next();
+    },
       error => {
         console.log(`error status : ${error.status} ${error.message}`);
 

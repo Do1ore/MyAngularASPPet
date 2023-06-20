@@ -1,0 +1,5 @@
+@startuml
+class UserIdDto {
+    + userId : string? <<get>> <<set>>
+}
+@enduml

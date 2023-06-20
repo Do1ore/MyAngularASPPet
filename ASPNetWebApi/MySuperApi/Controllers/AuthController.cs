@@ -95,7 +95,7 @@ namespace MySuperApi.Controllers
         {
             string userId = _userService.GetMyId();
             AppUser? user = await _db.Users.SingleOrDefaultAsync(a => a.Id == Guid.Parse(userId));
-            if (user is null)
+            if (user is null | string.IsNullOrEmpty(user?.Id.ToString()))
             {
                 return NotFound("Email not found");
             }
@@ -113,7 +113,7 @@ namespace MySuperApi.Controllers
 
             string token = CreateToken(user);
             RefreshToken newRefreshToken = GenerateRefreshToken();
-            SetRefreshToken(newRefreshToken, user);
+            await SetRefreshToken(newRefreshToken, user);
             Response.ContentType = "application/json";
             return Ok(token);
         }
@@ -130,7 +130,7 @@ namespace MySuperApi.Controllers
             return refreshToken;
         }
 
-        private async void SetRefreshToken(RefreshToken newRefreshToken, AppUser user)
+        private async Task SetRefreshToken(RefreshToken newRefreshToken, AppUser user)
         {
             CookieOptions cookieOptions = new()
             {
@@ -144,7 +144,7 @@ namespace MySuperApi.Controllers
             user.RefreshToken = newRefreshToken.Token;
             user.TokenCreated = newRefreshToken.Created;
             user.TokenExpires = newRefreshToken.Expires;
-            _ = await _db.Users
+            await _db.Users
                 .Where(a => a.Id == user.Id)
                 .ExecuteUpdateAsync(s => s
                 .SetProperty(a => a.RefreshToken, newRefreshToken.Token)

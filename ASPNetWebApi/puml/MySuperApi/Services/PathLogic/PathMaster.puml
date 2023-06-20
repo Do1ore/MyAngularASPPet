@@ -1,0 +1,7 @@
+@startuml
+class PathMaster {
+    + CreateFileName(filename:string) : string
+    + CreatePath(filename:string) : string
+}
+IPathMaster <|-- PathMaster
+@enduml

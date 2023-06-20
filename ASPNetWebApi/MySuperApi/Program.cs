@@ -13,6 +13,8 @@ using MySuperApi.Services.ProfileImageService;
 using MySuperApi.HubConfig;
 using MySuperApi.Repositories.Interfaces;
 using MySuperApi.Repositories.Implementation;
+using MySuperApi.Extensions;
+using Microsoft.AspNetCore.Builder;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,10 +49,7 @@ builder.Services.Configure<FormOptions>(options =>
     options.MultipartBodyLengthLimit = int.MaxValue;
 });
 
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v3", new OpenApiInfo { Title = "My API", Version = "v3" });
-});
+builder.Services.ConfigureSwagger();
 
 builder.Services.AddAutoMapper(typeof(AppMappingProfile));
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -68,23 +67,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v3/swagger.json", "My SuserAPI V3");
-        c.RoutePrefix = string.Empty;
-    });
-
-}
 app.UseCors("default");
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"Resourses")),
-    RequestPath = new PathString("/Resourses")
-});
+app.UseStaticFiles(
+    new StaticFileOptions
+    {
+        FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"Resourses")),
+        RequestPath = new PathString("/Resourses")
+    });
 
 //SignalR route
 app.MapHub<UserHub>("hub/user");
@@ -92,6 +81,13 @@ app.MapHub<UserHub>("hub/user");
 app.UseStaticFiles();
 app.UseHttpsRedirection();
 app.MapControllers();
-app.MapSwagger();
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint(
+        "/swagger/v1/swagger.json",
+        "MessageApi V1");
+    c.RoutePrefix = string.Empty;
+});
 
 app.Run();

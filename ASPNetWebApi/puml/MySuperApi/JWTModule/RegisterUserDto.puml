@@ -1,0 +1,8 @@
+@startuml
+class RegisterUserDto {
+    + Username : string <<get>> <<set>>
+    + Email : string <<get>> <<set>>
+    + Password : string <<get>> <<set>>
+    + Surname : string <<get>> <<set>>
+}
+@enduml

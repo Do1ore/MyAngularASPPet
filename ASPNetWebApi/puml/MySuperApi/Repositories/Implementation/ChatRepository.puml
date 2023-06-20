@@ -1,0 +1,14 @@
+@startuml
+class ChatRepository {
+    + ChatRepository(db:AppDbContext, logger:ILogger<ChatRepository>)
+    + <<async>> GetChatsForUser(userId:string) : Task<List<Chat>>
+    + <<async>> GetChatDetails(userId:string, chatId:string) : Task<Chat>
+    + <<async>> GetProfileImage(userId:string) : Task<string>
+    + <<async>> SendMessage(chatId:string, senderId:string, messageContent:string) : Task<ChatMessage>
+    + <<async>> UpdateCurrentProfileImage(imageId:string, userId:string) : Task
+    + <<async>> GetMessageDetails(chatMessage:ChatMessage) : Task<ChatMessage>
+    + <<async>> SearchUsers(searchTerm:string) : Task<List<AppUser>>
+    + <<async>> CreateChat(chatDto:CreateChatDto) : Task<Chat>
+}
+IChatRepository <|-- ChatRepository
+@enduml

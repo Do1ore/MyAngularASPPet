@@ -1,0 +1,5 @@
+@startuml
+class initDb <<partial>> {
+}
+Migration <|-- initDb
+@enduml

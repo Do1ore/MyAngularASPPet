@@ -1,0 +1,7 @@
+@startuml
+class CreateChatDto {
+    + ChatName : string? <<get>> <<set>>
+    + UserId : List<string>? <<get>> <<set>>
+    + CreatorId : string? <<get>> <<set>>
+}
+@enduml

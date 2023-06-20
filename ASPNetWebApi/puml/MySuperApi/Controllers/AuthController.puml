@@ -1,0 +1,10 @@
+@startuml
+class AuthController {
+    + AuthController(configuration:IConfiguration, userService:IUserService, db:AppDbContext)
+    + GetMe() : ActionResult<string>
+    + <<async>> Register(request:RegisterUserDto) : Task<ActionResult<AppUser>>
+    + <<async>> Login(dto:UserDto) : Task<ActionResult<string>>
+    + <<async>> RefreshToken() : Task<ActionResult<string>>
+}
+ControllerBase <|-- AuthController
+@enduml

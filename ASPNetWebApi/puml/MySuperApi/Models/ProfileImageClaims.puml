@@ -1,0 +1,8 @@
+@startuml
+class ProfileImageClaims {
+    + User : AppUser? <<get>> <<set>>
+    + ProfileImage : UserProfileImage? <<get>> <<set>>
+}
+ProfileImageClaims --> "UserId" Guid
+ProfileImageClaims --> "ProfileImageId" Guid
+@enduml

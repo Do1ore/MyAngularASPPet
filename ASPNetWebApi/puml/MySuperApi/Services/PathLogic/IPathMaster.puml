@@ -1,0 +1,6 @@
+@startuml
+interface IPathMaster {
+    + CreatePath(filename:string) : string
+    + CreateFileName(filename:string) : string
+}
+@enduml
