@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
 using MySuperApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -13,8 +12,6 @@ using MySuperApi.Services.ProfileImageService;
 using MySuperApi.HubConfig;
 using MySuperApi.Repositories.Interfaces;
 using MySuperApi.Repositories.Implementation;
-using MySuperApi.Extensions;
-using Microsoft.AspNetCore.Builder;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +28,7 @@ builder.Services.AddTransient<IProfileImageService, ProfileImageService>();
 builder.Services.AddScoped<IChatRepository, ChatRepository>();
 builder.Services.AddSignalR();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddSwaggerGen();
 builder.Services.AddCors(setupAction =>
 {
     setupAction.AddPolicy("default",
@@ -49,7 +47,7 @@ builder.Services.Configure<FormOptions>(options =>
     options.MultipartBodyLengthLimit = int.MaxValue;
 });
 
-builder.Services.ConfigureSwagger();
+
 
 builder.Services.AddAutoMapper(typeof(AppMappingProfile));
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
