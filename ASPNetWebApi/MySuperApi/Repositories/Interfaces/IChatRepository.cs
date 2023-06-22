@@ -14,8 +14,8 @@ namespace MySuperApi.Repositories.Interfaces
         public Task<Chat> GetChatDetails(string userId, string chatId);
         public Task<ChatMessage> GetMessageDetails(ChatMessage message);
         Task UpdateCurrentProfileImage(string imageId, string userId);
-
         public Task<List<AppUser>> SearchUsers(string searchTerm);
+        public Task DeleteChat(string chatId);
 
 
     }

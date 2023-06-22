@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using MySuperApi.DTOs;
+using MySuperApi.Models.MessageModels;
 using MySuperApi.Repositories.Interfaces;
 using MySuperApi.Services.UserService;
 
@@ -24,7 +25,7 @@ namespace MySuperApi.HubConfig
             _userService = userService;
         }
 
- 
+
         public async Task GetAllChatsForUser(string userId)
         {
 
@@ -77,6 +78,13 @@ namespace MySuperApi.HubConfig
             await JoinChat(chatDto.UserId.Last());
         }
 
+        public async Task DeleteChat(string chatId)
+        {
+            await _chatRepository.DeleteChat(chatId);
+            await Clients.Groups(chatId).SendAsync("DeleteChatResponse", chatId);
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, chatId);
+        }
+
         public override Task OnConnectedAsync()
         {
             _logger.LogInformation("New connection: " + Context.ConnectionId);
@@ -88,5 +96,6 @@ namespace MySuperApi.HubConfig
             _logger.LogInformation("Connection " + Context.ConnectionId + " terminated");
             return base.OnDisconnectedAsync(exception);
         }
+
     }
 }

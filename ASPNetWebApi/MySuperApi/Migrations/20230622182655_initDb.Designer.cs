@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MySuperApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230531131646_imageBytes")]
-    partial class imageBytes
+    [Migration("20230622182655_initDb")]
+    partial class initDb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -36,6 +36,9 @@ namespace MySuperApi.Migrations
 
                     b.Property<DateTime>("AccountLastTimeEdited")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<byte[]>("CurrentImageBytes")
+                        .HasColumnType("bytea");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -77,6 +80,9 @@ namespace MySuperApi.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("ChatAdministrator")
                         .HasColumnType("uuid");
 
                     b.Property<string>("Lastmessage")
@@ -227,7 +233,7 @@ namespace MySuperApi.Migrations
             modelBuilder.Entity("MySuperApi.Models.UserProfileImage", b =>
                 {
                     b.HasOne("MySuperApi.Models.AppUser", "AppUser")
-                        .WithMany()
+                        .WithMany("UserProfileImages")
                         .HasForeignKey("AppUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -252,6 +258,11 @@ namespace MySuperApi.Migrations
                     b.Navigation("ProfileImage");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("MySuperApi.Models.AppUser", b =>
+                {
+                    b.Navigation("UserProfileImages");
                 });
 #pragma warning restore 612, 618
         }

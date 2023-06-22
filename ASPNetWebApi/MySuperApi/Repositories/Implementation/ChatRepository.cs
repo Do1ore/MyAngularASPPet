@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
 using MySuperApi.DTOs;
 using MySuperApi.Models;
 using MySuperApi.Models.MessageModels;
@@ -47,6 +49,7 @@ namespace MySuperApi.Repositories.Implementation
             var messages = from message in _db.Messages
                            join sender in _db.Users on message.SenderId equals sender.Id
                            where message.ChatId == Guid.Parse(chatId)
+                           orderby message.SentAt ascending
                            select new ChatMessage
                            {
                                Id = message.Id,
@@ -193,6 +196,19 @@ namespace MySuperApi.Repositories.Implementation
             await _db.SaveChangesAsync();
             return chat;
 
+        }
+
+        public async Task DeleteChat(string chatId)
+        {
+            var chatUsers = await _db.ChatUsers
+                .Where(a => a.ChatId == Guid.Parse(chatId))
+                .Select(a => a.UserId).ToListAsync();
+
+            await _db.ChatUsers.Where(a => a.ChatId == Guid.Parse(chatId)).ExecuteDeleteAsync();
+            await _db.Chats.Where(a => a.Id == Guid.Parse(chatId)).ExecuteDeleteAsync();
+            await _db.Messages
+                .Where(a => a.ChatId == Guid.Parse(chatId))
+                .Where(a => chatUsers.Contains(a.SenderId)).ExecuteDeleteAsync();
         }
     }
 }
