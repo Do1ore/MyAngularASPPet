@@ -1,13 +1,14 @@
 import {Injectable} from '@angular/core';
 import {HubConnection, HubConnectionBuilder} from '@microsoft/signalr';
 import {environment} from "../../environments/environment";
-import {Subject} from "rxjs";
+import {Observable, Subject} from "rxjs";
 import {ChatMainModel} from '../models/chatMainModel';
 import {JwtHelperService} from "@auth0/angular-jwt";
 import {ToastrService} from "ngx-toastr";
 import {ChatMessage} from "../models/chatMessage";
 import {Message} from "postcss";
 import {CreateChatDto} from "../models/createChatDto";
+import {logMessages} from "@angular-devkit/build-angular/src/builders/browser-esbuild/esbuild";
 
 @Injectable({
   providedIn: 'root'
@@ -22,7 +23,6 @@ export class SignalRMessageService {
   private hubConnection: HubConnection | null = null;
   private baseApiUrl = environment.baseApiUrl;
   private authTokenName = environment.authTokenName;
-
 
 
   private signalRConnectedSubject: Subject<void> = new Subject<void>();
@@ -109,7 +109,6 @@ export class SignalRMessageService {
     if (this.hubConnection === null || this.hubConnection.state != 'Connected') {
       return;
     }
-
     this.hubConnection.on('GetChatsDetailsResponse', (model: ChatMainModel) => {
       console.info(model);
       this.chatDetailsSubject.next(model);
@@ -188,5 +187,19 @@ export class SignalRMessageService {
     this.hubConnection.on('CreateChatResponse', (chat: ChatMainModel) => {
       callback(chat);
     });
+
   }
+
+  public deleteChatCaller(chatId: string) {
+    if (this.hubConnection === null || this.hubConnection.state != 'Connected') {
+      return;
+    }
+    this.hubConnection?.invoke('DeleteChat', chatId);
+  }
+
+  public deleteChatListener(callback: (chatId: string) => void): void {
+    console.log('chat deleted');
+    this.hubConnection?.on('DeleteChatResponse', callback);
+  }
+
 }

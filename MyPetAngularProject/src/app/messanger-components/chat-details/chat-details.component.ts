@@ -16,7 +16,7 @@ import {Subscription} from "rxjs";
 })
 export class ChatDetailsComponent implements OnInit, OnChanges, AfterViewInit {
 
-  @Input() chatModel: ChatMainModel = new ChatMainModel();
+  chatModel: ChatMainModel = new ChatMainModel();
   @Input() chatId: string = '';
   public userId = '';
   message: string = '';
@@ -53,18 +53,37 @@ export class ChatDetailsComponent implements OnInit, OnChanges, AfterViewInit {
     });
     await this.initializeChat();
     this.isInitialized = true;
+
+  }
+
+  public deleteChat() {
+    this.chatId = "";
+    this.signalRMessageService.deleteChatCaller(this.chatModel.id);
+    this.closeModal();
   }
 
   async initializeChat() {
     this.userId = this.signalRMessageService.getUserIdFromToken();
     console.log('id: ' + this.userId)
     console.log("from this: " + this.chatId);
-    this.subscription = this.signalRMessageService.signalRConnect$.subscribe(() => {
+
+    this.subscription = this.signalRMessageService.signalRConnect$.subscribe(async () => {
+      await this.getChatModel();
+
       this.signalRMessageService.onReceiveMessage((message: ChatMessage) => {
         this.chatModel.messages.push(message);
+        this.scrollToBottom();
         console.log('Received new message:', message);
       });
+
+      this.signalRMessageService.deleteChatListener((chatId) => {
+        this.toaster.info('Chat deleted', 'Chat ' + this.chatModel.name + 'deleted. You automatically disconnected');
+        if (this.chatModel.id == chatId) {
+          this.chatModel = new ChatMainModel();
+        }
+      })
     })
+
   }
 
   async sendMessage() {

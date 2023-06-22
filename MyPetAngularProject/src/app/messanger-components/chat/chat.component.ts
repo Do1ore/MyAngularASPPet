@@ -68,6 +68,17 @@ export class ChatComponent implements OnInit, OnDestroy {
         if (a.id === chatId) a.lastmessage = message;
       })
     })
+    //delete chat listener
+    this.signalRMessageService.deleteChatListener((chatId)=>{
+      this.chatMainModel.forEach((chatModel)=>{
+        if(chatId === chatModel.id){
+          const index = this.chatMainModel.findIndex(obj => obj.id === chatId);
+          if (index !== -1) {
+            this.chatMainModel.splice(index, 1);
+          }
+        }
+      })
+    })
     console.log('Connected to chat/s')
   }
 
