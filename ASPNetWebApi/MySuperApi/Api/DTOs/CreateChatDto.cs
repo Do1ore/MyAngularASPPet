@@ -1,0 +1,14 @@
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace MySuperApi.Api.DTOs
+{
+    public class CreateChatDto
+    {
+        [Required]
+        public string? ChatName { get; set; }
+        [Required]
+        public List<string>? UserId { get; set; }
+        [Required]
+        public string? CreatorId { get; set; }
+    }
+}
