@@ -166,7 +166,7 @@ namespace MySuperApi.Infrastructure.Repositories.Implementation
 
         public async Task<Chat> CreateChat(CreateChatDto chatDto)
         {
-            var appUser = await _db.Users.Where(a => chatDto.UserId.Contains(a.Id.ToString())).ToListAsync();
+            var appUser = await _db.Users.Where(a => chatDto.UserIds.Contains(a.Id.ToString())).ToListAsync();
             List<ChatUser> chatUsers = new();
             var chatId = Guid.NewGuid();
 

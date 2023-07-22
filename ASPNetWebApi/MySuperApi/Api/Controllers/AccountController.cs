@@ -20,7 +20,8 @@ namespace MySuperApi.Api.Controllers
         private readonly AppDbContext _db;
 
 
-        public AccountController(IPathMaster pathMaster, IUserService userService, AppDbContext db, IProfileImageService userProfileImage, IChatRepository chatRepository)
+        public AccountController(IPathMaster pathMaster, IUserService userService, AppDbContext db,
+            IProfileImageService userProfileImage, IChatRepository chatRepository)
         {
             _pathMaster = pathMaster;
             _userService = userService;
@@ -30,14 +31,13 @@ namespace MySuperApi.Api.Controllers
         }
 
 
-
         [HttpPost("upload"), DisableRequestSizeLimit]
         public async Task<IActionResult> UploadAsync()
         {
             string userId = _userService.GetMyId();
             string a = _userService.GetMyName();
             AppUser? user = await _db.Users
-                .Include(a => a.UserProfileImages)
+                .Include(appUser => appUser.UserProfileImages)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(i => i.Id.ToString() == userId);
             if (user == null)
@@ -53,8 +53,8 @@ namespace MySuperApi.Api.Controllers
             if (file.Length > 0)
             {
                 string filename = Guid.NewGuid().ToString()
-                    + DateTime.Now.ToShortDateString()
-                    + ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName!.Trim('"');
+                                  + DateTime.Now.ToShortDateString()
+                                  + ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName!.Trim('"');
 
                 string fullPath = Path.Combine(pathToSave, folderName, filename);
                 string relativePath = Path.Combine(folderName, filename);
@@ -63,7 +63,9 @@ namespace MySuperApi.Api.Controllers
                 {
                     file.CopyTo(stream);
                 }
-                UserProfileImage profileImage = _userProfileImage.CreateProfileImageModel(filename, relativePath, userId);
+
+                UserProfileImage profileImage =
+                    _userProfileImage.CreateProfileImageModel(filename, relativePath, userId);
 
                 _ = await _db.ProfileImages.AddAsync(profileImage);
                 _ = await _db.ProfileImageStorages.AddAsync(new UserProfileImageStorage()
@@ -79,7 +81,6 @@ namespace MySuperApi.Api.Controllers
             else
             {
                 return BadRequest();
-
             }
         }
 
@@ -101,11 +102,13 @@ namespace MySuperApi.Api.Controllers
             {
                 return BadRequest("No image found.");
             }
+
             string pathToImage = Path.Combine(Directory.GetCurrentDirectory(), imagePath);
             if (!System.IO.File.Exists(pathToImage))
             {
                 return BadRequest("No image file found.");
             }
+
             byte[] file = System.IO.File.ReadAllBytes(pathToImage);
             Response.Headers.Add("Content-Type", "image/png");
 
@@ -126,10 +129,12 @@ namespace MySuperApi.Api.Controllers
             if (string.IsNullOrEmpty(imagePath))
             {
             }
+
             string pathToImage = Path.Combine(Directory.GetCurrentDirectory(), imagePath);
             if (!System.IO.File.Exists(pathToImage))
             {
             }
+
             byte[] file = await System.IO.File.ReadAllBytesAsync(pathToImage);
             string extension = Path.GetExtension(pathToImage);
 
@@ -149,6 +154,7 @@ namespace MySuperApi.Api.Controllers
             List<AppUser> users = await _chatRepository.SearchUsers(searchUserModel.SearchTerm);
             return users == null || users.Count < 0 ? BadRequest("No users found") : Ok(users);
         }
+
         public class SearchUserModel
         {
             public required string SearchTerm { get; set; }

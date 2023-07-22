@@ -4,7 +4,7 @@ using MySuperApi.Domain.MongoEntities.User;
 
 namespace MySuperApi.Domain.MongoEntities.Chat;
 
-public class Chat
+public class Chat_M
 {
     [BsonId]
     [BsonRepresentation(BsonType.String)]

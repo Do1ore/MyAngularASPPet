@@ -49,7 +49,6 @@ namespace MySuperApi.Api.Controllers
                 AccountCreated = DateTime.UtcNow,
                 AccountLastTimeEdited = DateTime.UtcNow,
                 LastTimeOnline = DateTime.UtcNow,
-
             };
 
 

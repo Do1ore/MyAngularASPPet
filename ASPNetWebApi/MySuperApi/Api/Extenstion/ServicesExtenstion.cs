@@ -3,11 +3,12 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
-using MySuperApi.Infrastructure.Repositories.Implementation;
+using MySuperApi.Infrastructure.Repositories.Implementation.Mongo;
 using MySuperApi.Infrastructure.Repositories.Interfaces;
 using MySuperApi.Infrastructure.Repositories.Services.PathLogic;
 using MySuperApi.Infrastructure.Repositories.Services.ProfileImageService;
 using MySuperApi.Infrastructure.Repositories.Services.UserService;
+using ChatRepository = MySuperApi.Infrastructure.Repositories.Implementation.ChatRepository;
 
 namespace MySuperApi.Api.Extenstion;
 
@@ -77,5 +78,11 @@ public static class ServicesExtenstion
             var client = s.GetRequiredService<IMongoClient>();
             return client.GetDatabase(databaseName);
         });
+    }
+
+    public static void AddCustomRepositories(this IServiceCollection services)
+    {
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IChatRepository, ChatRepository>();
     }
 }

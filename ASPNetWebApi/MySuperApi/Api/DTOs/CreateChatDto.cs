@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using MySuperApi.Domain.MongoEntities.Chat;
 
 namespace MySuperApi.Api.DTOs
 {
@@ -7,8 +8,9 @@ namespace MySuperApi.Api.DTOs
         [Required]
         public string? ChatName { get; set; }
         [Required]
-        public List<string>? UserId { get; set; }
+        public List<string>? UserIds { get; set; }
         [Required]
         public string? CreatorId { get; set; }
+        
     }
 }

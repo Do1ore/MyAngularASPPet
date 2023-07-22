@@ -26,6 +26,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddFormsOptionsConfiguration();
 builder.Services.AddCorsConfiguration();
 
+builder.Services.AddCustomRepositories();
 
 builder.Services.AddAutoMapper(typeof(AppMappingProfile));
 
@@ -37,8 +38,8 @@ app.UseCors("default");
 app.UseStaticFiles(
     new StaticFileOptions
     {
-        FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"Resources")),
-        RequestPath = new PathString("/Resourses")
+        FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Domain/Resources")),
+        RequestPath = new PathString("/Domain/Resources")
     });
 
 //SignalR route

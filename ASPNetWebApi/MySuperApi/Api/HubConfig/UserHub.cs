@@ -71,10 +71,10 @@ namespace MySuperApi.Api.HubConfig
         public async Task CreateChat(CreateChatDto chatDto)
         {
             var chat = await _chatRepository.CreateChat(chatDto);
-            _logger.LogInformation($"Chat created, users in chat: ", chatDto!.UserId!.Count);
+            _logger.LogInformation($"Chat created, users in chat: ", chatDto!.UserIds!.Count);
             await Clients.Caller.SendAsync("CreateChatResponse", chat);
 
-            await JoinChat(chatDto.UserId.Last());
+            await JoinChat(chatDto.UserIds.Last());
         }
 
         public async Task DeleteChat(string chatId)
