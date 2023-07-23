@@ -4,7 +4,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Domain.MongoEntities.Chat;
 
-public class Chat_M
+public class ChatM
 {
     [BsonId]
     [BsonRepresentation(BsonType.String)]
@@ -16,6 +16,6 @@ public class Chat_M
     [BsonRepresentation(BsonType.String)] public Guid? ChatAdministrator { get; set; }
 
     [BsonIgnore] public List<Guid>? UserIds { get; set; } = new List<Guid>();
-    public ICollection<ChatMessage_M> Messages { get; set; } = new List<ChatMessage_M>();
-    public ICollection<AppUser_M> ChatUsers { get; set; } = new List<AppUser_M>();
+    public ICollection<ChatMessageM> Messages { get; set; } = new List<ChatMessageM>();
+    public ICollection<AppUserM> ChatUsers { get; set; } = new List<AppUserM>();
 }

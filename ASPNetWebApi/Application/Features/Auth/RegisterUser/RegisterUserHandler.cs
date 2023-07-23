@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Application.Features.Auth.RegisterUser;
 
-public class RegisterUserHandler : IRequestHandler<RegisterRequest, AppUser_M>
+public class RegisterUserHandler : IRequestHandler<RegisterRequest, AppUserM>
 {
     private readonly IPasswordHashService _passwordService;
     private readonly IUserRepository _userRepository;
@@ -17,10 +17,10 @@ public class RegisterUserHandler : IRequestHandler<RegisterRequest, AppUser_M>
         _userRepository = userRepository;
     }
 
-    public async Task<AppUser_M> Handle(RegisterRequest request, CancellationToken cancellationToken)
+    public async Task<AppUserM> Handle(RegisterRequest request, CancellationToken cancellationToken)
     {
         _passwordService.CreatePasswordHash(request.User.Password, out byte[] passwordHash, out byte[] passwordSalt);
-        AppUser_M user = new()
+        AppUserM user = new()
         {
             Username = request.User.Username,
             Surname = request.User.Surname,

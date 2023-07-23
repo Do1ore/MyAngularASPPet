@@ -3,7 +3,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Domain.MongoEntities.User;
 
-public class AppUser_M
+public class AppUserM
 {
     [BsonId]
     [BsonRepresentation(BsonType.String)]
@@ -21,6 +21,6 @@ public class AppUser_M
     public DateTime AccountLastTimeEdited { get; set; }
     public DateTime LastTimeOnline { get; set; }
     public byte[]? CurrentImageBytes { get; set; }
-    public ICollection<UserProfileImage_M> UserProfileImages { get; set; } = new List<UserProfileImage_M>();
+    public ICollection<UserProfileImageM> UserProfileImages { get; set; } = new List<UserProfileImageM>();
     
 }

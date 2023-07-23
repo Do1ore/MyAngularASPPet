@@ -10,9 +10,9 @@ namespace MySuperApi.DTOs
         [Required] public Guid? CreatorId { get; set; }
 
 
-        public static implicit operator Chat_M(CreateChatDto dto)
+        public static implicit operator ChatM(CreateChatDto dto)
         {
-            return new Chat_M()
+            return new ChatM()
             {
                 Name = dto.ChatName,
                 UserIds = dto.UserIds,

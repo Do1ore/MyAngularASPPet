@@ -4,4 +4,4 @@ using MediatR;
 
 namespace Application.Features.Auth.RegisterUser;
 
-public record RegisterRequest(RegisterUserDto User) : IRequest<AppUser_M>;
+public record RegisterRequest(RegisterUserDto User) : IRequest<AppUserM>;

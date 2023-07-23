@@ -3,10 +3,10 @@ using MediatR;
 
 namespace Application.Features.Chat.CreateChat;
 
-public class CreateChatHandler : IRequestHandler<CreateChatRequest, Chat_M>
+public class CreateChatHandler : IRequestHandler<CreateChatRequest, ChatM>
 {
     
-    public Task<Chat_M> Handle(CreateChatRequest request, CancellationToken cancellationToken)
+    public Task<ChatM> Handle(CreateChatRequest request, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }

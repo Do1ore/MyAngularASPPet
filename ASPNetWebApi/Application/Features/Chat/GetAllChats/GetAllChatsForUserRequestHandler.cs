@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Application.Features.Chat.GetAllChats;
 
-public class GetAllChatsForUserRequestHandler : IRequestHandler<GetAllChatsForUserRequest, List<Chat_M>>
+public class GetAllChatsForUserRequestHandler : IRequestHandler<GetAllChatsForUserRequest, List<ChatM>>
 {
     private readonly IChatMessageRepository _messageRepository;
 
@@ -13,7 +13,7 @@ public class GetAllChatsForUserRequestHandler : IRequestHandler<GetAllChatsForUs
         _messageRepository = messageRepository;
     }
 
-    public Task<List<Chat_M>> Handle(GetAllChatsForUserRequest request, CancellationToken cancellationToken)
+    public Task<List<ChatM>> Handle(GetAllChatsForUserRequest request, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }

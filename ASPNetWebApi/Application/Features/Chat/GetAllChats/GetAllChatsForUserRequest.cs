@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Application.Features.Chat.GetAllChats;
 
-public record GetAllChatsForUserRequest : IRequest<List<Chat_M>>;
+public record GetAllChatsForUserRequest : IRequest<List<ChatM>>;

@@ -9,28 +9,28 @@ namespace Infrastructure.Repositories;
 
 public class UserRepository : IUserRepository
 {
-    private readonly IMongoCollection<AppUser_M> _userCollection;
+    private readonly IMongoCollection<AppUserM> _userCollection;
 
     public UserRepository(IMongoDatabase database)
     {
-        _userCollection = database.GetCollection<AppUser_M>(MongoCollectionName.User);
+        _userCollection = database.GetCollection<AppUserM>(MongoCollectionName.User);
     }
 
-    public async Task<AppUser_M> AddUser(AppUser_M user)
+    public async Task<AppUserM> AddUser(AppUserM user)
     {
         await _userCollection.InsertOneAsync(user);
 
         return user;
     }
 
-    public Task<List<Chat_M>> GetChatsForUser(string userId)
+    public Task<List<ChatM>> GetChatsForUser(string userId)
     {
         throw new NotImplementedException();
     }
 
     public async Task<bool> IsUserExists(Guid userId)
     {
-        var filter = Builders<AppUser_M>.Filter.Eq(u => u.Id, userId);
+        var filter = Builders<AppUserM>.Filter.Eq(u => u.Id, userId);
         var count = await _userCollection.CountDocumentsAsync(filter);
 
         return count > 0;
@@ -38,27 +38,27 @@ public class UserRepository : IUserRepository
 
     public async Task<bool> IsUserEmailExists(string email)
     {
-        var filter = Builders<AppUser_M>.Filter.Eq(u => u.Email, email);
+        var filter = Builders<AppUserM>.Filter.Eq(u => u.Email, email);
         var count = await _userCollection.CountDocumentsAsync(filter);
 
         return count > 0;
     }
 
-    public async Task<AppUser_M> GetUserById(Guid userId)
+    public async Task<AppUserM> GetUserById(Guid userId)
     {
-        var filter = Builders<AppUser_M>.Filter.Eq(u => u.Id, userId);
+        var filter = Builders<AppUserM>.Filter.Eq(u => u.Id, userId);
         return await _userCollection.Find(filter).FirstOrDefaultAsync();
     }
 
-    public async Task<AppUser_M> GetUserByEmail(string email)
+    public async Task<AppUserM> GetUserByEmail(string email)
     {
-        var filter = Builders<AppUser_M>.Filter.Eq(u => u.Email, email);
+        var filter = Builders<AppUserM>.Filter.Eq(u => u.Email, email);
         return await _userCollection.Find(filter).FirstOrDefaultAsync();
     }
 
     public async Task<string> UpdateUserRefreshToken(Guid userId, RefreshToken newRefreshToken)
     {
-        var filter = Builders<AppUser_M>.Filter.Eq(a => a.Id, userId);
+        var filter = Builders<AppUserM>.Filter.Eq(a => a.Id, userId);
         var user = await _userCollection.Find(filter).SingleOrDefaultAsync() ??
                    throw new ArgumentException("User not found");
 
@@ -66,7 +66,7 @@ public class UserRepository : IUserRepository
         user.TokenCreated = newRefreshToken.Created;
         user.TokenExpires = newRefreshToken.Expires;
 
-        var update = Builders<AppUser_M>.Update
+        var update = Builders<AppUserM>.Update
             .Set(u => u.RefreshToken, newRefreshToken.Token)
             .Set(u => u.TokenCreated, newRefreshToken.Created)
             .Set(u => u.TokenExpires, newRefreshToken.Expires);

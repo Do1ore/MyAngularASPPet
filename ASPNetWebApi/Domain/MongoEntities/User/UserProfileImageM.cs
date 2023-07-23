@@ -4,7 +4,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Domain.MongoEntities.User;
 
-public class UserProfileImage_M
+public class UserProfileImageM
 {
     [BsonId]
     [BsonRepresentation(BsonType.String)]
@@ -12,7 +12,7 @@ public class UserProfileImage_M
 
     [BsonIgnoreIfNull]
     [BsonIgnoreIfDefault]
-    public AppUser_M? AppUser { get; set; }
+    public AppUserM? AppUser { get; set; }
 
     [BsonIgnoreIfNull]
     [BsonIgnoreIfDefault]

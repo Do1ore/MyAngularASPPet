@@ -7,12 +7,12 @@ namespace Infrastructure.Repositories;
 public class MongoChatRepository : IMongoChatRepository
 {
   
-    public Task<Chat_M> CreateChat(Chat_M chatDto)
+    public Task<ChatM> CreateChat(ChatM chatDto)
     {
         throw new NotImplementedException();
     }
 
-    public Task<Chat_M> UpdateChat(Chat_M chatDto)
+    public Task<ChatM> UpdateChat(ChatM chatDto)
     {
         throw new NotImplementedException();
     }
@@ -22,7 +22,7 @@ public class MongoChatRepository : IMongoChatRepository
         throw new NotImplementedException();
     }
 
-    public Task<Chat_M> GetChatDetails(string userId, string chatId)
+    public Task<ChatM> GetChatDetails(string userId, string chatId)
     {
         throw new NotImplementedException();
     }

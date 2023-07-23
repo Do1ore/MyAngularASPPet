@@ -8,9 +8,9 @@ public class ChatMessageDto
     public Guid SenderId { get; set; }
     public Guid ChatId { get; set; }
 
-    public static implicit operator ChatMessage_M(ChatMessageDto dto)
+    public static implicit operator ChatMessageM(ChatMessageDto dto)
     {
-        return new ChatMessage_M()
+        return new ChatMessageM()
         {
             Content = dto.Content,
             SenderId = dto.SenderId,

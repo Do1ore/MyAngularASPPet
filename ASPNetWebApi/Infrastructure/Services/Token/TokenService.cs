@@ -18,7 +18,7 @@ public class TokenService : ITokenService
         _configuration = configuration;
     }
 
-    public string CreateToken(AppUser_M user)
+    public string CreateToken(AppUserM user)
     {
         List<Claim> claims = new()
         {

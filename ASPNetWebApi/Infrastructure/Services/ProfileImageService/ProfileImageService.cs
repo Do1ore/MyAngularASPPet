@@ -5,9 +5,9 @@ namespace Infrastructure.Services.ProfileImageService
 {
     public class ProfileImageService : IProfileImageService
     {
-        public UserProfileImage_M CreateProfileImageModel(string filename, string webpath, string userId)
+        public UserProfileImageM CreateProfileImageModel(string filename, string webpath, string userId)
         {
-            UserProfileImage_M profileImage = new UserProfileImage_M()
+            UserProfileImageM profileImage = new UserProfileImageM()
             {
                 AppUserId = Guid.Parse(userId),
                 FileName = filename,

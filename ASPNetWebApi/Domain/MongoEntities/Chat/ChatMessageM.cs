@@ -3,7 +3,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Domain.MongoEntities.Chat;
 
-public sealed class ChatMessage_M
+public sealed class ChatMessageM
 {
     [BsonId]
     [BsonRepresentation(BsonType.String)]

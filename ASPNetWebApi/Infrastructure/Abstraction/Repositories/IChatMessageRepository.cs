@@ -5,5 +5,5 @@ namespace Infrastructure.Abstraction.Repositories;
 
 public interface IChatMessageRepository
 {
-    public Task<ChatMessage_M> AddMessage(ChatMessage_M message);
+    public Task<ChatMessageM> AddMessage(ChatMessageM message);
 }
