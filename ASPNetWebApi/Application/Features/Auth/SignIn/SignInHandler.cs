@@ -40,6 +40,7 @@ public class SignInHandler : IRequestHandler<SingInRequest, string>
         var token = _tokenService.CreateToken(user);
 
         var refreshToken = _tokenService.CreateRefreshToken();
+        await _userRepository.UpdateUserRefreshToken(user.Id, refreshToken);
         _userDataAccessor.AppendRefreshToken(refreshToken, request.Response);
 
 

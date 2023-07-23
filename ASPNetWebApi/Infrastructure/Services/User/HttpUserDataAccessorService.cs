@@ -1,6 +1,8 @@
-﻿using Domain.JWTModels;
+﻿using System.Security.Claims;
+using Domain.JWTModels;
 using Infrastructure.Abstraction.Services.User;
 using Microsoft.AspNetCore.Http;
+
 
 namespace Infrastructure.Services.User
 {
@@ -15,10 +17,11 @@ namespace Infrastructure.Services.User
 
         public string GetMyId()
         {
-            var result = string.Empty;
+            string result = string.Empty;
             if (_httpContextAccessor.HttpContext != null)
             {
-                //result = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                result = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value ??
+                         throw new ArgumentException("Id not found in claims");
             }
 
             return result;
@@ -42,7 +45,8 @@ namespace Infrastructure.Services.User
             var result = string.Empty;
             if (_httpContextAccessor.HttpContext != null)
             {
-                //result = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name);
+                result = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Name)?.Value ??
+                         throw new ArgumentException("Name not found in claims");
             }
 
             return result;

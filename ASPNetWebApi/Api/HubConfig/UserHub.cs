@@ -19,21 +19,22 @@ namespace MySuperApi.HubConfig
             _logger = logger;
             _httpUserDataAccessorService = httpUserDataAccessorService;
         }
+
+
+         public async Task GetAllChatsForUser(string? userId)
+         {
+             if (userId == null)
+             {
+                 return;
+             }
+
+             //var chats = await _legacyChatRepository.GetChatsForUser(userId);
+
+             await Clients.Caller.SendAsync("GetAllChatsForUserResponse");
+         }
+
     }
 }
-
-//         public async Task GetAllChatsForUser(string userId)
-//         {
-//             if (userId == null)
-//             {
-//                 return;
-//             }
-//
-//             var chats = await _legacyChatRepository.GetChatsForUser(userId);
-//
-//             await Clients.Caller.SendAsync("GetAllChatsForUserResponse", chats);
-//         }
-//
 //         public async Task GetChatsDetails(string userId, string chatId)
 //         {
 //             if (chatId == null)
