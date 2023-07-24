@@ -1,4 +1,5 @@
 using Domain.Constants;
+using Domain.DTOs;
 using Domain.JWTModels;
 using Domain.MongoEntities.Chat;
 using Domain.MongoEntities.User;
@@ -27,6 +28,18 @@ public class UserRepository : IUserRepository
     {
         throw new NotImplementedException();
     }
+
+    public async IAsyncEnumerable<AppUserM> GetUsersDetails(List<Guid> userIds)
+    {
+        foreach (var userid in userIds)
+        {
+            yield return await _userCollection
+                .Find(Builders<AppUserM>.Filter
+                    .Eq(u => u.Id, userid))
+                .FirstOrDefaultAsync();
+        }
+    }
+
 
     public async Task<bool> IsUserExists(Guid userId)
     {

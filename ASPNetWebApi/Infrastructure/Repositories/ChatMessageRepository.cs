@@ -1,6 +1,5 @@
 using Domain.Constants;
 using Domain.MongoEntities.Chat;
-using Infrastructure.Abstraction;
 using Infrastructure.Abstraction.Repositories;
 using MongoDB.Driver;
 

@@ -23,7 +23,6 @@ builder.Services.AddCorsConfiguration();
 builder.Services.AddCustomServices();
 builder.Services.AddCustomRepositories();
 
-builder.Services.AddAutoMapper(typeof(AppMappingProfile));
 
 builder.Services.ConfigureAuthentication(builder);
 
