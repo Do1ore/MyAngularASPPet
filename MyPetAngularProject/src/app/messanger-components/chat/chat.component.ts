@@ -29,7 +29,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   public chatMainModel: ChatMainModel[] = [];
   public appUsers: AppUser[] = [];
   public appUsersSearch: AppUser[] = [];
-  public addUsersArray: AppUser[] = [];
+  public usersToAdd: AppUser[] = [];
   public searchTerm: string = '';
   private subscription: Subscription | undefined;
   private dropdown: DropdownInterface = new Dropdown();
@@ -65,13 +65,13 @@ export class ChatComponent implements OnInit, OnDestroy {
 
     this.signalRMessageService.onReceiveLastMessage((chatId, message) => {
       this.chatMainModel.forEach(a => {
-        if (a.id === chatId) a.lastmessage = message;
+        if (a.id === chatId) a.lastMessage = message;
       })
     })
     //delete chat listener
-    this.signalRMessageService.deleteChatListener((chatId)=>{
-      this.chatMainModel.forEach((chatModel)=>{
-        if(chatId === chatModel.id){
+    this.signalRMessageService.deleteChatListener((chatId) => {
+      this.chatMainModel.forEach((chatModel) => {
+        if (chatId === chatModel.id) {
           const index = this.chatMainModel.findIndex(obj => obj.id === chatId);
           if (index !== -1) {
             this.chatMainModel.splice(index, 1);
@@ -96,17 +96,17 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   addUserToArray(userId: string) {
+    console.log('Attempt to add user with id: ', userId)
     let user = this.appUsers.find(a => a.id === userId)!;
     if (!user) {
       this.toaster.info("User not found", "Error");
-
       return;
     }
-    if (this.addUsersArray.find(a => a.id === userId)) {
+    if (this.usersToAdd.find(a => a.id === userId)) {
       this.toaster.info("User that you want to add to a chat is already added", "User already added");
       return;
     }
-    this.addUsersArray.push(user)
+    this.usersToAdd.push(user)
   }
 
   getNewChatModal(): ModalInterface {
@@ -134,11 +134,12 @@ export class ChatComponent implements OnInit, OnDestroy {
   createChat() {
     let chatDto: CreateChatDto = new CreateChatDto();
     chatDto.chatName = this.chatName;
-    if (this.addUsersArray.length <= 0) {
+    if (this.usersToAdd.length <= 0) {
       this.toaster.warning("You want to create chat without users", "No users")
       return;
     }
-    this.addUsersArray.forEach(u => chatDto.userId.push(u.id));
+    console.log('Users to in create function:', this.usersToAdd)
+    this.usersToAdd.forEach(u => chatDto.userIds.push(u.id));
     //current userId
     chatDto.creatorId = this.signalRMessageService.getUserIdFromToken();
 

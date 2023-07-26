@@ -1,14 +1,12 @@
 import {Injectable} from '@angular/core';
 import {HubConnection, HubConnectionBuilder} from '@microsoft/signalr';
 import {environment} from "../../environments/environment";
-import {Observable, Subject} from "rxjs";
+import {Subject} from "rxjs";
 import {ChatMainModel} from '../models/chatMainModel';
 import {JwtHelperService} from "@auth0/angular-jwt";
 import {ToastrService} from "ngx-toastr";
 import {ChatMessage} from "../models/chatMessage";
-import {Message} from "postcss";
 import {CreateChatDto} from "../models/createChatDto";
-import {logMessages} from "@angular-devkit/build-angular/src/builders/browser-esbuild/esbuild";
 
 @Injectable({
   providedIn: 'root'

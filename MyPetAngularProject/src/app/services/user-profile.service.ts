@@ -9,7 +9,7 @@ import {SignalRMessageService} from "./signal-r-message.service";
   providedIn: 'root'
 })
 export class UserProfileService {
-  baseApiUrl: string = environment.baseApiUrl + "api/" + 'Account';
+  baseApiUrl: string = environment.baseApiUrl + "api/" + 'User';
   token!: string;
 
 
@@ -45,7 +45,7 @@ export class UserProfileService {
 
   public searchUser(searchTerm: string): Observable<AppUser[]> {
     const payload = {searchTerm: searchTerm}; // Используйте правильный ключ для searchTerm
-    return this.http.post<AppUser[]>(this.baseApiUrl + '/search-user', payload);
+    return this.http.get<AppUser[]>(this.baseApiUrl + '/search-user' + '/' + searchTerm);
   }
 }
 

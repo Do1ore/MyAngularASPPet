@@ -8,6 +8,7 @@ import {AuthService} from "../../services/auth.service";
 import {ToastrService} from "ngx-toastr";
 import {logMessages} from "@angular-devkit/build-angular/src/builders/browser-esbuild/esbuild";
 import {Subscription} from "rxjs";
+import {AppUser} from "../../models/appUser";
 
 @Component({
   selector: 'app-chat-details',
@@ -68,12 +69,20 @@ export class ChatDetailsComponent implements OnInit, OnChanges, AfterViewInit {
     console.log("from this: " + this.chatId);
 
     this.subscription = this.signalRMessageService.signalRConnect$.subscribe(async () => {
+      console.log('Connection started');
       await this.getChatModel();
 
+
       this.signalRMessageService.onReceiveMessage((message: ChatMessage) => {
+        let user = this.chatModel.appUsers.find(a => a.id === message.senderId);
+        if (user !== undefined) {
+          message.senderInformation = user;
+        }
         this.chatModel.messages.push(message);
         this.scrollToBottom();
         console.log('Received new message:', message);
+        console.log('Chat model: ', this.chatModel)
+        console.log('Current userid: ', this.userId)
       });
 
       this.signalRMessageService.deleteChatListener((chatId) => {
@@ -108,11 +117,13 @@ export class ChatDetailsComponent implements OnInit, OnChanges, AfterViewInit {
       this.toaster.error("Not connected to hub", "Server issue");
       return;
     }
-    this.signalRMessageService.getChatDetailsCaller(this.chatId);
-    this.signalRMessageService.getChatDetailsListener();
-    this.signalRMessageService.chatDetailsSubject.asObservable().subscribe((model) =>
-      this.chatModel = model)
-    console.log(this.chatModel)
+    if (this.chatId !== "") {
+      this.signalRMessageService.getChatDetailsCaller(this.chatId);
+      this.signalRMessageService.getChatDetailsListener();
+      this.signalRMessageService.chatDetailsSubject.asObservable().subscribe((model) => {
+        this.chatModel = model;
+      });
+    }
   }
 
 
@@ -153,6 +164,15 @@ export class ChatDetailsComponent implements OnInit, OnChanges, AfterViewInit {
 
     }
     modal.toggle();
+  }
+
+  getUserBySenderId(userId: string): AppUser {
+    let result = this.chatModel.appUsers.find(u => u.id === userId);
+    if (result === undefined) {
+      console.error('Undefined user');
+      return new AppUser();
+    }
+    return result;
   }
 
   closeModal() {

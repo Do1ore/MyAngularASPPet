@@ -1,11 +1,11 @@
 import {ChatMessage} from "./chatMessage";
-import {ChatUser} from "./chatUser";
+import {AppUser} from "./appUser";
 
 export class ChatMainModel {
   public id: string = "";
   public name: string = "";
   public chatAdministrator: string = "";
-  public lastmessage: string = "";
+  public lastMessage: string = "";
   public messages: ChatMessage[] = [];
-  public chatUsers: ChatUser[] = [];
+  public appUsers: AppUser[] = [];
 }

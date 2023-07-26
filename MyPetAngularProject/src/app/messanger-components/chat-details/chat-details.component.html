@@ -76,22 +76,31 @@
         </div>
       </div>
     </div>
-    <ng-template *ngIf="chatModel.messages.length > 0" class="pt-10 pb-20 px-0 sm:px-0 md:px-6 lg:px-8 xl:px-14">
-      <ng-template *ngFor="let message of chatModel.messages" class="flex-row">
-        <div
-          class="bg-gray-100 dark:bg-cyan-950  rounded-md mt-2 p-3 self-end w-fit content-start ml-auto max-w-xl">
-          <mark
-            class="me-4 p-1 text-white bg-blue-600 rounded dark:bg-blue-500 font-bold">{{message.senderInformation.username}}</mark>
-          <span class="text-black dark:text-fuchsia-100">{{message.content}}</span>
-        </div>
-        <!--        <div *ngIf="message.senderId !== userId"-->
-        <!--             class="bg-gray-50 dark:bg-gray-800 rounded-md mt-2 p-3 content-start w-fit">-->
-        <!--          <mark-->
-        <!--            class="me-4 p-1 text-white bg-gray-600 rounded dark:bg-gray-600 font-bold">{{message.senderInformation.username!}}</mark>-->
-        <!--          <span class="text-black dark:text-lime-100">{{message.content}}</span>-->
-        <!--        </div>-->
+    <!--    <div *ngIf="chatModel.messages.length > 0" class="pt-10 pb-20 px-0 sm:px-0 md:px-6 lg:px-8 xl:px-14">-->
+    <ng-template ngFor let-message [ngForOf]="chatModel.messages" class="flex-row">
+      <div *ngIf="message.senderId === userId"
+           class="text-green-800 bg-green-100 dark:bg-green-900 rounded-md mt-2 p-3 ml-auto dark:text-green-50 w-fit">
+        <mark
+          class="me-4 p-1 bg-transparent dark:text-blue-50
+            font-bold">{{getUserBySenderId(message.senderId).username!}}</mark>
+        <span class="text-black dark:text-green-200 me-4">{{message.content}}</span>
+        <mark
+          class="text-green-900 dark:text-green-200 dark:bg-green-800 bg-green-300 dark:bg-green-900 dark:text-green-800 p-1 rounded-md">
+          <small>{{message.sentAt | date: 'hh:mm'}}</small>
+        </mark>
+      </div>
+      <div *ngIf="message.senderId !== userId"
+           class="bg-blue-50 dark:bg-green-900 rounded-md mt-2 p-3 w-fit">
+        <mark
+          class="me-4 p-1 text-blue-900 dark:text-blue-200 bg-transparent
+            font-bold">{{getUserBySenderId(message.senderId).username}}</mark>
+        <span class="text-blue-800 dark:text-blue-200 dark:bg-green-800 me-4">{{message.content}}</span>
+        <mark
+          class="text-blue-900 dark:text-blue-200 dark:bg-blue-800 bg-blue-300 dark:bg-blue-900 dark:text-blue-800 p-1 rounded-md">
+          <small>{{message.sentAt | date: 'hh:mm'}}</small>
+        </mark>
 
-      </ng-template>
+      </div>
     </ng-template>
     <div #bottom></div>
   </div>
