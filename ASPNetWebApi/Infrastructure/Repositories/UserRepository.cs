@@ -33,10 +33,9 @@ public class UserRepository : IUserRepository
             throw new ArgumentException("User with this id is not found");
         }
 
-        var chatFilter = Builders<ChatM>.Filter.ElemMatch(c => c.AppUserIds,
-            Builders<Guid>.Filter.Eq(u => u, userId));
-
+        var chatFilter = Builders<ChatM>.Filter.AnyEq(chat => chat.AppUserIds, userId);
         var chats = await _chatCollection.Find(chatFilter).ToListAsync();
+
 
         if (chats.Count < 1 || chats is null)
         {
@@ -106,5 +105,23 @@ public class UserRepository : IUserRepository
                      throw new ArgumentException("Cannot update user");
 
         return result.RefreshToken;
+    }
+
+    public async Task<List<AppUserM>> FindUsers(string searchTerm)
+    {
+        searchTerm = searchTerm.ToLower();
+        var userFilter = Builders<AppUserM>.Filter
+            .Where(u => u.Email.ToLower().Contains(searchTerm) ||
+                        u.Username.ToLower().Contains(searchTerm) ||
+                        u.Surname.ToLower().Contains(searchTerm));
+
+
+        var options = new FindOptions<AppUserM>
+        {
+            Limit = 10
+        };
+
+        var users = await _userCollection.FindAsync(userFilter, options);
+        return users.ToList();
     }
 }

@@ -31,12 +31,13 @@ public class UserHub : Hub
         _logger.LogInformation("Chat all chats for user: [{@UserId}])", userId);
         var chats = await _mediator.Send(new GetAllChatsForUserRequest(Guid.Parse(userId)));
 
-        await Clients.Caller.SendAsync("GetAllChatsForUserResponse");
+        await Clients.Caller.SendAsync("GetAllChatsForUserResponse", chats);
     }
 
 
     public async Task GetChatsDetails(string userId, string chatId)
     {
+        await JoinChat(Guid.Parse(chatId));
         _logger.LogInformation("Chat details for chat:[{@ChatId}]; user id: [{@UserId}]", chatId, userId);
         var chat = await _mediator.Send(new ChatDetailsRequest(Guid.Parse(userId), Guid.Parse(chatId)));
 
@@ -48,7 +49,7 @@ public class UserHub : Hub
         var chat = await _mediator.Send(new CreateChatRequest(chatDto));
         await Clients.Caller.SendAsync("CreateChatResponse", chat);
 
-        await JoinChat((Guid)chat.ChatAdministrator!);
+        await JoinChat((Guid)chat.Id);
     }
 
     private async Task JoinChat(Guid chatId)
@@ -58,17 +59,17 @@ public class UserHub : Hub
             Context.ConnectionId);
     }
 
-    public async Task SendMessage(Guid chatId, Guid senderId, string message)
+    public async Task SendMessage(string chatId, string senderId, string message)
     {
         var sendingResult = await _mediator.Send(new SendMessageRequest(new ChatMessageM
         {
             Content = message,
-            ChatId = chatId,
-            SenderId = senderId,
+            ChatId = Guid.Parse(chatId),
+            SenderId = Guid.Parse(senderId),
             SentAt = DateTime.UtcNow
         }));
 
-        await Clients.Group(chatId.ToString()).SendAsync("ReceiveMessage", sendingResult);
+        await Clients.Group(chatId).SendAsync("ReceiveMessage", sendingResult);
     }
 }
 

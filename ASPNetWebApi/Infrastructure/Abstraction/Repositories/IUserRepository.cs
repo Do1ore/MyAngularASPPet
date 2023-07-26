@@ -16,4 +16,5 @@ public interface IUserRepository
     Task<AppUserM> GetUserById(Guid userId);
     Task<AppUserM> GetUserByEmail(string email);
     Task<string> UpdateUserRefreshToken(Guid userId, RefreshToken newRefreshToken);
+    Task<List<AppUserM>> FindUsers(string searchTerm);
 }
