@@ -33,8 +33,8 @@ public class UserRepository : IUserRepository
             throw new ArgumentException("User with this id is not found");
         }
 
-        var idFilter = Builders<Guid>.Filter.Eq(i => i, userId);
-        var chatFilter = Builders<ChatM>.Filter.ElemMatch(c => c.AppUserIds, idFilter);
+        var chatFilter = Builders<ChatM>.Filter.ElemMatch(c => c.AppUserIds,
+            Builders<Guid>.Filter.Eq(u => u, userId));
 
         var chats = await _chatCollection.Find(chatFilter).ToListAsync();
 

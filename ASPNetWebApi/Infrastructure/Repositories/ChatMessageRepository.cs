@@ -20,7 +20,7 @@ public class ChatMessageRepository : IChatMessageRepository
         message.SentAt = DateTime.UtcNow;
 
         var filter = Builders<ChatM>.Filter.Eq(chat => chat.Id, message.ChatId);
-        var update = Builders<ChatM>.Update.AddToSet<ChatMessageM>(chat => chat.Messages, message);
+        var update = Builders<ChatM>.Update.AddToSet(chat => chat.Messages, message);
         var options = new FindOneAndUpdateOptions<ChatM>
         {
             ReturnDocument = ReturnDocument.After

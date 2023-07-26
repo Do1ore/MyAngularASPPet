@@ -16,5 +16,5 @@ public class ChatM
     [BsonRepresentation(BsonType.String)] public Guid? ChatAdministrator { get; set; }
 
     public ICollection<ChatMessageM> Messages { get; set; } = new List<ChatMessageM>();
-    public ICollection<Guid> AppUserIds { get; set; } = new List<Guid>();
+    [BsonRepresentation(BsonType.String)] public ICollection<Guid> AppUserIds { get; set; } = new List<Guid>();
 }

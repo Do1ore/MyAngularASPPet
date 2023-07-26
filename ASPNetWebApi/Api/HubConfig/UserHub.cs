@@ -1,5 +1,8 @@
 ﻿using Application.Features.Chat.ChatDetails;
 using Application.Features.Chat.CreateChat;
+using Application.Features.Chat.GetAllChats;
+using Application.Features.Message.SendMessage;
+using Domain.MongoEntities.Chat;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
 using MySuperApi.DTOs;
@@ -23,22 +26,19 @@ public class UserHub : Hub
     }
 
 
-    public async Task GetAllChatsForUser(string? userId)
+    public async Task GetAllChatsForUser(string userId)
     {
-        if (userId == null)
-        {
-            return;
-        }
-
-        //var chats = await _legacyChatRepository.GetChatsForUser(userId);
+        _logger.LogInformation("Chat all chats for user: [{@UserId}])", userId);
+        var chats = await _mediator.Send(new GetAllChatsForUserRequest(Guid.Parse(userId)));
 
         await Clients.Caller.SendAsync("GetAllChatsForUserResponse");
     }
 
 
-    public async Task GetChatsDetails(Guid userId, Guid chatId)
+    public async Task GetChatsDetails(string userId, string chatId)
     {
-        var chat = await _mediator.Send(new ChatDetailsRequest(userId, chatId));
+        _logger.LogInformation("Chat details for chat:[{@ChatId}]; user id: [{@UserId}]", chatId, userId);
+        var chat = await _mediator.Send(new ChatDetailsRequest(Guid.Parse(userId), Guid.Parse(chatId)));
 
         await Clients.Caller.SendAsync("GetChatsDetailsResponse", chat);
     }
@@ -57,20 +57,21 @@ public class UserHub : Hub
         _logger.LogInformation("Connected to chat {ChatId}  and connection {ContextConnectionId}", chatId,
             Context.ConnectionId);
     }
+
+    public async Task SendMessage(Guid chatId, Guid senderId, string message)
+    {
+        var sendingResult = await _mediator.Send(new SendMessageRequest(new ChatMessageM
+        {
+            Content = message,
+            ChatId = chatId,
+            SenderId = senderId,
+            SentAt = DateTime.UtcNow
+        }));
+
+        await Clients.Group(chatId.ToString()).SendAsync("ReceiveMessage", sendingResult);
+    }
 }
 
-
-//
-//         public async Task SendMessage(string chatId, string senderId, string message)
-//         {
-//             var chatMessage = await _legacyChatRepository.SendMessage(chatId, senderId, message);
-//             var detailedChatMessage = await _legacyChatRepository.GetMessageDetails(chatMessage);
-//
-//             // Обработка полученного сообщения и отправка его обратно клиентам
-//             await Clients.Group(chatId).SendAsync("ReceiveMessage", detailedChatMessage);
-//             await Clients.Group(chatId).SendAsync("ReceiveLastMessage", chatId, message);
-//         }
-//
 
 //
 //         public async Task LeaveChat(string chatId)

@@ -9,8 +9,7 @@ public class ChatDetailsRequestHandler : IRequestHandler<ChatDetailsRequest, Cha
 {
     private readonly IUserRepository _userRepository;
     private readonly IMongoChatRepository _chatRepository;
-
-
+    
     public ChatDetailsRequestHandler(IUserRepository userRepository,
         IMongoChatRepository chatRepository)
     {
