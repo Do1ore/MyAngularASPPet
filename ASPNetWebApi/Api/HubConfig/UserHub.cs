@@ -1,6 +1,5 @@
 ﻿using Application.Features.Chat.ChatDetails;
 using Application.Features.Chat.CreateChat;
-using Infrastructure.Abstraction.Services.User;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
 using MySuperApi.DTOs;
@@ -10,20 +9,17 @@ namespace MySuperApi.HubConfig;
 public class UserHub : Hub
 {
     private readonly ILogger<UserHub> _logger;
-    private readonly IHttpUserDataAccessorService _httpUserDataAccessorService;
     private readonly IHubContext<UserHub> _hubContext;
     private readonly IMediator _mediator;
 
 
     public UserHub(ILogger<UserHub> logger,
-        IHttpUserDataAccessorService httpUserDataAccessorService,
         IHubContext<UserHub> hubContext,
         IMediator mediator)
     {
         _hubContext = hubContext;
         _mediator = mediator;
         _logger = logger;
-        _httpUserDataAccessorService = httpUserDataAccessorService;
     }
 
 

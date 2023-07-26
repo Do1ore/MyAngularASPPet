@@ -7,7 +7,7 @@ namespace Infrastructure.Abstraction.Repositories;
 public interface IUserRepository
 {
     Task<AppUserM> AddUser(AppUserM user);
-    Task<List<ChatM>> GetChatsForUser(string userId);
+    Task<List<ChatM>> GetChatsForUser(Guid userId);
     IAsyncEnumerable<AppUserM> GetUsersDetails(List<Guid> userIds);
 
     Task<bool> IsUserExists(Guid userId);

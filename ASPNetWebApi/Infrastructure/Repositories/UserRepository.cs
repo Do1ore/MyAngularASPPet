@@ -1,5 +1,4 @@
 using Domain.Constants;
-using Domain.DTOs;
 using Domain.JWTModels;
 using Domain.MongoEntities.Chat;
 using Domain.MongoEntities.User;
@@ -11,9 +10,11 @@ namespace Infrastructure.Repositories;
 public class UserRepository : IUserRepository
 {
     private readonly IMongoCollection<AppUserM> _userCollection;
+    private readonly IMongoCollection<ChatM> _chatCollection;
 
     public UserRepository(IMongoDatabase database)
     {
+        _chatCollection = database.GetCollection<ChatM>(MongoCollectionName.Chat);
         _userCollection = database.GetCollection<AppUserM>(MongoCollectionName.User);
     }
 
@@ -24,9 +25,25 @@ public class UserRepository : IUserRepository
         return user;
     }
 
-    public Task<List<ChatM>> GetChatsForUser(string userId)
+    public async Task<List<ChatM>> GetChatsForUser(Guid userId)
     {
-        throw new NotImplementedException();
+        var user = await _userCollection.Find(u => u.Id == userId).FirstOrDefaultAsync();
+        if (user is null)
+        {
+            throw new ArgumentException("User with this id is not found");
+        }
+
+        var idFilter = Builders<Guid>.Filter.Eq(i => i, userId);
+        var chatFilter = Builders<ChatM>.Filter.ElemMatch(c => c.AppUserIds, idFilter);
+
+        var chats = await _chatCollection.Find(chatFilter).ToListAsync();
+
+        if (chats.Count < 1 || chats is null)
+        {
+            throw new ArgumentException($"No chats found for user with id: {userId}");
+        }
+
+        return chats;
     }
 
     public async IAsyncEnumerable<AppUserM> GetUsersDetails(List<Guid> userIds)

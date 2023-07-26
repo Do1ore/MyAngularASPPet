@@ -6,15 +6,16 @@ namespace Application.Features.Chat.GetAllChats;
 
 public class GetAllChatsForUserRequestHandler : IRequestHandler<GetAllChatsForUserRequest, List<ChatM>>
 {
-    private readonly IChatMessageRepository _messageRepository;
+    private readonly IUserRepository _userRepository;
 
-    public GetAllChatsForUserRequestHandler(IChatMessageRepository messageRepository)
+    public GetAllChatsForUserRequestHandler(IUserRepository userRepository)
     {
-        _messageRepository = messageRepository;
+        _userRepository = userRepository;
     }
 
-    public Task<List<ChatM>> Handle(GetAllChatsForUserRequest request, CancellationToken cancellationToken)
+    public async Task<List<ChatM>> Handle(GetAllChatsForUserRequest request, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var chats = await _userRepository.GetChatsForUser(request.UserId);
+        return chats;
     }
 }

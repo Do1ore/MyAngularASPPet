@@ -14,7 +14,6 @@ public class ChatDetailsDto
 
     public Guid? ChatAdministrator { get; set; }
 
-    public List<Guid>? UserIds { get; set; } = new List<Guid>();
     public ICollection<ChatMessageM> Messages { get; set; } = new List<ChatMessageM>();
     public ICollection<AppUserDto> AppUsers { get; set; } = new List<AppUserDto>();
 }

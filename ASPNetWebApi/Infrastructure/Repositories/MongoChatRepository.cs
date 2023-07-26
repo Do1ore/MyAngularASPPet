@@ -15,7 +15,7 @@ public class MongoChatRepository : IMongoChatRepository
     }
 
     public async Task<ChatM> CreateChat(ChatM chat)
-    {
+    {   
         await _chatCollection.InsertOneAsync(chat);
         return chat;
     }
