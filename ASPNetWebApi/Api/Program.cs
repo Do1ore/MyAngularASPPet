@@ -40,6 +40,6 @@ app.UseStaticFiles();
 app.UseHttpsRedirection();
 app.MapControllers();
 app.UseSwagger();
-app.UseCustomSwaggerUI();
+app.UseCustomSwaggerUi();
 
 app.Run();

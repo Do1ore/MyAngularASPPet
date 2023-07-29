@@ -73,6 +73,7 @@ public static class ServicesExtenstion
         services.AddTransient<IPasswordHashService, PasswordHashService>();
 
         services.AddTransient<ITokenService, TokenService>();
+        services.AddTransient<IImageService, ImageService>();
     }
 
     public static void ConfigureMongo(this IServiceCollection services, IConfiguration configuration)

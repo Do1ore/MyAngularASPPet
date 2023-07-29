@@ -2,13 +2,13 @@ import {AfterViewInit, Component, ElementRef, Input, OnChanges, OnInit, ViewChil
 import {SignalRMessageService} from "../../services/signal-r-message.service";
 import {ChatMainModel} from "../../models/chatMainModel";
 import {ChatMessage} from "../../models/chatMessage";
-import {UserProfileService} from "../../services/user-profile.service";
+import {ImageService} from "../../services/image.service";
 import {Modal, ModalOptions} from "flowbite";
 import {AuthService} from "../../services/auth.service";
 import {ToastrService} from "ngx-toastr";
-import {logMessages} from "@angular-devkit/build-angular/src/builders/browser-esbuild/esbuild";
 import {Subscription} from "rxjs";
 import {AppUser} from "../../models/appUser";
+import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-chat-details',
@@ -24,10 +24,12 @@ export class ChatDetailsComponent implements OnInit, OnChanges, AfterViewInit {
   private modalInterface: Modal | null = null;
   private subscription: Subscription = new (Subscription);
   isInitialized: boolean = false;
+  safeChatImgProfileUrl: SafeUrl = "";
 
   constructor(
+    public sanitizer: DomSanitizer,
     public signalRMessageService: SignalRMessageService,
-    public userProfileService: UserProfileService,
+    public imageService: ImageService,
     public authService: AuthService,
     public toaster: ToastrService) {
   }
@@ -122,10 +124,20 @@ export class ChatDetailsComponent implements OnInit, OnChanges, AfterViewInit {
       this.signalRMessageService.getChatDetailsListener();
       this.signalRMessageService.chatDetailsSubject.asObservable().subscribe((model) => {
         this.chatModel = model;
+        this.getChatProfileImage();
       });
     }
   }
 
+  getChatProfileImage() {
+    this.imageService.getChatImage(this.chatId).subscribe((image: Blob) => {
+        let unsafeUrl = URL.createObjectURL(image);
+        this.safeChatImgProfileUrl = this.sanitizer.bypassSecurityTrustUrl(unsafeUrl);
+      },
+      (error) => {
+        console.error('Error while loading image: ' + error);
+      });
+  }
 
   ngOnChanges() {
     if (this.chatId !== '') {

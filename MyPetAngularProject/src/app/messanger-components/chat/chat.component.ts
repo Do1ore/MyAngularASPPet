@@ -3,7 +3,7 @@ import {ChatMainModel} from 'src/app/models/chatMainModel';
 import {SignalRMessageService} from "../../services/signal-r-message.service";
 import {Subscription} from "rxjs";
 import {Dropdown, DropdownInterface, DropdownOptions, Modal, ModalInterface, ModalOptions} from "flowbite";
-import {UserProfileService} from "../../services/user-profile.service";
+import {ImageService} from "../../services/image.service";
 import {AppUser} from "../../models/appUser";
 import {ToastrService} from "ngx-toastr";
 import {CreateChatDto} from "../../models/createChatDto";
@@ -39,7 +39,7 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   constructor(
     public signalRMessageService: SignalRMessageService,
-    public userService: UserProfileService,
+    public userService: ImageService,
     public toaster: ToastrService,
     public authService: AuthService,
   ) {

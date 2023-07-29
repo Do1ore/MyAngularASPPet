@@ -15,7 +15,7 @@ public static class WebAppExtension
             });
     }
 
-    public static void UseCustomSwaggerUI(this WebApplication app)
+    public static void UseCustomSwaggerUi(this WebApplication app)
     {
         app.UseSwaggerUI(c =>
         {
