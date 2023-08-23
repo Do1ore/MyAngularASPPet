@@ -5,7 +5,6 @@ import {environment} from "../../environments/environment";
 import {User} from "../models/user";
 import {Subject} from "rxjs";
 import {SignalRMessageService} from "./signal-r-message.service";
-import {waitForAsync} from "@angular/core/testing";
 
 
 @Injectable({
@@ -14,8 +13,6 @@ import {waitForAsync} from "@angular/core/testing";
 
 export class AuthService {
   apiUrl: string = environment.baseApiUrl + "api/" + 'Auth';
-  token!: string;
-
   public logoutSubject = new Subject<void>();
   public logout$ = this.logoutSubject.asObservable();
 

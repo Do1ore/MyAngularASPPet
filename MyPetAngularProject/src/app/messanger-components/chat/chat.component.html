@@ -31,7 +31,7 @@
                     fill-rule="evenodd"></path>
             </svg>
             <span class="flex-1 ml-3 whitespace-nowrap">{{chat.name | truncateText: 6}}</span>
-            <small class="flex-1 ml-3 whitespace-nowrap">{{chat.lastmessage | truncateText:5}}</small>
+            <small class="flex-1 ml-3 whitespace-nowrap">{{chat.lastMessage | truncateText:5}}</small>
           </button>
         </li>
       </ul>
@@ -101,10 +101,10 @@
               Search
             </button>
           </div>
-          <div *ngIf="addUsersArray.length > 0">
+          <div *ngIf="usersToAdd.length > 0">
             <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Users to add</label>
             <ul>
-              <li *ngFor="let user of addUsersArray">
+              <li *ngFor="let user of usersToAdd">
                 <a class="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
                   <img class="w-6 h-6 mr-2 rounded-full"
                        src="https://e7.pngegg.com/pngimages/436/585/png-clipart-computer-icons-user-account-graphics-account-icon-vector-icons-silhouette.png"

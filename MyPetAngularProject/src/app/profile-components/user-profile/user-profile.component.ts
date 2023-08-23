@@ -2,7 +2,7 @@ import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {ToastrService} from "ngx-toastr";
 import {HttpClient, HttpEventType} from "@angular/common/http";
 import {environment} from "../../../environments/environment";
-import {UserProfileService} from "../../services/user-profile.service";
+import {ImageService} from "../../services/image.service";
 import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
 import {SignalRMessageService} from "../../services/signal-r-message.service";
 
@@ -18,7 +18,7 @@ export class UserProfileComponent implements OnInit {
   public progress: number = 0;
   @Output() public onUploadFinished = new EventEmitter();
 
-  constructor(private http: HttpClient, public userProfile: UserProfileService, private sanitizer: DomSanitizer, public signalRService: SignalRMessageService) {
+  constructor(private http: HttpClient, public userProfile: ImageService, private sanitizer: DomSanitizer, public signalRService: SignalRMessageService) {
   }
   public imageUrl!: SafeUrl;
 

@@ -2,12 +2,13 @@ import {AfterViewInit, Component, ElementRef, Input, OnChanges, OnInit, ViewChil
 import {SignalRMessageService} from "../../services/signal-r-message.service";
 import {ChatMainModel} from "../../models/chatMainModel";
 import {ChatMessage} from "../../models/chatMessage";
-import {UserProfileService} from "../../services/user-profile.service";
+import {ImageService} from "../../services/image.service";
 import {Modal, ModalOptions} from "flowbite";
 import {AuthService} from "../../services/auth.service";
 import {ToastrService} from "ngx-toastr";
-import {logMessages} from "@angular-devkit/build-angular/src/builders/browser-esbuild/esbuild";
 import {Subscription} from "rxjs";
+import {AppUser} from "../../models/appUser";
+import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-chat-details',
@@ -16,17 +17,19 @@ import {Subscription} from "rxjs";
 })
 export class ChatDetailsComponent implements OnInit, OnChanges, AfterViewInit {
 
-  @Input() chatModel: ChatMainModel = new ChatMainModel();
+  chatModel: ChatMainModel = new ChatMainModel();
   @Input() chatId: string = '';
   public userId = '';
   message: string = '';
   private modalInterface: Modal | null = null;
   private subscription: Subscription = new (Subscription);
   isInitialized: boolean = false;
+  safeChatImgProfileUrl: SafeUrl = "";
 
   constructor(
+    public sanitizer: DomSanitizer,
     public signalRMessageService: SignalRMessageService,
-    public userProfileService: UserProfileService,
+    public imageService: ImageService,
     public authService: AuthService,
     public toaster: ToastrService) {
   }
@@ -53,18 +56,45 @@ export class ChatDetailsComponent implements OnInit, OnChanges, AfterViewInit {
     });
     await this.initializeChat();
     this.isInitialized = true;
+
+  }
+
+  public deleteChat() {
+    this.chatId = "";
+    this.signalRMessageService.deleteChatCaller(this.chatModel.id);
+    this.closeModal();
   }
 
   async initializeChat() {
     this.userId = this.signalRMessageService.getUserIdFromToken();
     console.log('id: ' + this.userId)
     console.log("from this: " + this.chatId);
-    this.subscription = this.signalRMessageService.signalRConnect$.subscribe(() => {
+
+    this.subscription = this.signalRMessageService.signalRConnect$.subscribe(async () => {
+      console.log('Connection started');
+      await this.getChatModel();
+
+
       this.signalRMessageService.onReceiveMessage((message: ChatMessage) => {
+        let user = this.chatModel.appUsers.find(a => a.id === message.senderId);
+        if (user !== undefined) {
+          message.senderInformation = user;
+        }
         this.chatModel.messages.push(message);
+        this.scrollToBottom();
         console.log('Received new message:', message);
+        console.log('Chat model: ', this.chatModel)
+        console.log('Current userid: ', this.userId)
       });
+
+      this.signalRMessageService.deleteChatListener((chatId) => {
+        this.toaster.info('Chat deleted', 'Chat ' + this.chatModel.name + 'deleted. You automatically disconnected');
+        if (this.chatModel.id == chatId) {
+          this.chatModel = new ChatMainModel();
+        }
+      })
     })
+
   }
 
   async sendMessage() {
@@ -89,13 +119,25 @@ export class ChatDetailsComponent implements OnInit, OnChanges, AfterViewInit {
       this.toaster.error("Not connected to hub", "Server issue");
       return;
     }
-    this.signalRMessageService.getChatDetailsCaller(this.chatId);
-    this.signalRMessageService.getChatDetailsListener();
-    this.signalRMessageService.chatDetailsSubject.asObservable().subscribe((model) =>
-      this.chatModel = model)
-    console.log(this.chatModel)
+    if (this.chatId !== "") {
+      this.signalRMessageService.getChatDetailsCaller(this.chatId);
+      this.signalRMessageService.getChatDetailsListener();
+      this.signalRMessageService.chatDetailsSubject.asObservable().subscribe((model) => {
+        this.chatModel = model;
+        this.getChatProfileImage();
+      });
+    }
   }
 
+  getChatProfileImage() {
+    this.imageService.getChatImage(this.chatId).subscribe((image: Blob) => {
+        let unsafeUrl = URL.createObjectURL(image);
+        this.safeChatImgProfileUrl = this.sanitizer.bypassSecurityTrustUrl(unsafeUrl);
+      },
+      (error) => {
+        console.error('Error while loading image: ' + error);
+      });
+  }
 
   ngOnChanges() {
     if (this.chatId !== '') {
@@ -134,6 +176,15 @@ export class ChatDetailsComponent implements OnInit, OnChanges, AfterViewInit {
 
     }
     modal.toggle();
+  }
+
+  getUserBySenderId(userId: string): AppUser {
+    let result = this.chatModel.appUsers.find(u => u.id === userId);
+    if (result === undefined) {
+      console.error('Undefined user');
+      return new AppUser();
+    }
+    return result;
   }
 
   closeModal() {
