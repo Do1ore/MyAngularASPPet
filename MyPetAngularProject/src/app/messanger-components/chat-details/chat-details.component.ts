@@ -9,6 +9,7 @@ import {ToastrService} from "ngx-toastr";
 import {Subscription} from "rxjs";
 import {AppUser} from "../../models/appUser";
 import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
+import {ModalHelperService} from "../../services/Ui/modal-helper.service";
 
 @Component({
   selector: 'app-chat-details',
@@ -21,17 +22,23 @@ export class ChatDetailsComponent implements OnInit, OnChanges, AfterViewInit {
   @Input() chatId: string = '';
   public userId = '';
   message: string = '';
-  private modalInterface: Modal | null = null;
-  private subscription: Subscription = new (Subscription);
+
   isInitialized: boolean = false;
   safeChatImgProfileUrl: SafeUrl = "";
+
+  private deleteChatModalInterface: Modal | null = null;
+  private editChatModalInterface: Modal | null = null;
+  private subscription: Subscription = new (Subscription);
+  private readonly deleteModalId: string = '#popup-modal';
+  public readonly editModalId: string = '#edit-popup-modal';
 
   constructor(
     public sanitizer: DomSanitizer,
     public signalRMessageService: SignalRMessageService,
     public imageService: ImageService,
     public authService: AuthService,
-    public toaster: ToastrService) {
+    public toaster: ToastrService,
+    public modalHelper: ModalHelperService) {
   }
 
   @ViewChild('bottom') scrollTarget!: ElementRef;
@@ -62,7 +69,7 @@ export class ChatDetailsComponent implements OnInit, OnChanges, AfterViewInit {
   public deleteChat() {
     this.chatId = "";
     this.signalRMessageService.deleteChatCaller(this.chatModel.id);
-    this.closeModal();
+    this.closeDeleteModal();
   }
 
   async initializeChat() {
@@ -145,31 +152,11 @@ export class ChatDetailsComponent implements OnInit, OnChanges, AfterViewInit {
     this.subscription.unsubscribe();
   }
 
-  initModal(): Modal {
-    const $modalElement: HTMLElement = document.querySelector('#popup-modal')!;
-
-    const modalOptions: ModalOptions = {
-      placement: 'top-center',
-      backdrop: 'dynamic',
-      backdropClasses: 'bg-gray-900 bg-opacity-50 dark:bg-opacity-80 fixed inset-0 z-40',
-      closable: true,
-      onHide: () => {
-        console.log('modal is hidden');
-      },
-      onShow: () => {
-        console.log('modal is shown');
-      },
-      onToggle: () => {
-        console.log('modal has been toggled');
-      }
-    }
-    return new Modal($modalElement, modalOptions);
-  }
 
   toggleDeleteModal() {
     let modal = new Modal();
-    if (!this.modalInterface) {
-      modal = this.initModal();
+    if (!this.deleteChatModalInterface) {
+      modal = this.modalHelper.initializeModal(this.deleteModalId);
 
     }
     modal.toggle();
@@ -184,12 +171,28 @@ export class ChatDetailsComponent implements OnInit, OnChanges, AfterViewInit {
     return result;
   }
 
-  closeModal() {
+  closeDeleteModal() {
     let modal = new Modal();
 
-    if (!this.modalInterface) {
-      modal = this.initModal();
+    if (!this.deleteChatModalInterface) {
+      modal = this.modalHelper.initializeModal(this.deleteModalId);
     }
     modal.hide()
+  }
+
+  toggleEditModal() {
+    let modal = new Modal();
+    if (!this.editChatModalInterface) {
+      modal = this.modalHelper.initializeModal(this.editModalId);
+      modal.toggle();
+    }
+  }
+
+  closeEditModal() {
+    let modal = new Modal();
+    if (!this.editChatModalInterface) {
+      modal = this.modalHelper.initializeModal(this.editModalId);
+    }
+    modal.hide();
   }
 }
