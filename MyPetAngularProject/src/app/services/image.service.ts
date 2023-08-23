@@ -52,10 +52,5 @@ export class ImageService {
       responseType: 'blob'
     });
   }
-
-  public searchUser(searchTerm: string): Observable<AppUser[]> {
-    const payload = {searchTerm: searchTerm}; // Используйте правильный ключ для searchTerm
-    return this.http.get<AppUser[]>(this.baseApiUrl + '/search-user' + '/' + searchTerm);
-  }
 }
 

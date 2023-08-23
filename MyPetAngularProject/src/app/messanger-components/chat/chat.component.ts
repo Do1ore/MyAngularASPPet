@@ -8,6 +8,7 @@ import {AppUser} from "../../models/appUser";
 import {ToastrService} from "ngx-toastr";
 import {CreateChatDto} from "../../models/createChatDto";
 import {AuthService} from "../../services/auth.service";
+import {UserService} from "../../services/user.service";
 
 @Component({
   selector: 'app-chat',
@@ -39,7 +40,8 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   constructor(
     public signalRMessageService: SignalRMessageService,
-    public userService: ImageService,
+    public userImageService: ImageService,
+    public userService: UserService,
     public toaster: ToastrService,
     public authService: AuthService,
   ) {
@@ -140,8 +142,12 @@ export class ChatComponent implements OnInit, OnDestroy {
     }
     console.log('Users to in create function:', this.usersToAdd)
     this.usersToAdd.forEach(u => chatDto.userIds.push(u.id));
+
     //current userId
-    chatDto.creatorId = this.signalRMessageService.getUserIdFromToken();
+    let chatAdministratorUserId = this.signalRMessageService.getUserIdFromToken();
+    chatDto.creatorId = chatAdministratorUserId;
+    //add chat administrator to array of users
+    chatDto.userIds.push(chatAdministratorUserId);
 
     this.signalRMessageService.createChatCaller(chatDto);
     this.signalRMessageService.createChatListener((chat) => {
