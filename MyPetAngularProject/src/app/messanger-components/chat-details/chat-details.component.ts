@@ -131,12 +131,9 @@ export class ChatDetailsComponent implements OnInit, OnChanges, AfterViewInit {
 
   getChatProfileImage() {
     this.imageService.getChatImage(this.chatId).subscribe((image: Blob) => {
-        let unsafeUrl = URL.createObjectURL(image);
-        this.safeChatImgProfileUrl = this.sanitizer.bypassSecurityTrustUrl(unsafeUrl);
-      },
-      (error) => {
-        console.error('Error while loading image: ' + error);
-      });
+      let unsafeUrl = URL.createObjectURL(image);
+      this.safeChatImgProfileUrl = this.sanitizer.bypassSecurityTrustUrl(unsafeUrl);
+    });
   }
 
   ngOnChanges() {
