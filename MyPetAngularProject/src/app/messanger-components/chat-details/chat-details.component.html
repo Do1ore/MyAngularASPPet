@@ -95,7 +95,7 @@
         </div>
       </div>
     </div>
-    <!--    <div *ngIf="chatModel.messages.length > 0" class="pt-10 pb-20 px-0 sm:px-0 md:px-6 lg:px-8 xl:px-14">-->
+
     <ng-template ngFor let-message [ngForOf]="chatModel.messages" class="flex-row">
       <div *ngIf="message.senderId === userId"
            class="text-green-800 bg-green-100 dark:bg-green-900 rounded-md mt-2 p-3 ml-auto dark:text-green-50 w-fit">

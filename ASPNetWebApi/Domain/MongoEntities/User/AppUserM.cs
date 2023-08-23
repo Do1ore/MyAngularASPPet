@@ -8,6 +8,7 @@ public class AppUserM
     [BsonId]
     [BsonRepresentation(BsonType.String)]
     public Guid Id { get; set; }
+
     public string Username { get; set; } = string.Empty;
     public string Surname { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
@@ -22,5 +23,4 @@ public class AppUserM
     public DateTime LastTimeOnline { get; set; }
     public string? ProfileImagePath { get; set; }
     public ICollection<UserProfileImageM> UserProfileImages { get; set; } = new List<UserProfileImageM>();
-    
 }
