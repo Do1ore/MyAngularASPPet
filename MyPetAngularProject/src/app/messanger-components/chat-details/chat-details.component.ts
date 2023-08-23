@@ -10,6 +10,7 @@ import {Subscription} from "rxjs";
 import {AppUser} from "../../models/appUser";
 import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
 import {ModalHelperService} from "../../services/Ui/modal-helper.service";
+import {ChatService} from "../../services/chat.service";
 
 @Component({
   selector: 'app-chat-details',
@@ -38,7 +39,8 @@ export class ChatDetailsComponent implements OnInit, OnChanges, AfterViewInit {
     public imageService: ImageService,
     public authService: AuthService,
     public toaster: ToastrService,
-    public modalHelper: ModalHelperService) {
+    public modalHelper: ModalHelperService,
+  ) {
   }
 
   @ViewChild('bottom') scrollTarget!: ElementRef;

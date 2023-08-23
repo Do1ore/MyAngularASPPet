@@ -4,6 +4,7 @@ import {AuthService} from "../../services/auth.service";
 import {Router} from "@angular/router";
 import {ToastrService} from "ngx-toastr";
 import {Subscription} from "rxjs";
+import {ChatService} from "../../services/chat.service";
 
 @Component({
   selector: 'app-chat-domain',
@@ -11,7 +12,12 @@ import {Subscription} from "rxjs";
   styleUrls: ['./chat-domain.component.scss']
 })
 export class ChatDomainComponent implements OnInit, OnDestroy {
-  constructor(public authService: AuthService, private router: Router, public toaster: ToastrService) {
+  constructor(
+    public authService: AuthService,
+    private router: Router,
+    public toaster: ToastrService,
+    private chatService: ChatService,
+  ) {
   }
 
   private loginSubscription: Subscription = new Subscription();
@@ -19,6 +25,8 @@ export class ChatDomainComponent implements OnInit, OnDestroy {
 
   public showChatDetails(chatId: string) {
     this.selectedChatId = chatId;
+    this.chatService.currentChatId = this.selectedChatId;
+    console.log('Current chat id: ', this.selectedChatId)
   }
 
   ngOnInit() {

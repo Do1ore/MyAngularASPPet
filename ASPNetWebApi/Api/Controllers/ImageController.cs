@@ -18,7 +18,7 @@ public class ImageController : ControllerBase
     }
 
     [HttpPost("upload-chat-image")]
-    public async Task<IActionResult> UploadChatImage(IFormFile image, Guid chatId)
+    public async Task<IActionResult> UploadChatImage([FromForm]IFormFile image, [FromForm]Guid chatId)
     {
         var result = await _mediator.Send(new UploadChatProfileImageRequest(image, chatId));
         return Ok(result);

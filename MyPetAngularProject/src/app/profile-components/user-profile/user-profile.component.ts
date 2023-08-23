@@ -20,6 +20,7 @@ export class UserProfileComponent implements OnInit {
 
   constructor(private http: HttpClient, public userProfile: ImageService, private sanitizer: DomSanitizer, public signalRService: SignalRMessageService) {
   }
+
   public imageUrl!: SafeUrl;
 
   ngOnInit(): void {
@@ -62,7 +63,7 @@ export class UserProfileComponent implements OnInit {
     const formData = new FormData();
     formData.append('file', fileToUpload, fileToUpload.name);
 
-    this.http.post(this.baseApiPath + 'api' + '/Account' + '/upload', formData, {
+    this.http.post(this.baseApiPath + 'api' + '/Image' + '/upload-chat-image', formData, {
       reportProgress: true,
       observe: "events",
     }).subscribe(event => {
