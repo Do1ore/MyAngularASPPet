@@ -12,5 +12,5 @@ public class AppUserDto
     public DateTime AccountCreated { get; set; }
     public DateTime AccountLastTimeEdited { get; set; }
     public DateTime LastTimeOnline { get; set; }
-    public byte[]? CurrentImageBytes { get; set; }
+    public string? ProfileImagePath { get; set; }
 }
