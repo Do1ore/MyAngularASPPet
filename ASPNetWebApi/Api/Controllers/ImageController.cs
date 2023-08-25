@@ -1,5 +1,7 @@
-using Application.Features.Image.GetChatImage;
+using Application.Features.Image.GetChatProfileImage;
+using Application.Features.Image.GetUserProfileImage;
 using Application.Features.Image.UploadChatProfileImage;
+using Application.Features.Image.UploadUserProfileImage;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Client;
@@ -18,7 +20,7 @@ public class ImageController : ControllerBase
     }
 
     [HttpPost("upload-chat-image")]
-    public async Task<IActionResult> UploadChatImage([FromForm]IFormFile image, [FromForm]Guid chatId)
+    public async Task<IActionResult> UploadChatImage([FromForm] IFormFile image, [FromForm] Guid chatId)
     {
         var result = await _mediator.Send(new UploadChatProfileImageRequest(image, chatId));
         return Ok(result);
@@ -28,6 +30,20 @@ public class ImageController : ControllerBase
     public async Task<IActionResult> GetChatImage(Guid chatId)
     {
         var result = await _mediator.Send(new GetChatImageRequest(chatId));
+        return PhysicalFile(result, "image/jpeg");
+    }
+
+    [HttpPost("upload-user-image")]
+    public async Task<IActionResult> UploadUserProfileImage(IFormFile image, Guid userid)
+    {
+        var result = await _mediator.Send(new UploadUserProfileImageRequest(image, userid));
+        return Ok(result);
+    }
+
+    [HttpGet("get-user-image/{userId}")]
+    public async Task<IActionResult> GetUserProfileImage(Guid userId)
+    {
+        var result = await _mediator.Send(new GetUserProfileImageRequest(userId));
         return PhysicalFile(result, "image/jpeg");
     }
 }

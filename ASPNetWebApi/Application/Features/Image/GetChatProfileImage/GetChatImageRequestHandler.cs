@@ -1,7 +1,7 @@
 using Infrastructure.Abstraction.Services;
 using MediatR;
 
-namespace Application.Features.Image.GetChatImage;
+namespace Application.Features.Image.GetChatProfileImage;
 
 public class GetChatImageRequestHandler : IRequestHandler<GetChatImageRequest, string>
 {

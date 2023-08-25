@@ -8,7 +8,7 @@ public static class WebAppExtension
     {
         app.UseStaticFiles(
             new StaticFileOptions
-            {
+            {  
                 FileProvider =
                     new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/resources")),
                 RequestPath = new PathString("/wwwroot/resources")

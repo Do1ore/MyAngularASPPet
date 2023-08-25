@@ -52,8 +52,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\resources\compressed\" />
-    <Folder Include="wwwroot\resources\native\" />
+    <Folder Include="wwwroot\resources\users\" />
   </ItemGroup>
 
 </Project>
