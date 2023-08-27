@@ -1,16 +1,14 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from "@angular/common/http";
-import {environment} from "../../environments/environment";
+import {environment} from "../../../environments/environment";
 import {Observable} from "rxjs";
-import {AppUser} from "../models/appUser";
-import {SignalRMessageService} from "./signal-r-message.service";
+import {SignalRMessageService} from "../signal-r-message.service";
 
 @Injectable({
   providedIn: 'root'
 })
-export class ImageService {
+export class ChatImageService {
   baseApiUrl: string = environment.baseApiUrl + "api/" + 'Image';
-  token!: string;
 
 
   constructor(private http: HttpClient, public signalRService: SignalRMessageService) {
@@ -33,24 +31,5 @@ export class ImageService {
     });
   }
 
-  public getImage(): Observable<Blob> {
-    const headers = new HttpHeaders().set('Accept', 'image/png');
-
-    const url = this.baseApiUrl + "/profile-image";
-    return this.http.get(url, {
-      headers: headers,
-      responseType: 'blob'
-    });
-  }
-
-  public getImageById(userId: string): Observable<Blob> {
-    const headers = new HttpHeaders().set('Accept', 'image/png');
-    const url = this.baseApiUrl + "/profile-image-by-id";
-    return this.http.post<Blob>(url, {
-      userId: userId,
-      headers: headers,
-      responseType: 'blob'
-    });
-  }
 }
 

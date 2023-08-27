@@ -2,7 +2,7 @@ import {AfterViewInit, Component, ElementRef, Input, OnChanges, OnInit, ViewChil
 import {SignalRMessageService} from "../../services/signal-r-message.service";
 import {ChatMainModel} from "../../models/chatMainModel";
 import {ChatMessage} from "../../models/chatMessage";
-import {ImageService} from "../../services/image.service";
+import {ChatImageService} from "../../services/image/chat-image.service";
 import {Modal, ModalOptions} from "flowbite";
 import {AuthService} from "../../services/auth.service";
 import {ToastrService} from "ngx-toastr";
@@ -11,6 +11,7 @@ import {AppUser} from "../../models/appUser";
 import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
 import {ModalHelperService} from "../../services/Ui/modal-helper.service";
 import {ChatService} from "../../services/chat.service";
+import {UserImageService} from "../../services/image/user-image.service";
 
 @Component({
   selector: 'app-chat-details',
@@ -19,27 +20,30 @@ import {ChatService} from "../../services/chat.service";
 })
 export class ChatDetailsComponent implements OnInit, OnChanges, AfterViewInit {
 
-  chatModel: ChatMainModel = new ChatMainModel();
+
   @Input() chatId: string = '';
   public userId = '';
   message: string = '';
 
   isInitialized: boolean = false;
   safeChatImgProfileUrl: SafeUrl = "";
+  //All chat data, like messages, users
+  public chatModel: ChatMainModel = new ChatMainModel();
 
   private deleteChatModalInterface: Modal | null = null;
   private editChatModalInterface: Modal | null = null;
-  private subscription: Subscription = new (Subscription);
+  private subscription: Subscription = new Subscription;
   private readonly deleteModalId: string = '#popup-modal';
   public readonly editModalId: string = '#edit-popup-modal';
 
   constructor(
     public sanitizer: DomSanitizer,
     public signalRMessageService: SignalRMessageService,
-    public imageService: ImageService,
+    public imageService: ChatImageService,
     public authService: AuthService,
     public toaster: ToastrService,
     public modalHelper: ModalHelperService,
+    public userImageService: UserImageService,
   ) {
   }
 
@@ -82,7 +86,6 @@ export class ChatDetailsComponent implements OnInit, OnChanges, AfterViewInit {
     this.subscription = this.signalRMessageService.signalRConnect$.subscribe(async () => {
       console.log('Connection started');
       await this.getChatModel();
-
 
       this.signalRMessageService.onReceiveMessage((message: ChatMessage) => {
         let user = this.chatModel.appUsers.find(a => a.id === message.senderId);
@@ -131,9 +134,10 @@ export class ChatDetailsComponent implements OnInit, OnChanges, AfterViewInit {
     if (this.chatId !== "") {
       this.signalRMessageService.getChatDetailsCaller(this.chatId);
       this.signalRMessageService.getChatDetailsListener();
-      this.signalRMessageService.chatDetailsSubject.asObservable().subscribe((model) => {
+      this.signalRMessageService.chatDetailsSubject.asObservable().subscribe(async (model) => {
         this.chatModel = model;
         this.getChatProfileImage();
+        await this.getUserProfileImages();
       });
     }
   }
@@ -143,6 +147,15 @@ export class ChatDetailsComponent implements OnInit, OnChanges, AfterViewInit {
       let unsafeUrl = URL.createObjectURL(image);
       this.safeChatImgProfileUrl = this.sanitizer.bypassSecurityTrustUrl(unsafeUrl);
     });
+  }
+
+  async getUserProfileImages() {
+    if (this.chatModel.appUsers.length <= 0) {
+      console.log('Zero users')
+      return;
+    }
+
+    await this.userImageService.getUserProfileImages(this.chatModel.appUsers);
   }
 
   ngOnChanges() {
@@ -190,11 +203,14 @@ export class ChatDetailsComponent implements OnInit, OnChanges, AfterViewInit {
     }
   }
 
-  closeEditModal() {
-    let modal = new Modal();
-    if (!this.editChatModalInterface) {
-      modal = this.modalHelper.initializeModal(this.editModalId);
+  getUserCredentials(userId: string) {
+    let userData = this.chatModel.appUsers.find(a => a.id == userId);
+    if (!userData) {
+      return 'ML'
     }
-    modal.hide();
+    if (!userData.surname) {
+      return userData.username.substring(0, 2).toUpperCase();
+    }
+    return userData.surname.substring(0, 1).toUpperCase() + userData.username.substring(0, 1).toUpperCase();
   }
 }

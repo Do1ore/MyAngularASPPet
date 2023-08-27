@@ -3,7 +3,7 @@ import {ChatMainModel} from 'src/app/models/chatMainModel';
 import {SignalRMessageService} from "../../services/signal-r-message.service";
 import {Subscription} from "rxjs";
 import {Dropdown, DropdownInterface, DropdownOptions, Modal, ModalInterface, ModalOptions} from "flowbite";
-import {ImageService} from "../../services/image.service";
+import {ChatImageService} from "../../services/image/chat-image.service";
 import {AppUser} from "../../models/appUser";
 import {ToastrService} from "ngx-toastr";
 import {CreateChatDto} from "../../models/createChatDto";
@@ -15,7 +15,7 @@ import {UserService} from "../../services/user.service";
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.scss']
 })
-export class ChatComponent implements OnInit, OnDestroy {
+export class ChatComponent implements OnInit {
   get isAuthorized(): boolean {
     return this._isAuthorized;
   }
@@ -40,7 +40,7 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   constructor(
     public signalRMessageService: SignalRMessageService,
-    public userImageService: ImageService,
+    public userImageService: ChatImageService,
     public userService: UserService,
     public toaster: ToastrService,
     public authService: AuthService,
@@ -83,19 +83,10 @@ export class ChatComponent implements OnInit, OnDestroy {
     })
     console.log('Connected to chat/s')
   }
-
-  ngOnDestroy(): void {
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-    }
-    this.leftGroups();
-    console.log('Component destroyed');
-    this.signalRMessageService.disconnectFromHub();
-  }
-
   selectChat(chatId: string) {
     this.chatSelected.emit(chatId);
   }
+
 
   addUserToArray(userId: string) {
     console.log('Attempt to add user with id: ', userId)

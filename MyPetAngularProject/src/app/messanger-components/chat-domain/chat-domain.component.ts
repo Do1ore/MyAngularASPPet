@@ -11,7 +11,7 @@ import {ChatService} from "../../services/chat.service";
   templateUrl: './chat-domain.component.html',
   styleUrls: ['./chat-domain.component.scss']
 })
-export class ChatDomainComponent implements OnInit, OnDestroy {
+export class ChatDomainComponent implements OnInit {
   constructor(
     public authService: AuthService,
     private router: Router,
@@ -42,7 +42,4 @@ export class ChatDomainComponent implements OnInit, OnDestroy {
     }
   }
 
-  ngOnDestroy(): void {
-    this.loginSubscription.unsubscribe();
-  }
 }

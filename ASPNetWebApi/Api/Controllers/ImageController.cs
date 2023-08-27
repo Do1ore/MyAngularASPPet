@@ -2,9 +2,9 @@ using Application.Features.Image.GetChatProfileImage;
 using Application.Features.Image.GetUserProfileImage;
 using Application.Features.Image.UploadChatProfileImage;
 using Application.Features.Image.UploadUserProfileImage;
+using Infrastructure.Abstraction.Services.User;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Identity.Client;
 
 namespace MySuperApi.Controllers;
 
@@ -13,10 +13,12 @@ namespace MySuperApi.Controllers;
 public class ImageController : ControllerBase
 {
     private readonly IMediator _mediator;
+    private readonly IHttpUserDataAccessorService _dataAccessorService;
 
-    public ImageController(IMediator mediator)
+    public ImageController(IMediator mediator, IHttpUserDataAccessorService dataAccessorService)
     {
         _mediator = mediator;
+        _dataAccessorService = dataAccessorService;
     }
 
     [HttpPost("upload-chat-image")]
@@ -34,10 +36,18 @@ public class ImageController : ControllerBase
     }
 
     [HttpPost("upload-user-image")]
-    public async Task<IActionResult> UploadUserProfileImage(IFormFile image, Guid userid)
+    public async Task<IActionResult> UploadUserProfileImage([FromForm] IFormFile image, [FromForm] Guid userid)
     {
         var result = await _mediator.Send(new UploadUserProfileImageRequest(image, userid));
         return Ok(result);
+    }
+
+    [HttpGet("get-current-user-image")]
+    public async Task<IActionResult> GetCurrentUserProfileImage()
+    {
+        var userId = _dataAccessorService.GetMyId();
+        var result = await _mediator.Send(new GetUserProfileImageRequest(Guid.Parse(userId)));
+        return PhysicalFile(result, "image/jpeg");
     }
 
     [HttpGet("get-user-image/{userId}")]

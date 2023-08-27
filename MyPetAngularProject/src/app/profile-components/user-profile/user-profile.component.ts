@@ -2,9 +2,10 @@ import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {ToastrService} from "ngx-toastr";
 import {HttpClient, HttpEventType} from "@angular/common/http";
 import {environment} from "../../../environments/environment";
-import {ImageService} from "../../services/image.service";
+import {ChatImageService} from "../../services/image/chat-image.service";
 import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
 import {SignalRMessageService} from "../../services/signal-r-message.service";
+import {UserImageService} from "../../services/image/user-image.service";
 
 
 @Component({
@@ -18,7 +19,10 @@ export class UserProfileComponent implements OnInit {
   public progress: number = 0;
   @Output() public onUploadFinished = new EventEmitter();
 
-  constructor(private http: HttpClient, public userProfile: ImageService, private sanitizer: DomSanitizer, public signalRService: SignalRMessageService) {
+  constructor(private http: HttpClient,
+              public userImageService: UserImageService,
+              private sanitizer: DomSanitizer,
+              private signalRService: SignalRMessageService) {
   }
 
   public imageUrl!: SafeUrl;
@@ -28,21 +32,7 @@ export class UserProfileComponent implements OnInit {
   }
 
   public getProfileImage() {
-    this.userProfile.getImage().subscribe(
-      (imageBlob: Blob) => {
-        // Создаем безопасный URL для изображения
-        const objectUrl: string = URL.createObjectURL(imageBlob);
-        this.imageUrl = this.sanitizer.bypassSecurityTrustUrl(objectUrl);
-      },
-      (error: any) => {
-        console.error('Ошибка при загрузке изображения:', error);
-      }
-    );
-  }
-
-  public getProfileImageById() {
-    let userId = this.signalRService.getUserIdFromToken();
-    this.userProfile.getImageById(userId).subscribe(
+    this.userImageService.getCurrentUserProfileImage().subscribe(
       (imageBlob: Blob) => {
         // Создаем безопасный URL для изображения
         const objectUrl: string = URL.createObjectURL(imageBlob);
@@ -61,20 +51,14 @@ export class UserProfileComponent implements OnInit {
     }
     let fileToUpload = <File>files[0];
     const formData = new FormData();
-    formData.append('file', fileToUpload, fileToUpload.name);
+    formData.append('image', fileToUpload);
+    formData.append('userId', this.signalRService.getUserIdFromToken())
 
-    this.http.post(this.baseApiPath + 'api' + '/Image' + '/upload-chat-image', formData, {
-      reportProgress: true,
-      observe: "events",
-    }).subscribe(event => {
-      if (event.type === HttpEventType.UploadProgress) {
-        this.progress = Math.round(100 * event.loaded / event.total!);
-      } else if (event.type === HttpEventType.Response) {
-        this.message = 'Upload success';
-        this.onUploadFinished.emit(event.body);
-      }
-    })
+    this.userImageService.uploadUserProfileImage(formData).subscribe(() => {
+      console.log('Uploaded')
+    });
   }
+
 
 }
 

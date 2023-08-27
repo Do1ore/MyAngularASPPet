@@ -97,20 +97,55 @@
       </div>
     </div>
 
-    <ng-template ngFor let-message [ngForOf]="chatModel.messages" class="flex-row">
-      <div *ngIf="message.senderId === userId"
-           class="text-green-800 bg-green-100 dark:bg-green-900 rounded-md mt-2 p-3 ml-auto dark:text-green-50 w-fit">
-        <mark
-          class="me-4 p-1 bg-transparent dark:text-blue-50
+    <!--    ChatMessages-->
+    <ng-template ngFor let-message [ngForOf]="chatModel.messages">
+      <!--Current user-->
+      <div *ngIf="message.senderId === userId">
+
+
+        <div class="text-green-800 bg-green-100 dark:bg-green-900 rounded-md mt-2 p-3 ml-auto dark:text-green-50 w-fit flex flex-row items-center">
+
+          <div *ngIf="userImageService.getUserProfileById(message.senderId); else elseBlock">
+            <img
+              class="relative inline-flex items-center overflow-hidden w-10 h-10 p-1 rounded-full ring-2 ring-gray-300 dark:ring-gray-500 me-2"
+              [src]="userImageService.getUserProfileById(message.senderId)" alt="Bordered avatar">
+          </div>
+          <ng-template #elseBlock>
+            <div
+              class="relative  inline-flex items-center justify-center w-10 h-10 overflow-hidden bg-gray-100 rounded-full dark:bg-gray-600">
+            <span
+              class="font-medium text-gray-600 dark:text-gray-300">{{getUserCredentials(message.senderId)}}</span>
+            </div>
+          </ng-template>
+
+          <mark
+            class="me-4 p-1 bg-transparent dark:text-blue-50
             font-bold">{{getUserBySenderId(message.senderId).username!}}</mark>
-        <span class="text-black dark:text-green-200 me-4">{{message.content}}</span>
-        <mark
-          class="text-green-900  bg-green-300 dark:bg-green-900 dark:text-green-800 p-1 rounded-md">
-          <small>{{message.sentAt | date: 'hh:mm'}}</small>
-        </mark>
+          <span class="text-black dark:text-green-200 me-4">{{message.content}}</span>
+          <mark
+            class="text-green-900  bg-green-300 dark:bg-green-900 dark:text-green-800 p-1 rounded-md">
+            <small>{{message.sentAt | date: 'hh:mm'}}</small>
+          </mark>
+        </div>
       </div>
+
+      <!--Other user-->
       <div *ngIf="message.senderId !== userId"
            class="bg-blue-50 dark:bg-green-900 rounded-md mt-2 p-3 w-fit">
+
+        <div *ngIf="userImageService.getUserProfileById(message.senderId); else elseBlock">
+          <img
+            class="relative inline-flex items-center justify-center w-10 h-10 p-1 rounded-full ring-2 ring-gray-300 dark:ring-gray-500"
+            [src]="userImageService.getUserProfileById(message.senderId)" alt="Bordered avatar">
+        </div>
+        <ng-template #elseBlock>
+          <div
+            class="relative inline-flex items-center justify-center w-10 h-10 overflow-hidden bg-gray-100 rounded-full dark:bg-gray-600">
+            <span
+              class="font-medium text-gray-600 dark:text-gray-300">{{getUserCredentials(message.senderId)}}</span>
+          </div>
+        </ng-template>
+
         <mark
           class="me-4 p-1 text-blue-900 dark:text-blue-200 bg-transparent
             font-bold">{{getUserBySenderId(message.senderId).username}}</mark>
