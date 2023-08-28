@@ -86,6 +86,7 @@ export class ChatDetailsComponent implements OnInit, OnChanges, AfterViewInit {
     this.subscription = this.signalRMessageService.signalRConnect$.subscribe(async () => {
       console.log('Connection started');
       await this.getChatModel();
+      this.signalRMessageService.getChatDetailsListener();
 
       this.signalRMessageService.onReceiveMessage((message: ChatMessage) => {
         let user = this.chatModel.appUsers.find(a => a.id === message.senderId);
@@ -133,7 +134,6 @@ export class ChatDetailsComponent implements OnInit, OnChanges, AfterViewInit {
     }
     if (this.chatId !== "") {
       this.signalRMessageService.getChatDetailsCaller(this.chatId);
-      this.signalRMessageService.getChatDetailsListener();
       this.signalRMessageService.chatDetailsSubject.asObservable().subscribe(async (model) => {
         this.chatModel = model;
         this.getChatProfileImage();
