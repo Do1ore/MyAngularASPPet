@@ -1,8 +1,8 @@
 using Application.Features.Chat.ChatDetails;
 using Application.Features.Chat.CreateChat;
+using Domain.DTOs;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using MySuperApi.DTOs;
 
 namespace MySuperApi.Controllers;
 

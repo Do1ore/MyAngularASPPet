@@ -1,10 +1,10 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {ChatDetailsComponent} from "../chat-details/chat-details.component";
+import {Component, OnInit} from '@angular/core';
 import {AuthService} from "../../services/auth.service";
 import {Router} from "@angular/router";
 import {ToastrService} from "ngx-toastr";
 import {Subscription} from "rxjs";
-import {ChatService} from "../../services/chat.service";
+import {SignalRChatService} from "../../services/signalR/signal-r-chat.service";
+
 
 @Component({
   selector: 'app-chat-domain',
@@ -16,7 +16,7 @@ export class ChatDomainComponent implements OnInit {
     public authService: AuthService,
     private router: Router,
     public toaster: ToastrService,
-    private chatService: ChatService,
+    private chatService: SignalRChatService,
   ) {
   }
 

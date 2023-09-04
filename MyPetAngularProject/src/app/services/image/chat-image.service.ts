@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {environment} from "../../../environments/environment";
 import {Observable} from "rxjs";
-import {SignalRMessageService} from "../signal-r-message.service";
+import {SignalRMessageService} from "../signalR/signal-r-message.service";
 
 @Injectable({
   providedIn: 'root'

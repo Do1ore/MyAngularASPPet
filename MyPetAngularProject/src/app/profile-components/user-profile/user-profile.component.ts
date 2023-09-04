@@ -4,8 +4,9 @@ import {HttpClient, HttpEventType} from "@angular/common/http";
 import {environment} from "../../../environments/environment";
 import {ChatImageService} from "../../services/image/chat-image.service";
 import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
-import {SignalRMessageService} from "../../services/signal-r-message.service";
+import {SignalRMessageService} from "../../services/signalR/signal-r-message.service";
 import {UserImageService} from "../../services/image/user-image.service";
+import {LocalStorageHelperService} from "../../services/local-storage-helper.service";
 
 
 @Component({
@@ -22,7 +23,7 @@ export class UserProfileComponent implements OnInit {
   constructor(private http: HttpClient,
               public userImageService: UserImageService,
               private sanitizer: DomSanitizer,
-              private signalRService: SignalRMessageService) {
+              private storageService: LocalStorageHelperService) {
   }
 
   public imageUrl!: SafeUrl;
@@ -52,7 +53,7 @@ export class UserProfileComponent implements OnInit {
     let fileToUpload = <File>files[0];
     const formData = new FormData();
     formData.append('image', fileToUpload);
-    formData.append('userId', this.signalRService.getUserIdFromToken())
+    formData.append('userId', this.storageService.getUserIdFromToken())
 
     this.userImageService.uploadUserProfileImage(formData).subscribe(() => {
       console.log('Uploaded')

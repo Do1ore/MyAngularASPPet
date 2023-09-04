@@ -1,4 +1,4 @@
-﻿namespace MySuperApi.DTOs
+﻿namespace Domain.DTOs
 {
     public class UserIdDto
     {

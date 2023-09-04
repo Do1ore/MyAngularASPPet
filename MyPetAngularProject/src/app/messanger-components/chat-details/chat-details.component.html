@@ -55,9 +55,16 @@
         <div class="flex-row justify-start items-start">
 
           <div class="flex items-center mb-4">
-            <img [src]="safeChatImgProfileUrl"
-                 class="w-20 h-20 p-1 rounded-full ring-2 ring-gray-300 dark:ring-gray-500 object-cover me-4"
-                 alt="chat image">
+            <div *ngIf="safeChatImgProfileUrl; else withoutImage">
+              <img [src]="safeChatImgProfileUrl"
+                   class="w-20 h-20 p-1 rounded-full ring-2 ring-gray-300 dark:ring-gray-500 object-cover me-4"
+                   alt="chat image">
+            </div>
+            <ng-template #withoutImage>
+              <span class="inline-flex items-center justify-center h-[3.875rem] w-[3.875rem] rounded-full bg-gray-600 me-4">
+              <span class="text-lg font-medium text-white leading-none">{{chatModel.name.charAt(0).toUpperCase()}}</span>
+              </span>
+            </ng-template>
 
             <h1
               class="self-center mb-4 text-3xl font-extrabold text-gray-900 dark:text-white md:text-5xl lg:text-6xl me-2">
@@ -163,7 +170,7 @@
 
   <!--  Message input-->
   <footer
-    class="max-w-4xl mx-auto sticky bottom-0 z-10 backdrop-blur-sm rounded-lg shadow-lg border-gray-200 pt-2 pb-4 sm:pt-4 sm:pb-6 px-4 sm:px-6 lg:px-3   dark:border-gray-700">
+    class="max-w-4xl mx-auto sticky bottom-0 z-10 backdrop-blur-sm rounded-lg shadow-lg border-gray-200 pt-2 pb-4 sm:pt-4 sm:pb-6 px-4 sm:px-6 lg:px-3  F dark:border-gray-700">
     <div class="relative">
       <form (ngSubmit)="sendMessage()">
 

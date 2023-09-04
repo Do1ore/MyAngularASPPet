@@ -2,10 +2,10 @@
 using Application.Features.Chat.CreateChat;
 using Application.Features.Chat.GetAllChats;
 using Application.Features.Message.SendMessage;
+using Domain.DTOs;
 using Domain.MongoEntities.Chat;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
-using MySuperApi.DTOs;
 
 namespace MySuperApi.HubConfig;
 
@@ -49,7 +49,7 @@ public class UserHub : Hub
         var chat = await _mediator.Send(new CreateChatRequest(chatDto));
         await Clients.Caller.SendAsync("CreateChatResponse", chat);
 
-        await JoinChat((Guid)chat.Id);
+        await JoinChat(chat.Id);
     }
 
     private async Task JoinChat(Guid chatId)

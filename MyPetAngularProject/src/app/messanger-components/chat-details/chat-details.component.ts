@@ -1,216 +1,222 @@
 import {AfterViewInit, Component, ElementRef, Input, OnChanges, OnInit, ViewChild} from '@angular/core';
-import {SignalRMessageService} from "../../services/signal-r-message.service";
+import {SignalRMessageService} from "../../services/signalR/signal-r-message.service";
 import {ChatMainModel} from "../../models/chatMainModel";
 import {ChatMessage} from "../../models/chatMessage";
 import {ChatImageService} from "../../services/image/chat-image.service";
-import {Modal, ModalOptions} from "flowbite";
+import {Modal} from "flowbite";
 import {AuthService} from "../../services/auth.service";
 import {ToastrService} from "ngx-toastr";
 import {Subscription} from "rxjs";
 import {AppUser} from "../../models/appUser";
 import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
 import {ModalHelperService} from "../../services/Ui/modal-helper.service";
-import {ChatService} from "../../services/chat.service";
 import {UserImageService} from "../../services/image/user-image.service";
+import {LocalStorageHelperService} from "../../services/local-storage-helper.service";
+import {SignalRConnectionService} from "../../services/signalR/signalr-connection.service";
+import {SignalRChatService} from "../../services/signalR/signal-r-chat.service";
 
 @Component({
-  selector: 'app-chat-details',
-  templateUrl: './chat-details.component.html',
-  styleUrls: ['./chat-details.component.scss']
+    selector: 'app-chat-details',
+    templateUrl: './chat-details.component.html',
+    styleUrls: ['./chat-details.component.scss']
 })
 export class ChatDetailsComponent implements OnInit, OnChanges, AfterViewInit {
 
 
-  @Input() chatId: string = '';
-  public userId = '';
-  message: string = '';
+    @Input() chatId: string = '';
+    public userId = '';
+    message: string = '';
 
-  isInitialized: boolean = false;
-  safeChatImgProfileUrl: SafeUrl = "";
-  //All chat data, like messages, users
-  public chatModel: ChatMainModel = new ChatMainModel();
+    isInitialized: boolean = false;
+    safeChatImgProfileUrl: SafeUrl = "";
+    //All chat data, like messages, users
+    public chatModel: ChatMainModel = new ChatMainModel();
 
-  private deleteChatModalInterface: Modal | null = null;
-  private editChatModalInterface: Modal | null = null;
-  private subscription: Subscription = new Subscription;
-  private readonly deleteModalId: string = '#popup-modal';
-  public readonly editModalId: string = '#edit-popup-modal';
+    private deleteChatModalInterface: Modal | null = null;
+    private editChatModalInterface: Modal | null = null;
+    private subscription: Subscription = new Subscription;
+    private readonly deleteModalId: string = '#popup-modal';
+    public readonly editModalId: string = '#edit-popup-modal';
 
-  constructor(
-    public sanitizer: DomSanitizer,
-    public signalRMessageService: SignalRMessageService,
-    public imageService: ChatImageService,
-    public authService: AuthService,
-    public toaster: ToastrService,
-    public modalHelper: ModalHelperService,
-    public userImageService: UserImageService,
-  ) {
-  }
-
-  @ViewChild('bottom') scrollTarget!: ElementRef;
-
-  ngAfterViewInit() {
-    setTimeout(() => {
-      this.scrollToBottom();
-    }, 200);
-  }
-
-  scrollToBottom() {
-    if (this.scrollTarget && this.scrollTarget.nativeElement) {
-      this.scrollTarget.nativeElement.scrollIntoView({behavior: 'smooth'});
+    constructor(
+        public sanitizer: DomSanitizer,
+        public imageService: ChatImageService,
+        public authService: AuthService,
+        public toaster: ToastrService,
+        public modalHelper: ModalHelperService,
+        public userImageService: UserImageService,
+        public chatService: SignalRChatService,
+        public messageService: SignalRMessageService,
+        private storageHelper: LocalStorageHelperService,
+        private connectionService: SignalRConnectionService,
+    ) {
     }
-  }
 
-  async ngOnInit() {
-    this.authService.logout$.subscribe(() => {
-      this.userId = '';
-      console.log('Logging out');
-      return;
-    });
-    await this.initializeChat();
-    this.isInitialized = true;
+    @ViewChild('bottom') scrollTarget!: ElementRef;
 
-  }
+    ngAfterViewInit() {
+        setTimeout(() => {
+            this.scrollToBottom();
+        }, 200);
+    }
 
-  public deleteChat() {
-    this.chatId = "";
-    this.signalRMessageService.deleteChatCaller(this.chatModel.id);
-    this.closeDeleteModal();
-  }
-
-  async initializeChat() {
-    this.userId = this.signalRMessageService.getUserIdFromToken();
-    console.log('id: ' + this.userId)
-    console.log("from this: " + this.chatId);
-
-    this.subscription = this.signalRMessageService.signalRConnect$.subscribe(async () => {
-      console.log('Connection started');
-      await this.getChatModel();
-      this.signalRMessageService.getChatDetailsListener();
-
-      this.signalRMessageService.onReceiveMessage((message: ChatMessage) => {
-        let user = this.chatModel.appUsers.find(a => a.id === message.senderId);
-        if (user !== undefined) {
-          message.senderInformation = user;
+    scrollToBottom() {
+        if (this.scrollTarget && this.scrollTarget.nativeElement) {
+            this.scrollTarget.nativeElement.scrollIntoView({behavior: 'smooth'});
         }
-        this.chatModel.messages.push(message);
+    }
+
+    async ngOnInit() {
+        this.authService.logout$.subscribe(() => {
+            this.userId = '';
+            console.log('Logging out');
+            return;
+        });
+        await this.initializeChat();
+        this.isInitialized = true;
+
+    }
+
+    public deleteChat() {
+        this.chatService.deleteChatCaller(this.chatId);
+        this.closeDeleteModal();
+        console.log('Delete chat called');
+    }
+
+    async initializeChat() {
+        this.userId = this.storageHelper.getUserIdFromToken();
+        console.log('id: ' + this.userId)
+        console.log("from this: " + this.chatId);
+
+        await this.getChatModel();
+
+        this.chatService.deleteChatCaller(this.chatId);
+
+        this.chatService.getChatDetailsListener((chats) => this.chatModel = chats);
+
+        this.messageService.onReceiveMessage((message: ChatMessage) => {
+            let user = this.chatModel.appUsers.find(a => a.id === message.senderId);
+            if (user !== undefined) {
+                message.senderInformation = user;
+            }
+            this.chatModel.messages.push(message);
+            this.scrollToBottom();
+            console.log('Received new message:', message);
+            console.log('Chat model: ', this.chatModel)
+            console.log('Current userid: ', this.userId)
+        });
+
+        this.chatService.deleteChatListener((chatId) => {
+            this.toaster.info('Chat deleted', 'Chat ' + this.chatModel.name + 'deleted. You automatically disconnected');
+            if (this.chatModel.id == chatId) {
+                this.chatModel = new ChatMainModel();
+            }
+        })
+
+
+    }
+
+    async sendMessage() {
+        if (this.message === '') {
+            console.log('message null')
+            return;
+        }
+        if (this.connectionService.isConnected()) {
+            this.toaster.error("Not connected to hub", "Server issue");
+            return;
+        }
+        console.log('Sending message...')
+        this.messageService.sendMessage(this.chatId, this.message);
+        console.log(this.message);
+        this.message = '';
         this.scrollToBottom();
-        console.log('Received new message:', message);
-        console.log('Chat model: ', this.chatModel)
-        console.log('Current userid: ', this.userId)
-      });
+    }
 
-      this.signalRMessageService.deleteChatListener((chatId) => {
-        this.toaster.info('Chat deleted', 'Chat ' + this.chatModel.name + 'deleted. You automatically disconnected');
-        if (this.chatModel.id == chatId) {
-          this.chatModel = new ChatMainModel();
+
+    async getChatModel() {
+        if (this.connectionService.isConnected()) {
+            this.toaster.error("Not connected to hub", "Server issue");
+            return;
         }
-      })
-    })
-
-  }
-
-  async sendMessage() {
-    if (this.message === '') {
-      console.log('message null')
-      return;
-    }
-    if (this.signalRMessageService.getHubConnection().state !== 'Connected') {
-      this.toaster.error("Not connected to hub", "Server issue");
-      return;
-    }
-    console.log('Sending message...')
-    this.signalRMessageService.sendMessage(this.chatId, this.message);
-    console.log(this.message);
-    this.message = '';
-    this.scrollToBottom();
-  }
-
-
-  async getChatModel() {
-    if (this.signalRMessageService.getHubConnection().state !== 'Connected') {
-      this.toaster.error("Not connected to hub", "Server issue");
-      return;
-    }
-    if (this.chatId !== "") {
-      this.signalRMessageService.getChatDetailsCaller(this.chatId);
-      this.signalRMessageService.chatDetailsSubject.asObservable().subscribe(async (model) => {
-        this.chatModel = model;
-        this.getChatProfileImage();
-        await this.getUserProfileImages();
-      });
-    }
-  }
-
-  getChatProfileImage() {
-    this.imageService.getChatImage(this.chatId).subscribe((image: Blob) => {
-      let unsafeUrl = URL.createObjectURL(image);
-      this.safeChatImgProfileUrl = this.sanitizer.bypassSecurityTrustUrl(unsafeUrl);
-    });
-  }
-
-  async getUserProfileImages() {
-    if (this.chatModel.appUsers.length <= 0) {
-      console.log('Zero users')
-      return;
+        if (this.chatId !== "") {
+            this.chatService.getChatDetailsCaller(this.chatId);
+            this.messageService.chatDetailsSubject.asObservable().subscribe(async (model) => {
+                this.chatModel = model;
+                this.getChatProfileImage();
+                await this.getUserProfileImages();
+            });
+        }
     }
 
-    await this.userImageService.getUserProfileImages(this.chatModel.appUsers);
-  }
-
-  ngOnChanges() {
-    if (this.chatId !== '') {
-      this.getChatModel().then(() => {
-        console.log(this.chatId);
-      });
+    getChatProfileImage() {
+        this.imageService.getChatImage(this.chatId).subscribe((image: Blob) => {
+            let unsafeUrl = URL.createObjectURL(image);
+            this.safeChatImgProfileUrl = this.sanitizer.bypassSecurityTrustUrl(unsafeUrl);
+        });
     }
-    this.subscription.unsubscribe();
-  }
 
+    async getUserProfileImages() {
+        if (this.chatModel.appUsers.length <= 0) {
+            console.log('Zero users')
+            return;
+        }
 
-  toggleDeleteModal() {
-    let modal = new Modal();
-    if (!this.deleteChatModalInterface) {
-      modal = this.modalHelper.initializeModal(this.deleteModalId);
-
+        await this.userImageService.getUserProfileImages(this.chatModel.appUsers);
     }
-    modal.toggle();
-  }
 
-  getUserBySenderId(userId: string): AppUser {
-    let result = this.chatModel.appUsers.find(u => u.id === userId);
-    if (result === undefined) {
-      console.error('Undefined user');
-      return new AppUser();
+    ngOnChanges() {
+        if (this.chatId !== '') {
+            this.getChatModel().then(() => {
+                console.log(this.chatId);
+            });
+        }
+        this.subscription.unsubscribe();
     }
-    return result;
-  }
 
-  closeDeleteModal() {
-    let modal = new Modal();
 
-    if (!this.deleteChatModalInterface) {
-      modal = this.modalHelper.initializeModal(this.deleteModalId);
-    }
-    modal.hide()
-  }
+    toggleDeleteModal() {
+        let modal = new Modal();
+        if (!this.deleteChatModalInterface) {
+            modal = this.modalHelper.initializeModal(this.deleteModalId);
 
-  toggleEditModal() {
-    let modal = new Modal();
-    if (!this.editChatModalInterface) {
-      modal = this.modalHelper.initializeModal(this.editModalId);
-      modal.toggle();
+        }
+        modal.toggle();
     }
-  }
 
-  getUserCredentials(userId: string) {
-    let userData = this.chatModel.appUsers.find(a => a.id == userId);
-    if (!userData) {
-      return 'ML'
+    getUserBySenderId(userId: string): AppUser {
+        let result = this.chatModel.appUsers.find(u => u.id === userId);
+        if (result === undefined) {
+            console.error('Undefined user');
+            return new AppUser();
+        }
+        return result;
     }
-    if (!userData.surname) {
-      return userData.username.substring(0, 2).toUpperCase();
+
+    closeDeleteModal() {
+        let modal = new Modal();
+
+        if (!this.deleteChatModalInterface) {
+            modal = this.modalHelper.initializeModal(this.deleteModalId);
+        }
+        modal.hide()
     }
-    return userData.surname.substring(0, 1).toUpperCase() + userData.username.substring(0, 1).toUpperCase();
-  }
+
+    toggleEditModal() {
+        let modal = new Modal();
+        if (!this.editChatModalInterface) {
+            modal = this.modalHelper.initializeModal(this.editModalId);
+            modal.toggle();
+        }
+    }
+
+    getUserCredentials(userId: string) {
+        let userData = this.chatModel.appUsers.find(a => a.id == userId);
+        if (!userData) {
+            return 'ML'
+        }
+        if (!userData.surname) {
+            return userData.username.substring(0, 2).toUpperCase();
+        }
+        return userData.surname.substring(0, 1).toUpperCase() + userData.username.substring(0, 1).toUpperCase();
+    }
 }

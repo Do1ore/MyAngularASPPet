@@ -1,6 +1,6 @@
 using Domain.MongoEntities.Chat;
 
-namespace MySuperApi.DTOs.Message;
+namespace Domain.DTOs.Message;
 
 public class ChatMessageDto
 {

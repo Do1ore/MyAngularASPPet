@@ -16,7 +16,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
-using MySuperApi.DTOs;
 
 namespace MySuperApi.Extenstion;
 

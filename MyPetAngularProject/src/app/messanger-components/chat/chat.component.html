@@ -40,15 +40,14 @@
 </div>
 
 
-<!-- Main modal -->
+<!-- Create chat modal -->
 <div aria-hidden="true"
      style="backdrop-filter: blur(15px) !important;"
      class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full"
      id="add-chat-modal"
      tabindex="-1">
   <div class="relative w-full max-w-md max-h-full"
-       style="top:100px !important; "
-  >
+       style="top:100px !important; ">
     <!-- Modal content -->
     <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
       <button
@@ -64,9 +63,10 @@
         </svg>
         <span class="sr-only">Close modal</span>
       </button>
+
       <div class="px-6 py-6 lg:px-8">
         <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">Create new chat</h3>
-        <form class="space-y-6" (ngSubmit)="createChat()">
+        <form class="space-y-6" (ngSubmit)="createChat()" enctype="multipart/form-data">
           <div>
             <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Chat name</label>
             <input
@@ -120,9 +120,7 @@
             type="submit">
             Create chat
           </button>
-          <div class="text-sm font-medium text-gray-500 dark:text-gray-300">
-            Not registered? <a class="text-blue-700 hover:underline dark:text-blue-500" href="#">Create chat</a>
-          </div>
+
         </form>
       </div>
     </div>

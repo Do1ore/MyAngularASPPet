@@ -52,6 +52,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="DTOs\" />
     <Folder Include="wwwroot\resources\users\" />
   </ItemGroup>
 

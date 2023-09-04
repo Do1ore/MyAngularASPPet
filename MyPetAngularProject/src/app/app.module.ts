@@ -15,7 +15,7 @@ import {ToastrModule, GlobalConfig} from "ngx-toastr";
 import {UserProfileComponent} from './profile-components/user-profile/user-profile.component';
 import {ChatComponent} from './messanger-components/chat/chat.component';
 import {JWT_OPTIONS, JwtHelperService, JwtModule, JwtModuleOptions} from "@auth0/angular-jwt";
-import {SignalRMessageService} from "./services/signal-r-message.service";
+import {SignalRMessageService} from "./services/signalR/signal-r-message.service";
 import {ChatDetailsComponent} from './messanger-components/chat-details/chat-details.component';
 import {ChatDomainComponent} from './messanger-components/chat-domain/chat-domain.component';
 import {TruncateTextPipe} from './services/pipes/truncate-text.pipe';
