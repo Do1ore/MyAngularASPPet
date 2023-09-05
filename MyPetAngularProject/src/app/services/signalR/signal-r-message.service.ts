@@ -1,11 +1,7 @@
 import {Injectable} from '@angular/core';
-import {environment} from "../../../environments/environment";
 import {Subject} from "rxjs";
 import {ChatMainModel} from '../../models/chatMainModel';
-import {JwtHelperService} from "@auth0/angular-jwt";
-import {ToastrService} from "ngx-toastr";
 import {ChatMessage} from "../../models/chatMessage";
-import {CreateChatDto} from "../../models/createChatDto";
 import {SignalRConnectionService} from "./signalr-connection.service";
 import {LocalStorageHelperService} from "../local-storage-helper.service";
 
@@ -25,32 +21,7 @@ export class SignalRMessageService {
     constructor(private signalRConnection: SignalRConnectionService, private storageService: LocalStorageHelperService) {
     }
 
-
-    public sendMessageCaller(message: string, chatId: string) {
-        if (this.signalRConnection.hubConnection === null || this.signalRConnection.hubConnection.state != 'Connected') {
-            return;
-        }
-        this.signalRConnection.hubConnection.on('GetChatsDetailsResponse', (model: ChatMainModel) => {
-            this.chatDetailsSubject.next(model);
-        });
-    }
-
     //MESSAGES//
-    joinChat(chatId: string) {
-        if (this.signalRConnection.hubConnection === null || this.signalRConnection.hubConnection.state != 'Connected') {
-            return;
-        }
-        return this.signalRConnection.hubConnection.invoke('JoinChat', chatId);
-    }
-
-    leaveChat(chatId: string) {
-        if (this.signalRConnection.hubConnection === null || this.signalRConnection.hubConnection.state != 'Connected') {
-            return;
-        }
-
-        return this.signalRConnection.hubConnection.invoke('LeaveChat', chatId);
-    }
-
 
     public sendMessage(chatId: string, message: string) {
         if (this.signalRConnection.hubConnection === null || this.signalRConnection.hubConnection.state != 'Connected') {

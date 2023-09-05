@@ -71,6 +71,12 @@ public class UserHub : Hub
 
         await Clients.Group(chatId).SendAsync("ReceiveMessage", sendingResult);
     }
+    public override Task OnConnectedAsync()
+    {
+        _logger.LogInformation("New connection: {@Message}", Context.ConnectionId);
+        return base.OnConnectedAsync();
+    }
+//
 }
 
 
@@ -90,12 +96,7 @@ public class UserHub : Hub
 //             await Groups.RemoveFromGroupAsync(Context.ConnectionId, chatId);
 //         }
 //
-//         public override Task OnConnectedAsync()
-//         {
-//             _logger.LogInformation("New connection: " + Context.ConnectionId);
-//             return base.OnConnectedAsync();
-//         }
-//
+    
 //         public override Task OnDisconnectedAsync(Exception? exception)
 //         {
 //             _logger.LogInformation("Connection " + Context.ConnectionId + " terminated");

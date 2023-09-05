@@ -13,256 +13,238 @@ import {SignalRConnectionService} from "../../services/signalR/signalr-connectio
 import {LocalStorageHelperService} from "../../services/local-storage-helper.service";
 
 @Component({
-    selector: 'app-chat',
-    templateUrl: './chat.component.html',
-    styleUrls: ['./chat.component.scss']
+  selector: 'app-chat',
+  templateUrl: './chat.component.html',
+  styleUrls: ['./chat.component.scss']
 })
 export class ChatComponent implements OnInit {
-    get isAuthorized(): boolean {
-        return this._isAuthorized;
+
+  @Output() chatSelected: EventEmitter<string> = new EventEmitter<string>();
+  public chatMainModel: ChatMainModel[] = [];
+  public appUsers: AppUser[] = [];
+  public appUsersSearch: AppUser[] = [];
+  public usersToAdd: AppUser[] = [];
+  public searchTerm: string = '';
+  private dropdown: DropdownInterface = new Dropdown();
+
+
+  public chatName: string = '';
+  public fileName: string = '';
+  private chatImageInput: File | null = null;
+
+  constructor(
+    public signalRConnectionService: SignalRConnectionService,
+    public signalRMessageService: SignalRMessageService,
+    public userService: UserService,
+    public toaster: ToastrService,
+    public authService: AuthService,
+    public chatService: SignalRChatService,
+    private storageHelper: LocalStorageHelperService,
+  ) {
+  }
+
+  async ngOnInit(): Promise<void> {
+    this.authService.logout$.subscribe(() => {
+      this.chatMainModel = [];
+      this.appUsers = [];
+      this.appUsersSearch = [];
+      this.signalRConnectionService.disconnectFromHub();
+      console.log('Logging out');
+      return;
+    });
+
+    if (!this.signalRConnectionService.isConnected()) {
+      console.log('Connection started - 1')
+      await this.signalRConnectionService.waitForConnection();
+      console.log('Actual status: ', this.signalRConnectionService.connectionState)
+      console.log('Connected - 2')
     }
+    console.log('Next line - 3')
 
-    set isAuthorized(value: boolean) {
-        this._isAuthorized = value;
-    }
+    this.initDropdownMenu();
 
-    private _isAuthorized: boolean = false;
+    await this.getChatInfo();
 
-    @Output() chatSelected: EventEmitter<string> = new EventEmitter<string>();
-    public chatMainModel: ChatMainModel[] = [];
-    public appUsers: AppUser[] = [];
-    public appUsersSearch: AppUser[] = [];
-    public usersToAdd: AppUser[] = [];
-    public searchTerm: string = '';
-    private subscription: Subscription | undefined;
-    private dropdown: DropdownInterface = new Dropdown();
-
-
-    public chatName: string = '';
-    public fileName: string = '';
-    private chatImageInput: File | null = null;
-
-    constructor(
-        public signalRConnectionService: SignalRConnectionService,
-        public signalRMessageService: SignalRMessageService,
-        public userService: UserService,
-        public toaster: ToastrService,
-        public authService: AuthService,
-        public chatService: SignalRChatService,
-        private storageHelper: LocalStorageHelperService,
-    ) {
-    }
-
-    async ngOnInit(): Promise<void> {
-        this.authService.logout$.subscribe(() => {
-            this.chatMainModel = [];
-            this.appUsers = [];
-            this.appUsersSearch = [];
-            this.signalRConnectionService.disconnectFromHub();
-            console.log('Logging out');
-            return;
-        });
-
-        this.initDropdownMenu();
-        await this.signalRConnectionService.startHubConnection();
-
-        await this.getChatInfo();
-
-        this.signalRMessageService.onReceiveLastMessage((chatId, message) => {
-            this.chatMainModel.forEach(a => {
-                if (a.id === chatId) a.lastMessage = message;
-            })
-        })
-        //delete chat listener
-        this.chatService.deleteChatListener((chatId) => {
-            this.chatMainModel.forEach((chatModel) => {
-                if (chatId === chatModel.id) {
-                    const index = this.chatMainModel.findIndex(obj => obj.id === chatId);
-                    if (index !== -1) {
-                        this.chatMainModel.splice(index, 1);
-                    }
-                }
-            })
-        })
-
-    }
-
-    selectChat(chatId: string) {
-        this.chatSelected.emit(chatId);
-        this.chatService.currentChatId = chatId;
-    }
-
-
-    addUserToArray(userId: string) {
-        console.log('Attempt to add user with id: ', userId)
-        let user = this.appUsers.find(a => a.id === userId)!;
-        if (!user) {
-            this.toaster.info("User not found", "Error");
-            return;
+    this.signalRMessageService.onReceiveLastMessage((chatId, message) => {
+      this.chatMainModel.forEach(a => {
+        if (a.id === chatId) a.lastMessage = message;
+      })
+    })
+    //delete chat listener
+    this.chatService.deleteChatListener((chatId) => {
+      this.chatMainModel.forEach((chatModel) => {
+        if (chatId === chatModel.id) {
+          const index = this.chatMainModel.findIndex(obj => obj.id === chatId);
+          if (index !== -1) {
+            this.chatMainModel.splice(index, 1);
+          }
         }
-        if (this.usersToAdd.find(a => a.id === userId)) {
-            this.toaster.info("User that you want to add to a chat is already added", "User already added");
-            return;
-        }
-        this.usersToAdd.push(user)
+      })
+    })
+
+  }
+
+  selectChat(chatId: string) {
+    this.chatSelected.emit(chatId);
+    this.chatService.currentChatId = chatId;
+  }
+
+
+  addUserToArray(userId: string) {
+    console.log('Attempt to add user with id: ', userId)
+    let user = this.appUsers.find(a => a.id === userId)!;
+    if (!user) {
+      this.toaster.info("User not found", "Error");
+      return;
     }
-
-    chatModalCreate(): ModalInterface {
-        const $modalElement: HTMLElement | null = document.querySelector('#add-chat-modal');
-
-        const modalOptions: ModalOptions = {
-            placement: 'top-center',
-            backdrop: 'dynamic',
-            backdropClasses: '',
-            closable: true,
-            onHide: () => {
-                console.log('modal is hidden');
-                this.hideDropdown();
-            },
-            onShow: () => {
-                console.log('modal is shown');
-            },
-            onToggle: () => {
-                console.log('modal has been toggled');
-            }
-        }
-        return new Modal($modalElement, modalOptions);
+    if (this.usersToAdd.find(a => a.id === userId)) {
+      this.toaster.info("User that you want to add to a chat is already added", "User already added");
+      return;
     }
+    this.usersToAdd.push(user)
+  }
 
-    createChat() {
-        let chatDto: CreateChatDto = new CreateChatDto();
-        chatDto.chatName = this.chatName;
-        if (this.usersToAdd.length <= 0) {
-            this.toaster.warning("You want to create chat without users", "No users")
-            return;
-        }
-        console.log('Users to in create function:', this.usersToAdd)
-        this.usersToAdd.forEach(u => chatDto.userIds.push(u.id));
+  chatModalCreate(): ModalInterface {
+    const $modalElement: HTMLElement | null = document.querySelector('#add-chat-modal');
 
-        //current userId
-        let chatAdministratorUserId = this.storageHelper.getUserIdFromToken();
-        chatDto.creatorId = chatAdministratorUserId;
-        //add chat administrator to array of users
-        chatDto.userIds.push(chatAdministratorUserId);
-        chatDto.chatImage = this.chatImageInput;
-
-        this.chatService.createChatCaller(chatDto);
-        this.chatService.createChatListener((chat) => {
-                this.chatMainModel.push(chat);
-                this.signalRMessageService.joinChat(chat.id);
-                this.chatModalCreate().hide();
-            }
-        );
+    const modalOptions: ModalOptions = {
+      placement: 'top-center',
+      backdrop: 'dynamic',
+      backdropClasses: '',
+      closable: true,
+      onHide: () => {
+        console.log('modal is hidden');
+        this.hideDropdown();
+      },
+      onShow: () => {
+        console.log('modal is shown');
+      },
+      onToggle: () => {
+        console.log('modal has been toggled');
+      }
     }
+    return new Modal($modalElement, modalOptions);
+  }
 
-    showCreateChatModal() {
-        if (this.chatModalCreate()) {
-            let modal = this.chatModalCreate();
-            modal.show();
-        }
+  createChat() {
+    let chatDto: CreateChatDto = new CreateChatDto();
+    chatDto.chatName = this.chatName;
+    if (this.usersToAdd.length <= 0) {
+      this.toaster.warning("You want to create chat without users", "No users")
+      return;
     }
+    console.log('Users to in create function:', this.usersToAdd)
+    this.usersToAdd.forEach(u => chatDto.userIds.push(u.id));
 
-    hideCreateChatModal() {
-        if (this.chatModalCreate()) {
-            let modal = this.chatModalCreate();
-            modal.hide();
-        }
+    //current userId
+    let chatAdministratorUserId = this.storageHelper.getUserIdFromToken();
+    chatDto.creatorId = chatAdministratorUserId;
+    //add chat administrator to array of users
+    chatDto.userIds.push(chatAdministratorUserId);
+    chatDto.chatImage = this.chatImageInput;
+
+    this.chatService.createChatCaller(chatDto);
+    this.chatService.createChatListener((chat) => {
+        this.chatMainModel.push(chat);
+        this.chatService.joinChat(chat.id);
+        this.chatModalCreate().hide();
+      }
+    );
+  }
+
+  showCreateChatModal() {
+    if (this.chatModalCreate()) {
+      let modal = this.chatModalCreate();
+      modal.show();
     }
+  }
 
-    initDropdownMenu() {
-        const $targetEl: HTMLElement | null = document.getElementById('dropdownUsers');
-
-        const $triggerEl: HTMLElement | null = document.getElementById('default-search')
-// options with default values
-        const options: DropdownOptions = {
-            placement: 'bottom',
-            triggerType: 'click',
-            offsetSkidding: 0,
-            offsetDistance: 10,
-            delay: 100,
-            onHide: () => {
-                console.log('dropdown has been hidden');
-            },
-            onShow: () => {
-                console.log('dropdown has been shown');
-            },
-            onToggle: () => {
-                console.log('dropdown has been toggled');
-            }
-        };
-
-        if (!$targetEl && !$triggerEl) {
-            return;
-        }
-        this.dropdown = new Dropdown($targetEl, $triggerEl, options);
+  hideCreateChatModal() {
+    if (this.chatModalCreate()) {
+      let modal = this.chatModalCreate();
+      modal.hide();
     }
+  }
 
-    showDropdown() {
-        this.dropdown.show();
+  initDropdownMenu() {
+    const $targetEl: HTMLElement | null = document.getElementById('dropdownUsers');
+
+    const $triggerEl: HTMLElement | null = document.getElementById('default-search');
+    // options with default values
+    const options: DropdownOptions = {
+      placement: 'bottom',
+      triggerType: 'click',
+      offsetSkidding: 0,
+      offsetDistance: 10,
+      delay: 100,
+      onHide: () => {
+        console.log('dropdown has been hidden');
+      },
+      onShow: () => {
+        console.log('dropdown has been shown');
+      },
+      onToggle: () => {
+        console.log('dropdown has been toggled');
+      }
+    };
+
+    if (!$targetEl && !$triggerEl) {
+      return;
     }
+    this.dropdown = new Dropdown($targetEl, $triggerEl, options);
+  }
 
-    hideDropdown() {
-        this.dropdown.hide();
+  showDropdown() {
+    this.dropdown.show();
+  }
+
+  hideDropdown() {
+    this.dropdown.hide();
+  }
+
+  async getChatInfo(): Promise<void> {
+    this.chatService.getAllChatsForUserCaller();
+    this.chatService.getAllChatsForUserListener((chats) => {
+      this.chatMainModel = chats;
+      console.log('Connected to chat/s:', this.chatMainModel)
+    });
+    return;
+  }
+
+  searchUsers(): void {
+    this.appUsersSearch = [];
+    if (this.searchTerm.length <= 0) {
+      return;
     }
-
-    async waitForChats(): Promise<void> {
-        let model1: ChatMainModel[] = [];
-        this.signalRMessageService.chatDetails$.subscribe((model) => model1 = model)
-
-        while (model1.length == 0) {
-            console.log(model1.length);
-
-            //wait 100 milliseconds and check state again and again
-            await new Promise(resolve => setTimeout(resolve, 100));
-        }
-    }
-
-
-    async getChatInfo(): Promise<void> {
-        this.chatService.getAllChatsForUserCaller();
-        this.chatService.getAllChatsForUserListener((chats) => {
-            this.chatMainModel = chats
-        });
-
-        console.log('Connected to chat/s:', this.chatMainModel)
+    this.userService.searchUser(this.searchTerm).subscribe((model: AppUser[]) => {
+      this.appUsers = model;
+      this.appUsersSearch = model;
+      console.log(model.length);
+      if (model.length <= 0) {
+        console.log('No users found')
         return;
-    }
-
-    searchUsers(): void {
-        this.appUsersSearch = [];
-        if (this.searchTerm.length <= 0) {
-            return;
+      }
+      model.forEach((u) => {
+          model.find(a => a.id === u.id)!.imageURL = 'https://e7.pngegg.com/pngimages/436/585/png-clipart-computer-icons-user-account-graphics-account-icon-vector-icons-silhouette.png';
         }
-        this.userService.searchUser(this.searchTerm).subscribe((model: AppUser[]) => {
-            this.appUsers = model;
-            this.appUsersSearch = model;
-            console.log(model.length);
-            if (model.length <= 0) {
-                console.log('No users found')
-                return;
-            }
-            model.forEach((u) => {
-                    model.find(a => a.id === u.id)!.imageURL = 'https://e7.pngegg.com/pngimages/436/585/png-clipart-computer-icons-user-account-graphics-account-icon-vector-icons-silhouette.png';
-                }
-            );
-        })
+      );
+    })
+  }
+
+  joinGroups() {
+    if (this.chatMainModel.length > 0) {
+      this.chatMainModel.forEach((a) => {
+        this.chatService.joinChat(a.id);
+      })
     }
+  }
 
-    joinGroups() {
-        if (this.chatMainModel.length > 0) {
-            this.chatMainModel.forEach((a) => {
-                this.signalRMessageService.joinChat(a.id);
-            })
-        }
+  onFileSelected({event}: { event: any }) {
+    const file: File = event.target.files[0];
+
+    if (file) {
+      this.fileName = file.name;
+      this.chatImageInput = file;
     }
-
-
-    onFileSelected({event}: { event: any }) {
-        const file: File = event.target.files[0];
-
-        if (file) {
-            this.fileName = file.name;
-            this.chatImageInput = file;
-        }
-    }
+  }
 }

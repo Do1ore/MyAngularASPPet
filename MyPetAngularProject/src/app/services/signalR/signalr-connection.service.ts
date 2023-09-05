@@ -4,42 +4,66 @@ import {environment} from "../../../environments/environment";
 import {Subject} from "rxjs";
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 })
 export class SignalRConnectionService {
-    public hubConnection: HubConnection | null = null;
-    private baseApiUrl = environment.baseApiUrl;
-    public connectionState: HubConnectionState = HubConnectionState.Disconnected;
+  public hubConnection: HubConnection | null = null;
+  private baseApiUrl = environment.baseApiUrl;
+  public connectionState: HubConnectionState = HubConnectionState.Disconnected;
 
 
-    protected signalRConnectedSubject: Subject<void> = new Subject<void>();
+  protected signalRConnectedSubject: Subject<void> = new Subject<void>();
 
-    public async startHubConnection(): Promise<HubConnection> {
-        console.log('method started!')
-        if (!this.hubConnection || this.hubConnection?.state !== 'Connected') {
-            this.hubConnection = new HubConnectionBuilder()
-                .withUrl(this.baseApiUrl + 'hub/user')
-                .withAutomaticReconnect()
-                .build();
+  constructor() {
+    this.getHubConnection().then();
+  }
 
-            this.hubConnection.start()
-                .then(() => {
-                    this.connectionState = HubConnectionState.Connected;
-                })
-                .catch(err => console.error('Error while starting SignalR connection:', err));
+  //Connect or get hub connection
+  public async getHubConnection(): Promise<HubConnection> {
+    console.log('method started!')
+    if (!this.hubConnection || this.hubConnection?.state !== 'Connected') {
+      this.hubConnection = new HubConnectionBuilder()
+        .withUrl(this.baseApiUrl + 'hub/user')
+        .withAutomaticReconnect()
+        .build();
+
+      this.hubConnection.start()
+        .then(() => {
+          this.connectionState = HubConnectionState.Connected;
+          console.log('Hub connection: ', this.hubConnection);
+          console.log('Connection state: ', this.connectionState);
+        })
+        .catch(err => console.error('Error while starting SignalR connection:', err));
+    }
+    return this.hubConnection;
+  }
+
+  public isConnected() {
+    return (this.hubConnection?.state === HubConnectionState.Connected)
+  }
+
+  public disconnectFromHub() {
+    if (this.hubConnection) {
+      this.hubConnection.stop().then();
+      console.log('Connection with hub closed');
+    }
+  }
+
+  async waitForConnection(): Promise<void> {
+    return new Promise<void>(async (resolve) => {
+      const connection = this.hubConnection!;
+
+      const checkConnectionStatus = () => {
+        if (connection.state === HubConnectionState.Connected) {
+          resolve();
+        } else {
+          setTimeout(checkConnectionStatus, 1000); // Проверяем каждую секунду
         }
-        return this.hubConnection;
-    }
+      };
 
-    isConnected() {
-        return (this.hubConnection?.state === HubConnectionState.Connected)
-    }
+      checkConnectionStatus();
+    });
+  }
 
-    public disconnectFromHub() {
-        if (this.hubConnection) {
-            this.hubConnection.stop().then();
-            console.log('Connection with hub closed');
-        }
-    }
 }
 

@@ -1,12 +1,18 @@
 import {Component, OnInit} from '@angular/core';
-import {Carousel} from "flowbite";
+import {SignalRConnectionService} from "./services/signalR/signalr-connection.service";
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
-  title = 'MyPetAngularProject';
+export class AppComponent implements OnInit {
+    title = 'MyPetAngularProject';
 
+    constructor(private connectionService: SignalRConnectionService) {
+    }
+
+    ngOnInit(): void {
+
+    }
 }
