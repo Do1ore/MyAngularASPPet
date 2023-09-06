@@ -101,8 +101,6 @@ export class ChatDetailsComponent implements OnInit, OnChanges, AfterViewInit {
 
     this.chatService.deleteChatCaller(this.chatId);
 
-    this.chatService.getChatDetailsListener((chats) => this.chatModel = chats);
-
     this.messageService.onReceiveMessage((message: ChatMessage) => {
       let user = this.chatModel.appUsers.find(a => a.id === message.senderId);
       if (user !== undefined) {

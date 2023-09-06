@@ -1,7 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HubConnection, HubConnectionBuilder, HubConnectionState} from "@microsoft/signalr";
 import {environment} from "../../../environments/environment";
-import {Subject} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
@@ -11,8 +10,6 @@ export class SignalRConnectionService {
   private baseApiUrl = environment.baseApiUrl;
   public connectionState: HubConnectionState = HubConnectionState.Disconnected;
 
-
-  protected signalRConnectedSubject: Subject<void> = new Subject<void>();
 
   constructor() {
     this.getHubConnection().then();

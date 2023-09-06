@@ -15,7 +15,7 @@ export class SignalRChatService {
   constructor(private signalRConnection: SignalRConnectionService, private readonly storageService: LocalStorageHelperService) {
   }
 
-  //CHAT DETAILS//
+  //CHAT DETAILS
   public getChatDetailsCaller(chatId: string) {
     if (this.signalRConnection.hubConnection === null || this.signalRConnection.hubConnection.state != 'Connected') {
       return;
@@ -35,7 +35,7 @@ export class SignalRChatService {
       callback(model);
     });
   }
-
+  // DELETE
   public deleteChatCaller(chatId: string) {
     if (this.signalRConnection.hubConnection === null || this.signalRConnection.hubConnection.state != 'Connected') {
       return;
@@ -48,7 +48,7 @@ export class SignalRChatService {
   }
 
 
-  //CHATS//
+  //ALL CHATS
   public createChatCaller(chatDto: CreateChatDto) {
     if (this.signalRConnection.hubConnection === null || this.signalRConnection.hubConnection.state != 'Connected') {
       return;
