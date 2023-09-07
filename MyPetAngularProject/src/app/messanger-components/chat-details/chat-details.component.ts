@@ -14,6 +14,8 @@ import {UserImageService} from "../../services/image/user-image.service";
 import {LocalStorageHelperService} from "../../services/local-storage-helper.service";
 import {SignalRConnectionService} from "../../services/signalR/signalr-connection.service";
 import {SignalRChatService} from "../../services/signalR/signal-r-chat.service";
+import {SignalRUserService} from "../../services/signalR/signal-r-user.service";
+
 
 @Component({
   selector: 'app-chat-details',
@@ -49,6 +51,7 @@ export class ChatDetailsComponent implements OnInit, OnChanges, AfterViewInit {
     public messageService: SignalRMessageService,
     private storageHelper: LocalStorageHelperService,
     private connectionService: SignalRConnectionService,
+    private signalRUserService: SignalRUserService,
   ) {
   }
 
@@ -98,9 +101,10 @@ export class ChatDetailsComponent implements OnInit, OnChanges, AfterViewInit {
     console.log("from this: " + this.chatId);
 
     await this.getChatModel();
+    this.startListeners();
+  }
 
-    this.chatService.deleteChatCaller(this.chatId);
-
+  private startListeners() {
     this.messageService.onReceiveMessage((message: ChatMessage) => {
       let user = this.chatModel.appUsers.find(a => a.id === message.senderId);
       if (user !== undefined) {
@@ -118,8 +122,14 @@ export class ChatDetailsComponent implements OnInit, OnChanges, AfterViewInit {
       if (this.chatModel.id == chatId) {
         this.chatModel = new ChatMainModel();
       }
+    });
+
+    this.signalRUserService.listenUserProfileImageUpdate((fileUrl, userId) => {
+      this.userImageService.updateUserProfileImageUrl(fileUrl, userId);
+      console.log('User image for user: ', userId, 'updated: ', fileUrl);
     })
   }
+
 
   async sendMessage() {
     if (this.message === '') {

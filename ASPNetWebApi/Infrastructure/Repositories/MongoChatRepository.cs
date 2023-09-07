@@ -15,7 +15,7 @@ public class MongoChatRepository : IMongoChatRepository
     }
 
     public async Task<ChatM> CreateChat(ChatM chat)
-    {   
+    {
         await _chatCollection.InsertOneAsync(chat);
         return chat;
     }
@@ -46,5 +46,22 @@ public class MongoChatRepository : IMongoChatRepository
         }
 
         return chat;
+    }
+
+    public async Task<long> DeleteChat(Guid chatId, Guid adminId)
+    {
+        var filter = Builders<ChatM>.Filter.Eq(chat => chat.Id, adminId);
+
+        var deleteResult = await _chatCollection.DeleteOneAsync(filter);
+        return deleteResult.DeletedCount;
+    }
+
+    public async Task<bool> IsUserChatAdministrator(Guid chatId, Guid userId)
+    {
+        var filter = Builders<ChatM>.Filter.Eq(chat => chat.Id, chatId);
+
+        var chat = await _chatCollection.Find(filter).FirstOrDefaultAsync();
+
+        return chat.ChatAdministrator == userId;
     }
 }

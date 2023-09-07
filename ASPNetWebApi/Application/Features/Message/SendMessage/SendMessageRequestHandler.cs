@@ -7,9 +7,9 @@ namespace Application.Features.Message.SendMessage;
 
 public class SendMessageRequestHandler : IRequestHandler<SendMessageRequest, ChatMessageDto>
 {
-    private readonly IChatMessageRepository _messageRepository;
+    private readonly IMongoChatMessageRepository _messageRepository;
 
-    public SendMessageRequestHandler(IChatMessageRepository messageRepository)
+    public SendMessageRequestHandler(IMongoChatMessageRepository messageRepository)
     {
         _messageRepository = messageRepository;
     }

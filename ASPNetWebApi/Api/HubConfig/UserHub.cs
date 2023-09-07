@@ -12,15 +12,12 @@ namespace MySuperApi.HubConfig;
 public class UserHub : Hub
 {
     private readonly ILogger<UserHub> _logger;
-    private readonly IHubContext<UserHub> _hubContext;
     private readonly IMediator _mediator;
 
 
     public UserHub(ILogger<UserHub> logger,
-        IHubContext<UserHub> hubContext,
         IMediator mediator)
     {
-        _hubContext = hubContext;
         _mediator = mediator;
         _logger = logger;
     }
@@ -76,10 +73,7 @@ public class UserHub : Hub
         _logger.LogInformation("New connection: {@Message}", Context.ConnectionId);
         return base.OnConnectedAsync();
     }
-//
 }
-
-
 //
 //         public async Task LeaveChat(string chatId)
 //         {

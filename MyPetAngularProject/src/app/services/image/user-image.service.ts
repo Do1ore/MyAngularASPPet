@@ -13,6 +13,7 @@ export class UserImageService {
 
   baseApiUrl: string = environment.baseApiUrl + "api/" + 'Image';
   public userProfileImages: UserProfileImage[] = [];
+  public currentUserSafeImageUrl: SafeUrl = '';
 
   constructor(private http: HttpClient, private sanitizer: DomSanitizer) {
   }
@@ -42,20 +43,33 @@ export class UserImageService {
         let safeUrl = URL.createObjectURL(imageBlob);
         let userProfileImage = new UserProfileImage();
         userProfileImage.Id = u.id;
-        userProfileImage.SafaImagePath = this.sanitizer.bypassSecurityTrustUrl(safeUrl);
+        userProfileImage.SafeImagePath = this.sanitizer.bypassSecurityTrustUrl(safeUrl);
 
         this.userProfileImages.push(userProfileImage);
       });
     })
   }
 
-  public getUserProfileById(userId: string) {
-    let userProfileImageSageUrl = this.userProfileImages.find(a => a.Id == userId)?.SafaImagePath;
+  public updateUserProfileImageUrl(imagePath: string, userId: string): void {
+    const userIndex = this.userProfileImages.findIndex(user => user.Id === userId);
 
-    if (!userProfileImageSageUrl) {
+    if (userIndex !== -1) {
+      this.userProfileImages[userIndex].SafeImagePath = imagePath as SafeUrl;
+    } else {
+      const newUserProfileImage = new UserProfileImage();
+      newUserProfileImage.Id = userId;
+      newUserProfileImage.SafeImagePath = imagePath as SafeUrl;
+      this.userProfileImages.push(newUserProfileImage);
+    }
+  }
+
+  public getUserProfileById(userId: string) {
+    let safeImagePath = this.userProfileImages.find(a => a.Id == userId)?.SafeImagePath;
+
+    if (!safeImagePath) {
       return null;
     }
-    return userProfileImageSageUrl;
+    return safeImagePath;
   }
 
 }

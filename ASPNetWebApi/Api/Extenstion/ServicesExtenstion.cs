@@ -95,7 +95,7 @@ public static class ServicesExtenstion
     {
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IMongoChatRepository, MongoChatRepository>();
-        services.AddScoped<IChatMessageRepository, ChatMessageRepository>();
+        services.AddScoped<IMongoChatMessageRepository, MongoChatMessageRepository>();
     }
 
     public static void AddAndConfigureMediatR(this IServiceCollection services)
