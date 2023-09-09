@@ -1,5 +1,6 @@
 ﻿using Application.Features.Chat.ChatDetails;
 using Application.Features.Chat.CreateChat;
+using Application.Features.Chat.DeleteChat;
 using Application.Features.Chat.GetAllChats;
 using Application.Features.Message.SendMessage;
 using Domain.DTOs;
@@ -68,11 +69,20 @@ public class UserHub : Hub
 
         await Clients.Group(chatId).SendAsync("ReceiveMessage", sendingResult);
     }
+
     public override Task OnConnectedAsync()
     {
         _logger.LogInformation("New connection: {@Message}", Context.ConnectionId);
         return base.OnConnectedAsync();
     }
+
+    public async Task DeleteChat(string chatId, string userId)
+    {
+        await _mediator.Send(new DeleteChatRequest(Guid.Parse(chatId), Guid.Parse(userId)));
+        await Clients.Groups(chatId).SendAsync("DeleteChatResponse", chatId);
+        await Groups.RemoveFromGroupAsync(Context.ConnectionId, chatId);
+    }
+    
 }
 //
 //         public async Task LeaveChat(string chatId)
@@ -83,14 +93,7 @@ public class UserHub : Hub
 //         }
 //
 
-//         public async Task DeleteChat(string chatId)
-//         {
-//             await _legacyChatRepository.DeleteChat(chatId);
-//             await Clients.Groups(chatId).SendAsync("DeleteChatResponse", chatId);
-//             await Groups.RemoveFromGroupAsync(Context.ConnectionId, chatId);
-//         }
-//
-    
+
 //         public override Task OnDisconnectedAsync(Exception? exception)
 //         {
 //             _logger.LogInformation("Connection " + Context.ConnectionId + " terminated");

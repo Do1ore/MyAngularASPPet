@@ -35,12 +35,14 @@ export class SignalRChatService {
       callback(model);
     });
   }
+
   // DELETE
   public deleteChatCaller(chatId: string) {
     if (this.signalRConnection.hubConnection === null || this.signalRConnection.hubConnection.state != 'Connected') {
       return;
     }
-    this.signalRConnection.hubConnection?.invoke('DeleteChat', chatId);
+    let userId = this.storageService.getUserIdFromToken();
+    this.signalRConnection.hubConnection?.invoke('DeleteChat', chatId, userId);
   }
 
   public deleteChatListener(callback: (chatId: string) => void): void {
@@ -101,6 +103,7 @@ export class SignalRChatService {
     }
     return this.signalRConnection.hubConnection.invoke('JoinChat', chatId);
   }
+
 
   leaveChat(chatId: string) {
     if (this.signalRConnection.hubConnection === null || this.signalRConnection.hubConnection.state != 'Connected') {

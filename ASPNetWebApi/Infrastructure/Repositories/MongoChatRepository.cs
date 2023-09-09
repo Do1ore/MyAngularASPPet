@@ -50,7 +50,7 @@ public class MongoChatRepository : IMongoChatRepository
 
     public async Task<long> DeleteChat(Guid chatId, Guid adminId)
     {
-        var filter = Builders<ChatM>.Filter.Eq(chat => chat.Id, adminId);
+        var filter = Builders<ChatM>.Filter.Eq(chat => chat.Id, chatId);
 
         var deleteResult = await _chatCollection.DeleteOneAsync(filter);
         return deleteResult.DeletedCount;
