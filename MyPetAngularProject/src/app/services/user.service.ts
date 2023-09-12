@@ -15,7 +15,7 @@ export class UserService {
   }
 
   public searchUser(searchTerm: string): Observable<AppUser[]> {
-    const payload = {searchTerm: searchTerm}; // Используйте правильный ключ для searchTerm
+    const payload = {searchTerm: searchTerm};
     return this.http.get<AppUser[]>(this.baseApiUrl + '/search-user' + '/' + searchTerm);
   }
 }

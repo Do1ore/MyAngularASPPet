@@ -8,7 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 
-namespace Infrastructure.Services;
+namespace Infrastructure.Implementation.Services;
 
 public class ImageService : IImageService
 {

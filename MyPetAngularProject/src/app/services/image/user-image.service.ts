@@ -27,6 +27,14 @@ export class UserImageService {
     });
   }
 
+  public getUserImageById(userId: string): Observable<Blob> {
+    const headers = new HttpHeaders().set('Accept', 'image/jpeg');
+
+    return this.http.get(this.baseApiUrl + "/get-user-image/" + userId, {
+      headers: headers,
+      responseType: 'blob'
+    });
+  }
   public uploadUserProfileImage(formData: FormData) {
     return this.http.post(this.baseApiUrl + '/upload-user-image', formData);
   }
@@ -63,7 +71,7 @@ export class UserImageService {
     }
   }
 
-  public getUserProfileById(userId: string) {
+  public findUserProfileById(userId: string) {
     let safeImagePath = this.userProfileImages.find(a => a.Id == userId)?.SafeImagePath;
 
     if (!safeImagePath) {

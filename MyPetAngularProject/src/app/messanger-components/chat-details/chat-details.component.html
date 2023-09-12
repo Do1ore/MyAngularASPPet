@@ -112,10 +112,10 @@
       <!--Current user-->
       <div *ngIf="message.senderId === userId" class="flex flex-row items-center ml-auto w-fit mt-2">
 
-        <div *ngIf="userImageService.getUserProfileById(message.senderId); else elseBlock">
+        <div *ngIf="userImageService.findUserProfileById(message.senderId); else elseBlock">
           <img
-            class="relative inline-flex items-center overflow-hidden w-10 h-10 p-1 rounded-full ring-2 ring-gray-300 dark:ring-gray-500 me-2"
-            [src]="userImageService.getUserProfileById(message.senderId)" alt="Bordered avatar">
+                  class="relative inline-flex items-center overflow-hidden w-10 h-10 p-1 rounded-full ring-2 ring-gray-300 dark:ring-gray-500 me-2"
+                  [src]="userImageService.findUserProfileById(message.senderId)" alt="Bordered avatar">
         </div>
         <ng-template #elseBlock>
           <div
@@ -141,10 +141,10 @@
       <div *ngIf="message.senderId !== userId"
            class="rounded-md mt-2 p-3 flex flex-row items-center">
 
-        <div *ngIf="userImageService.getUserProfileById(message.senderId); else elseBlock">
+        <div *ngIf="userImageService.findUserProfileById(message.senderId); else elseBlock">
           <img
-            class="relative inline-flex items-center overflow-hidden w-10 h-10 p-1 rounded-full ring-2 ring-gray-300 dark:ring-gray-500 me-2"
-            [src]="userImageService.getUserProfileById(message.senderId)" alt="Bordered avatar">
+                  class="relative inline-flex items-center overflow-hidden w-10 h-10 p-1 rounded-full ring-2 ring-gray-300 dark:ring-gray-500 me-2"
+                  [src]="userImageService.findUserProfileById(message.senderId)" alt="Bordered avatar">
         </div>
         <ng-template #elseBlock>
           <div

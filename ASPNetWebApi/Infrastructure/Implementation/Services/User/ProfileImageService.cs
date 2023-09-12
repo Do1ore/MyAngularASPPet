@@ -1,7 +1,7 @@
 ﻿using Domain.MongoEntities.User;
 using Infrastructure.Abstraction.Services.User;
 
-namespace Infrastructure.Services.ProfileImageService
+namespace Infrastructure.Implementation.Services.ProfileImageService
 {
     public class ProfileImageService : IProfileImageService
     {

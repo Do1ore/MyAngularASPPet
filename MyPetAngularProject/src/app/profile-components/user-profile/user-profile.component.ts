@@ -1,12 +1,8 @@
 import {Component, EventEmitter, OnInit, Output} from '@angular/core';
-import {ToastrService} from "ngx-toastr";
-import {HttpClient, HttpEventType} from "@angular/common/http";
-import {environment} from "../../../environments/environment";
-import {ChatImageService} from "../../services/image/chat-image.service";
 import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
-import {SignalRMessageService} from "../../services/signalR/signal-r-message.service";
 import {UserImageService} from "../../services/image/user-image.service";
 import {LocalStorageHelperService} from "../../services/local-storage-helper.service";
+import {ActivatedRoute} from "@angular/router";
 
 
 @Component({
@@ -15,27 +11,59 @@ import {LocalStorageHelperService} from "../../services/local-storage-helper.ser
   styleUrls: ['./user-profile.component.scss']
 })
 export class UserProfileComponent implements OnInit {
-  public baseApiPath: string = environment.baseApiUrl;
-  public message: string = '';
-  public progress: number = 0;
+
+  //profile owner id
+  userId: string | null = '';
+  isCreator: boolean = false;
+
   @Output() public onUploadFinished = new EventEmitter();
 
-  constructor(private http: HttpClient,
-              public userImageService: UserImageService,
+  public message: string = '';
+  public progress: number = 0;
+
+
+  constructor(public userImageService: UserImageService,
               private sanitizer: DomSanitizer,
-              private storageService: LocalStorageHelperService) {
+              private storageService: LocalStorageHelperService,
+              private route: ActivatedRoute) {
   }
 
   public imageUrl!: SafeUrl;
 
   ngOnInit(): void {
-    this.getProfileImage();
+    this.userId = this.route.snapshot.paramMap.get('userid');
+
+    this.isCreator = this.isUserProfileOwner();
+    if (this.isCreator)
+      this.getCurrentUserProfileImage();
+    else {
+      console.log('userId: ', this.userId)
+
+      this.getUserProfileImage(this.userId!);
+    }
   }
 
-  public getProfileImage() {
+  isUserProfileOwner() {
+    return this.isCreator = this.userId === this.storageService.getUserIdFromToken();
+  }
+
+  public getCurrentUserProfileImage() {
     this.userImageService.getCurrentUserProfileImage().subscribe(
       (imageBlob: Blob) => {
-        // Создаем безопасный URL для изображения
+
+        const objectUrl: string = URL.createObjectURL(imageBlob);
+        this.imageUrl = this.sanitizer.bypassSecurityTrustUrl(objectUrl);
+      },
+      (error: any) => {
+        console.error('Ошибка при загрузке изображения:', error);
+      }
+    );
+  }
+
+  public getUserProfileImage(userId: string) {
+    this.userImageService.getUserImageById(userId).subscribe(
+      (imageBlob: Blob) => {
+
         const objectUrl: string = URL.createObjectURL(imageBlob);
         this.imageUrl = this.sanitizer.bypassSecurityTrustUrl(objectUrl);
       },
@@ -59,7 +87,6 @@ export class UserProfileComponent implements OnInit {
       console.log('Uploaded')
     });
   }
-
 
 }
 

@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {AuthService} from "../services/auth.service";
 import {DarkmodeService} from "../services/darkmode.service";
 import {Subject} from "rxjs";
+import {LocalStorageHelperService} from "../services/local-storage-helper.service";
 
 @Component({
   selector: 'app-navbar',
@@ -15,10 +16,13 @@ export class NavbarComponent implements OnInit {
   }
 
   userName: string = '';
+  userId: string = '';
   public _isAuthorized: boolean = true;
 
 
-  constructor(private authService: AuthService, private themeService: DarkmodeService) {
+  constructor(private authService: AuthService,
+              private themeService: DarkmodeService,
+              public storageHelper: LocalStorageHelperService) {
   }
 
   async ngOnInit() {
@@ -33,8 +37,11 @@ export class NavbarComponent implements OnInit {
       });
     this.setUpExpandNavbar();
     this.themeService.setUpThemes();
-    await this.authService.isAuthorized().subscribe((response) => {
+    this.authService.isAuthorized().subscribe((response) => {
       this._isAuthorized = response;
+      if (response) {
+        this.userId = this.storageHelper.getUserIdFromToken();
+      }
     });
 
     //if user logins update current nav username

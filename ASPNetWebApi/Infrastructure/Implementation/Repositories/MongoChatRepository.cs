@@ -3,7 +3,7 @@ using Domain.MongoEntities.Chat;
 using Infrastructure.Abstraction.Repositories;
 using MongoDB.Driver;
 
-namespace Infrastructure.Repositories;
+namespace Infrastructure.Implementation.Repositories;
 
 public class MongoChatRepository : IMongoChatRepository
 {
@@ -21,11 +21,6 @@ public class MongoChatRepository : IMongoChatRepository
     }
 
     public Task<ChatM> UpdateChat(ChatM chat)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task DeleteChat(Guid chatId)
     {
         throw new NotImplementedException();
     }

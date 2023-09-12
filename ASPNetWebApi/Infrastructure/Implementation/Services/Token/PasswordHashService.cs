@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using Infrastructure.Abstraction.Services.Token;
 
-namespace Infrastructure.Services.Token;
+namespace Infrastructure.Implementation.Services.Token;
 
 public class PasswordHashService : IPasswordHashService
 {

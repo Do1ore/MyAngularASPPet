@@ -5,7 +5,7 @@ using Domain.MongoEntities.User;
 using Infrastructure.Abstraction.Repositories;
 using MongoDB.Driver;
 
-namespace Infrastructure.Repositories;
+namespace Infrastructure.Implementation.Repositories;
 
 public class UserRepository : IUserRepository
 {

@@ -3,8 +3,7 @@ using Domain.JWTModels;
 using Infrastructure.Abstraction.Services.User;
 using Microsoft.AspNetCore.Http;
 
-
-namespace Infrastructure.Services.User
+namespace Infrastructure.Implementation.Services.User
 {
     public class HttpUserDataAccessorService : IHttpUserDataAccessorService
     {

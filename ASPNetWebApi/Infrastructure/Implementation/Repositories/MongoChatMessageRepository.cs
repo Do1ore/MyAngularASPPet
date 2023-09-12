@@ -3,7 +3,7 @@ using Domain.MongoEntities.Chat;
 using Infrastructure.Abstraction.Repositories;
 using MongoDB.Driver;
 
-namespace Infrastructure.Repositories;
+namespace Infrastructure.Implementation.Repositories;
 
 public class MongoChatMessageRepository : IMongoChatMessageRepository
 {
