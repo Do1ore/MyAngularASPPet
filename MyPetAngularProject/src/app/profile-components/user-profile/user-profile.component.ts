@@ -3,6 +3,8 @@ import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
 import {UserImageService} from "../../services/image/user-image.service";
 import {LocalStorageHelperService} from "../../services/local-storage-helper.service";
 import {ActivatedRoute} from "@angular/router";
+import {AppUser} from "../../models/appUser";
+import {UserService} from "../../services/user.service";
 
 
 @Component({
@@ -20,12 +22,14 @@ export class UserProfileComponent implements OnInit {
 
   public message: string = '';
   public progress: number = 0;
+  public userData: AppUser = new AppUser();
 
 
   constructor(public userImageService: UserImageService,
               private sanitizer: DomSanitizer,
               private storageService: LocalStorageHelperService,
-              private route: ActivatedRoute) {
+              private route: ActivatedRoute,
+              private userService: UserService) {
   }
 
   public imageUrl!: SafeUrl;
@@ -41,6 +45,7 @@ export class UserProfileComponent implements OnInit {
 
       this.getUserProfileImage(this.userId!);
     }
+    this.getUserData();
   }
 
   isUserProfileOwner() {
@@ -85,6 +90,13 @@ export class UserProfileComponent implements OnInit {
 
     this.userImageService.uploadUserProfileImage(formData).subscribe(() => {
       console.log('Uploaded')
+    });
+  }
+
+  public getUserData() {
+    this.userService.getUserById(this.userId!).subscribe((user) => {
+      this.userData = user;
+      console.log('User data: ', this.userData)
     });
   }
 

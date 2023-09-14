@@ -93,8 +93,8 @@
                      alt="Image Description">
               </div>
               <div class="ml-4 md:ml-0">
-                <div class="text-base font-semibold text-gray-800 dark:text-gray-200">Nicole Grazioso</div>
-                <div class="text-xs text-gray-500 dark:text-gray-400">Director Payments & Risk | Airbnb</div>
+                <div class="text-base font-semibold text-gray-800 dark:text-gray-200">{{userData.username}} {{userData.surname}}</div>
+                <div class="text-xs text-gray-500 dark:text-gray-400">{{userData.email}} | Airbnb</div>
               </div>
             </div>
           </footer>
@@ -124,7 +124,7 @@
       <img class="w-20 h-20 p-1 rounded-full ring-2 ring-gray-300 dark:ring-gray-500 me-2" [src]="imageUrl"
            alt="Bordered avatar">
 
-      <h1 class="flex items-center text-5xl font-extrabold dark:text-white">Nickname<span
+      <h1 class="flex items-center text-5xl font-extrabold dark:text-white">{{userData.username}}<span
         class="bg-blue-100 text-blue-800 text-2xl font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-blue-200 dark:text-blue-800 ml-2">PRO</span>
       </h1>
     </div>

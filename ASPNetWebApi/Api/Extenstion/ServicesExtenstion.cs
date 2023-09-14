@@ -8,8 +8,6 @@ using Infrastructure.Abstraction.Services.Token;
 using Infrastructure.Abstraction.Services.User;
 using Infrastructure.Implementation.Repositories;
 using Infrastructure.Implementation.Services;
-using Infrastructure.Implementation.Services.PathLogic;
-using Infrastructure.Implementation.Services.ProfileImageService;
 using Infrastructure.Implementation.Services.Token;
 using Infrastructure.Implementation.Services.User;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -96,6 +94,7 @@ public static class ServicesExtenstion
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IMongoChatRepository, MongoChatRepository>();
         services.AddScoped<IMongoChatMessageRepository, MongoChatMessageRepository>();
+        services.AddScoped<IPostRepository, PostRepository>();
     }
 
     public static void AddAndConfigureMediatR(this IServiceCollection services)

@@ -16,6 +16,10 @@ export class UserService {
 
   public searchUser(searchTerm: string): Observable<AppUser[]> {
     const payload = {searchTerm: searchTerm};
-    return this.http.get<AppUser[]>(this.baseApiUrl + '/search-user' + '/' + searchTerm);
+    return this.http.get<AppUser[]>(this.baseApiUrl + '/search-user/' + searchTerm);
+  }
+
+  public getUserById(userId: string): Observable<AppUser> {
+    return this.http.get<AppUser>(this.baseApiUrl + '/get-user/' + userId);
   }
 }

@@ -1,4 +1,4 @@
-using Application.Features.User;
+using Application.Features.User.GetUserById;
 using Application.Features.User.SearchUser;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -17,9 +17,17 @@ public class UserController : Controller
     }
 
     [HttpGet("search-user/{searchTeam}")]
-    public async Task<IActionResult> GetUser(string searchTeam)
+    public async Task<IActionResult> GetUsers(string searchTeam)
     {
         var userList = await _mediator.Send(new SearchUserRequest(searchTeam));
         return Ok(userList);
     }
+
+    [HttpGet("get-user/{userId}")]
+    public async Task<IActionResult> GetUserById(Guid userId)
+    {
+        var user = await _mediator.Send(new GetUserByIdRequest(userId));
+        return Ok(user);
+    }
+
 }

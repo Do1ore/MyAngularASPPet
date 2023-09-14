@@ -1,6 +1,4 @@
 using Microsoft.AspNetCore.Http;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
 
 namespace Domain.MongoEntities.User;
 

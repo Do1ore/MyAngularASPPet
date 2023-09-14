@@ -1,6 +1,6 @@
 ﻿using Infrastructure.Abstraction.Services;
 
-namespace Infrastructure.Implementation.Services.PathLogic
+namespace Infrastructure.Implementation.Services
 {
     public class PathMasterService : IPathMasterService
     {

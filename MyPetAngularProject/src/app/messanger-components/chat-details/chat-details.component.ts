@@ -127,7 +127,7 @@ export class ChatDetailsComponent implements OnInit, OnChanges, AfterViewInit {
     this.signalRUserService.listenUserProfileImageUpdate((fileUrl, userId) => {
       this.userImageService.updateUserProfileImageUrl(fileUrl, userId);
       console.log('User image for user: ', userId, 'updated: ', fileUrl);
-    })
+    });
   }
 
 
@@ -157,10 +157,14 @@ export class ChatDetailsComponent implements OnInit, OnChanges, AfterViewInit {
       return;
     }
     this.chatService.getChatDetailsCaller(this.chatId);
-    this.chatService.getChatDetailsListener((chats) => this.chatModel = chats);
+    this.chatService.getChatDetailsListener(async (chats) => {
+      this.chatModel = chats;
+      await this.getUserProfileImages();
+    });
+
     console.log('getChatModel started')
     this.getChatProfileImage();
-    await this.getUserProfileImages();
+
   }
 
 

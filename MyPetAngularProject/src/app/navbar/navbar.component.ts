@@ -39,6 +39,7 @@ export class NavbarComponent implements OnInit {
     this.themeService.setUpThemes();
     this.authService.isAuthorized().subscribe((response) => {
       this._isAuthorized = response;
+      console.log('Auth subscription: ', response)
       if (response) {
         this.userId = this.storageHelper.getUserIdFromToken();
       }
